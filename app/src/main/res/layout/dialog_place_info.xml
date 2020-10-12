@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/textView_dialog_placeTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginLeft="22dp"
+        android:layout_marginStart="22dp"
+        android:layout_marginTop="26dp"
+        android:text="장소 이름" />
+
+    <EditText
+        android:id="@+id/editText_dialog_placeTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_marginLeft="37dp"
+        android:layout_marginStart="37dp"
+        android:layout_marginTop="16dp"
+        android:layout_toEndOf="@+id/textView_dialog_placeTitle"
+        android:layout_toRightOf="@+id/textView_dialog_placeTitle"
+        android:ems="10"
+        android:inputType="textPersonName"
+        android:text="" />
+
+    <TextView
+        android:id="@+id/textView_dialog_placeDesc"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/editText_dialog_placeTitle"
+        android:layout_marginTop="16dp"
+        android:layout_toLeftOf="@+id/editText_dialog_placeTitle"
+        android:layout_toStartOf="@+id/editText_dialog_placeTitle"
+        android:text="장소 설명" />
+
+    <EditText
+        android:id="@+id/editText_dialog_placeDesc"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/editText_dialog_placeTitle"
+        android:layout_alignStart="@+id/editText_dialog_placeTitle"
+        android:layout_below="@+id/editText_dialog_placeTitle"
+        android:ems="10"
+        android:inputType="textPersonName"
+        android:text="" />
+
+    <Button
+        android:id="@+id/button_dialog_placeInfo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignEnd="@+id/editText_dialog_placeDesc"
+        android:layout_alignRight="@+id/editText_dialog_placeDesc"
+        android:layout_below="@+id/editText_dialog_placeDesc"
+        android:layout_marginTop="26dp"
+        android:text="완료" />
+
+</RelativeLayout>

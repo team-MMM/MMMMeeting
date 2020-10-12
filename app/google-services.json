@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "341402809599",
+    "firebase_url": "https://mmm-meeting.firebaseio.com",
+    "project_id": "mmm-meeting",
+    "storage_bucket": "mmm-meeting.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:341402809599:android:d03af5ff1150b6a9d108ca",
+        "android_client_info": {
+          "package_name": "com.example.mmmmeeting"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "341402809599-pf04cgmhdsfrvfa32lo5kbjrm68uobqh.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.mmmmeeting",
+            "certificate_hash": "9db489ac4170dbe464e42053f6e41bfc27b56f73"
+          }
+        },
+        {
+          "client_id": "341402809599-vpcv59popblcatij37mhe3jgjm4j5kd1.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCoFtX8130oWSsFLpLQd_aKzih0sf0kL1Y"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "341402809599-vpcv59popblcatij37mhe3jgjm4j5kd1.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

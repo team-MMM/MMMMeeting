@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <include
+        layout="@layout/view_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="70dp">
+
+        <Button
+            android:id="@+id/btn_logout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:layout_marginRight="5dp"
+            android:layout_toLeftOf="@id/btn_revoke"
+            android:background="@color/common_google_signin_btn_text_dark_pressed"
+            android:text="로그아웃" />
+
+        <Button
+            android:id="@+id/btn_revoke"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:layout_marginRight="5dp"
+            android:layout_alignParentRight="true"
+            android:background="@color/common_google_signin_btn_text_dark_pressed"
+            android:text="회원 탈퇴" />
+
+
+
+
+    </RelativeLayout>
+
+    <ImageView
+        android:id="@+id/imageView2"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:src="@drawable/penguin" />
+
+
+    <Button
+        android:id="@+id/btn_memberInfo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:layout_gravity="center_horizontal|center_vertical"
+        android:background="@color/common_google_signin_btn_text_dark_pressed"
+        android:text="내 정보 수정" />
+
+    <Button
+        android:id="@+id/btn_checkMeeting"
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal|center_vertical"
+        android:layout_marginTop="10dp"
+        android:background="@color/common_google_signin_btn_text_dark_pressed"
+        android:text="나의 모임" />
+
+    <Button
+        android:id="@+id/btn_checkMap"
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal|center_vertical"
+        android:layout_marginTop="10dp"
+        android:background="@color/common_google_signin_btn_text_dark_pressed"
+        android:text="모임 지도" />
+
+
+</LinearLayout>
+

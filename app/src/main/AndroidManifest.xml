@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.example.mmmmeeting">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="우리 지금 만나"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme">
+
+        <activity android:name="com.example.mmmmeeting.activity.SignActivity">
+
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+
+        </activity>
+
+        <activity android:name="com.example.mmmmeeting.activity.BasicActivity"/>
+        <activity android:name="com.example.mmmmeeting.activity.EachMeetingActivity"/>
+        <activity android:name="com.example.mmmmeeting.activity.GalleryActivity"/>
+        <activity android:name="com.example.mmmmeeting.activity.MainActivity"/>
+        <activity android:name="com.example.mmmmeeting.activity.MakeMeetingActivity"/>
+        <activity android:name="com.example.mmmmeeting.activity.MeetingGridActivity"/>
+        <activity android:name="com.example.mmmmeeting.activity.WritePostActivity"/>
+        <activity android:name="com.example.mmmmeeting.activity.MemberInitActivity"/>
+    </application>
+
+</manifest>
