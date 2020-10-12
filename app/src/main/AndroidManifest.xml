@@ -2,7 +2,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.mmmmeeting">
 
-    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES"/>
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
 
     <application
         android:allowBackup="true"
@@ -11,6 +13,10 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyB0_yYCWRjfJoPOhDAPnZ4l2-mu6IbLbv0" />
 
         <activity android:name="com.example.mmmmeeting.activity.SignActivity">
 
@@ -30,6 +36,7 @@
         <activity android:name="com.example.mmmmeeting.activity.MeetingGridActivity"/>
         <activity android:name="com.example.mmmmeeting.activity.WritePostActivity"/>
         <activity android:name="com.example.mmmmeeting.activity.MemberInitActivity"/>
+        <activity android:name="com.example.mmmmeeting.activity.MapMainActivity"/>
     </application>
 
 </manifest>
