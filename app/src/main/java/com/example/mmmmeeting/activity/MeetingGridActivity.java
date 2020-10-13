@@ -23,7 +23,6 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 public class MeetingGridActivity extends AppCompatActivity implements View.OnClickListener {
-    private FirebaseAuth mAuth ;
     Button addMeeting;
     Button deleteMeeting;
     Button attendMeeting;
@@ -40,7 +39,6 @@ public class MeetingGridActivity extends AppCompatActivity implements View.OnCli
 
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-        mAuth = FirebaseAuth.getInstance();
         addMeeting = (Button) findViewById(R.id.meetingAdd);
         deleteMeeting = (Button) findViewById(R.id.meetingDelete);
         attendMeeting = (Button) findViewById(R.id.meetingAttend);
@@ -76,22 +74,6 @@ public class MeetingGridActivity extends AppCompatActivity implements View.OnCli
                         }
                     }
                 });
-
-
-        /* 선택하면 모임 화면으로 전환되게 하려고 했는데 안 됨..ㅠㅠ
-        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
-                Intent intent = new Intent(getApplicationContext(),EachMeetingActivity.class);
-                GridItems gridItem = (GridItems) adapter.getItem(position);
-                intent.putExtra("Name",gridItem.getName());
-                Log.d("getName",gridItem.getName());
-                intent.putExtra("Description",gridItem.getDescription());
-                startActivity(intent);
-            }
-        });
-
-         */
 
     }
 

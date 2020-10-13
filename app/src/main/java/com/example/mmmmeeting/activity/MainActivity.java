@@ -3,6 +3,8 @@ package com.example.mmmmeeting.activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 
@@ -17,7 +19,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 public class MainActivity extends BasicActivity implements View.OnClickListener {
     private FirebaseAuth mAuth;
     private FirebaseFirestore db;
-    Button btnRevoke, btnLogout, btnMemberInfo, btnMyMeeting, btnMyMap;
+    Button btnMyMeeting, btnMyMap;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -27,46 +29,52 @@ public class MainActivity extends BasicActivity implements View.OnClickListener 
 
         mAuth = FirebaseAuth.getInstance();
 
-        btnRevoke = (Button) findViewById(R.id.btn_revoke);
-        btnLogout = (Button) findViewById(R.id.btn_logout);
-        btnMemberInfo = (Button) findViewById(R.id.btn_memberInfo);
         btnMyMeeting = (Button) findViewById(R.id.btn_checkMeeting);
         btnMyMap = (Button) findViewById(R.id.btn_myMap);
 
-
-        btnRevoke.setOnClickListener(this);
-        btnLogout.setOnClickListener(this);
-        btnMemberInfo.setOnClickListener(this);
         btnMyMeeting.setOnClickListener(this);
         btnMyMap.setOnClickListener(this);
     }
+
+    //메뉴바 코드
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.setting,menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()){
+            case R.id.revoke:
+                revokeAccess();
+                finish();
+                return true;
+
+            case R.id.logout:
+                signOut();
+                finish();
+                return true;
+
+            case R.id.memberInfo:
+                myStartActivity(MemberInitActivity.class);
+                return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+    //
 
     private  void signOut(){
         FirebaseAuth.getInstance().signOut();
     }
 
-
-
     @Override
     public void onClick(View v) {
         switch(v.getId()){
-            case R.id.btn_revoke:
-                revokeAccess();
-                finish();
-                break;
-
-            case R.id.btn_logout:
-                signOut();
-                finish();
-                break;
-
 
             case R.id.btn_checkMeeting:
                 myStartActivity(MeetingGridActivity.class);
-                break;
-
-            case R.id.btn_memberInfo:
-                myStartActivity(MemberInitActivity.class);
                 break;
 
             // 지도 화면으로 이동
@@ -75,7 +83,6 @@ public class MainActivity extends BasicActivity implements View.OnClickListener 
                 break;
         }
     }
-
 
     private void revokeAccess() {
         db = FirebaseFirestore.getInstance();
