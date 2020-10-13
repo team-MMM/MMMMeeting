@@ -100,8 +100,8 @@ public class MeetingGridActivity extends BasicActivity implements View.OnClickLi
                 myStartActivity(MakeMeetingActivity.class);
                 break;
             case(R.id.meetingDelete):
-                // 삭제할 모임 선택
-                // 선택한 모임 삭제
+                myStartActivity(MeetingDeleteActivity.class);
+                finish();
                 break;
             case(R.id.meetingAttend):
                 myStartActivity(MeetingAttendActivity.class);
