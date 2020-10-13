@@ -1,33 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="@color/colorAccent"
+    android:background="@color/colorPrimary"
     >
         <TextView
             android:id="@+id/roomName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@color/colorAccent"
             android:clickable="true"
             style="@style/Widget.AppCompat.Button.Borderless"
-            android:textAlignment="center"
-            android:text=""
+            android:text="모임 이름"
             android:textStyle="bold"
-            android:textSize="20dp"
+            android:textSize="15sp"
             />
 
         <TextView
             android:id="@+id/roomDescription"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_margin="5dp"
-            android:gravity="center"
+            android:layout_below="@id/roomName"
+            android:layout_marginLeft="10sp"
+            android:layout_marginBottom="10sp"
             android:text="모임 설명"
-            android:textColor="#000000"
-            android:textSize="15dp"
+            android:textColor="@android:color/black"
+            android:textSize="10sp"
             />
-</LinearLayout>
+</RelativeLayout>

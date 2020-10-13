@@ -27,6 +27,7 @@ import com.google.firebase.firestore.QuerySnapshot;
 public class MeetingDeleteActivity extends AppCompatActivity implements View.OnClickListener {
 
     Button delete;
+    Button back3;
     FirebaseFirestore db = FirebaseFirestore.getInstance();
 
     @Override
@@ -34,9 +35,11 @@ public class MeetingDeleteActivity extends AppCompatActivity implements View.OnC
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_meeting_delete);
 
-        delete = (Button) findViewById(R.id.deleteBtn);
+        delete = findViewById(R.id.deleteBtn);
+        back3 = findViewById(R.id.backBtn3);
 
         delete.setOnClickListener(this);
+        back3.setOnClickListener(this);
     }
 
     @Override
@@ -44,6 +47,11 @@ public class MeetingDeleteActivity extends AppCompatActivity implements View.OnC
         switch (v.getId()){
             case R.id.deleteBtn:
                 checkCode();
+                break;
+
+            case R.id.backBtn3:
+                myStartActivity(MainActivity.class);
+                finish();
                 break;
         }
     }
@@ -63,7 +71,7 @@ public class MeetingDeleteActivity extends AppCompatActivity implements View.OnC
                     } else {
                         Log.d("Delete", "No Document");
                         startToast("존재하지 않는 코드입니다.");
-                        myStartActivity(MeetingGridActivity.class);
+                        myStartActivity(MainActivity.class);
                         finish();
                     }
                 } else {
@@ -90,13 +98,13 @@ public class MeetingDeleteActivity extends AppCompatActivity implements View.OnC
                                     userdel.update("userID", FieldValue.arrayRemove(user.getUid()));
                                     startToast("모임에서 탈퇴했습니다.");
                                     Log.d("Delete", document.getId() + " => " + document.getData());
-                                    myStartActivity(MeetingGridActivity.class);
+                                    myStartActivity(MainActivity.class);
                                     finish();
                                     break;
                                 } else {
                                     Log.d("Delete", "No Document");
                                     startToast("해당 모임에 가입되어 있지 않습니다.");
-                                    myStartActivity(MeetingGridActivity.class);
+                                    myStartActivity(MainActivity.class);
                                     finish();
                                 }
                             }

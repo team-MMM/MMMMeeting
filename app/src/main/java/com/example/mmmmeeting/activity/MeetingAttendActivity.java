@@ -24,6 +24,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 public class MeetingAttendActivity extends AppCompatActivity implements View.OnClickListener {
 
     Button attend;
+    Button back2;
     FirebaseFirestore db = FirebaseFirestore.getInstance();
 
     @Override
@@ -31,10 +32,10 @@ public class MeetingAttendActivity extends AppCompatActivity implements View.OnC
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_meeting_attend);
 
-        attend = (Button) findViewById(R.id.attendBtn);
-
+        attend = findViewById(R.id.attendBtn);
+        back2 = findViewById(R.id.backBtn2);
         attend.setOnClickListener(this);
-
+        back2.setOnClickListener(this);
     }
 
     @Override
@@ -43,6 +44,9 @@ public class MeetingAttendActivity extends AppCompatActivity implements View.OnC
             case R.id.attendBtn:
                 checkCode();
                 break;
+            case R.id.backBtn2:
+                myStartActivity(MainActivity.class);
+                finish();
         }
     }
     private void checkCode() {
@@ -61,7 +65,7 @@ public class MeetingAttendActivity extends AppCompatActivity implements View.OnC
                         Log.d("Attend", "No Document");
                         // 3. code 없으면 dialog or toast Message -> 존재하지 않음 알림
                         startToast("존재하지 않는 코드입니다.");
-                        myStartActivity(MeetingGridActivity.class);
+                        myStartActivity(MainActivity.class);
                         finish();
                     }
                 } else {
@@ -79,7 +83,7 @@ public class MeetingAttendActivity extends AppCompatActivity implements View.OnC
         DocumentReference newUser = db.collection("meetings").document(code);
         newUser.update("userID", FieldValue.arrayUnion(user.getUid()));
         startToast("새로운 모임에 참가했습니다.");
-        myStartActivity(MeetingGridActivity.class);
+        myStartActivity(MainActivity.class);
         finish();
     }
 

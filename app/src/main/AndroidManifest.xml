@@ -35,7 +35,6 @@
         <activity android:name=".activity.GalleryActivity" />
         <activity android:name=".activity.MainActivity" />
         <activity android:name=".activity.MakeMeetingActivity" />
-        <activity android:name=".activity.MeetingGridActivity" />
         <activity android:name=".activity.WritePostActivity" />
         <activity android:name=".activity.MemberInitActivity" />
         <activity android:name=".activity.MapPlaceActivity"/>
