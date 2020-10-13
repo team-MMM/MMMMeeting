@@ -16,7 +16,8 @@ com.example.mmmmeeting
 
 ***Firebase 팀 아이디 만들었어요!!
 
-아이디: mmmcapstone@gmail.com 비밀번호: (영어로)컴종설!
+아이디: mmmcapstone@gmail.com <br>
+비밀번호: (영어로)컴종설!
 
 *******FIREBASE 연동 안될 때 *********
 
