@@ -1,9 +1,9 @@
 <모임+지도 합친 최종 버전>
 
-Main에서 모임 지도 버튼 누르면 이동 <br>
-*MapPlaceActivity.java <br>
-*activity_map_place.xml <br>
-*dialog_place_info.xml <br>
+Main에서 모임 지도 버튼 누르면 이동
+* MapPlaceActivity.java
+* activity_map_place.xml
+* dialog_place_info.xml
 
 코드가 섞여 헷갈릴거 같아서 주석으로 소연이 코드 부분 표시함!
 
