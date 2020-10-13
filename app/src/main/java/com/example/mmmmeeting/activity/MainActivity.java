@@ -1,5 +1,6 @@
 package com.example.mmmmeeting.activity;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -65,14 +66,13 @@ public class MainActivity extends BasicActivity implements View.OnClickListener 
     }
     //
 
-    private  void signOut(){
+    public void signOut(){
         FirebaseAuth.getInstance().signOut();
     }
 
     @Override
     public void onClick(View v) {
         switch(v.getId()){
-
             case R.id.btn_checkMeeting:
                 myStartActivity(MeetingGridActivity.class);
                 break;
@@ -84,7 +84,7 @@ public class MainActivity extends BasicActivity implements View.OnClickListener 
         }
     }
 
-    private void revokeAccess() {
+    public void revokeAccess() {
         db = FirebaseFirestore.getInstance();
         mAuth.getCurrentUser().delete();
 
