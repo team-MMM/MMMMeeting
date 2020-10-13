@@ -37,7 +37,7 @@ public class SignActivity extends BasicActivity {
         setContentView(R.layout.activity_login);
         setToolbarTitle("우리 지금 만나");
 
-
+// branch test
 
         signInButton = findViewById(R.id.signInButton);
         mAuth = FirebaseAuth.getInstance();
