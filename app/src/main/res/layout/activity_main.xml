@@ -11,31 +11,61 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
-    <ImageView
-        android:id="@+id/imageView2"
+    <TextView
         android:layout_width="match_parent"
-        android:layout_height="200dp"
-        android:src="@drawable/penguin" />
+        android:layout_height="100dp"
+        android:gravity="center"
+        android:text="나의 모임 목록"
+        android:textColor="#000000"
+        android:textSize="24sp"
+        android:textStyle="bold" />
 
-
-    <Button
-        android:id="@+id/btn_checkMeeting"
-        android:layout_width="100dp"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal|center_vertical"
-        android:layout_marginTop="10dp"
-        android:background="@color/common_google_signin_btn_text_dark_pressed"
-        android:text="나의 모임" />
+        android:orientation="horizontal"
+        android:gravity="right">
 
-    <Button
-        android:id="@+id/btn_myMap"
-        android:layout_width="100dp"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal|center_vertical"
-        android:layout_marginTop="10dp"
-        android:background="@color/common_google_signin_btn_text_dark_pressed"
-        android:text="모임 지도" />
+        <Button
+            android:id="@+id/meetingAdd"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="모임 생성"
+            android:textColor="@android:color/holo_blue_light"
+            android:background="@drawable/button_shape"
+            android:layout_marginRight="10sp"
+             />
 
+        <Button
+            android:id="@+id/meetingAttend"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="모임 참가"
+            android:textColor="@android:color/holo_blue_light"
+            android:background="@drawable/button_shape"
+            android:layout_marginRight="10sp"
+            />
 
+        <Button
+            android:id="@+id/meetingDelete"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="모임 탈퇴"
+            android:textColor="@android:color/holo_blue_light"
+            android:background="@drawable/button_shape"
+            android:layout_marginRight="10sp"
+            />
+
+    </LinearLayout>
+
+    <GridView
+        android:id="@+id/gridView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:numColumns="3"
+        android:layout_margin="20sp"
+        android:horizontalSpacing="20sp"
+        android:verticalSpacing="20sp"
+        />
 </LinearLayout>
 
