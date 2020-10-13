@@ -76,7 +76,7 @@ public class MapPlaceActivity extends AppCompatActivity
 
     //소연 코드 변수들
 
-    private static final String API_KEY="AIzaSyB0_yYCWRjfJoPOhDAPnZ4l2-mu6IbLbv0";
+    private static final String API_KEY="";
 
     private static final String TAG = "googlemap_example";
     private static final int GPS_ENABLE_REQUEST_CODE = 2001;
