@@ -1,6 +1,6 @@
 <모임+지도 합친 최종 버전>
 
-Main에서 모임 지도 버튼 누르면 이동
+Main에서 모임 지도 버튼 누르면 이동 <br>
 -MapPlaceActivity.java
 -activity_map_place.xml
 -dialog_place_info.xml
@@ -10,9 +10,6 @@ Main에서 모임 지도 버튼 누르면 이동
 // dev branch 코드 변경
 * 모임 참가, 모임 탈퇴 버튼 동작 (코드 입력시 해당 코드 모임 참가 / 탈퇴)
 * 모임방 클릭시 (grid item 클릭시) 모임 방 내부로 들어가기 동작
-
-
-
 <br><br>
 ***************************************************************************
 com.example.mmmmeeting
