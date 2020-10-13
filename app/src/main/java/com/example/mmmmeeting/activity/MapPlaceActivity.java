@@ -76,7 +76,8 @@ public class MapPlaceActivity extends AppCompatActivity
 
     //소연 코드 변수들
 
-    private static final String API_KEY="AIzaSyB0_yYCWRjfJoPOhDAPnZ4l2-mu6IbLbv0";
+    private static final String API_KEY="AIzaSyCaoVruvFz2VBzyFMTWi9c9UTK2cgp13xM";
+
     private static final String TAG = "googlemap_example";
     private static final int GPS_ENABLE_REQUEST_CODE = 2001;
     private static final int UPDATE_INTERVAL_MS = 1000;  // 1초
@@ -328,7 +329,7 @@ public class MapPlaceActivity extends AppCompatActivity
         }
     }
 
-    //여기까지
+
 
     public String showInfo(LatLng depart, LatLng arrival){
 
@@ -374,6 +375,7 @@ public class MapPlaceActivity extends AppCompatActivity
 
 
     }
+    //여기까지
 
 
     void show() //카테고리 보여주기
