@@ -60,7 +60,7 @@ public class MakeMeetingActivity extends BasicActivity implements View.OnClickLi
                                 addMeetingCode();
 
                                 startToast("미팅 생성에 성공하였습니다.");
-                                myStartActivity(MeetingGridActivity.class);
+                                myStartActivity(MainActivity.class);
                                 finish();
                             }
                         })

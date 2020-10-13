@@ -61,7 +61,7 @@ public class MeetingAttendActivity extends AppCompatActivity implements View.OnC
                         Log.d("Attend", "No Document");
                         // 3. code 없으면 dialog or toast Message -> 존재하지 않음 알림
                         startToast("존재하지 않는 코드입니다.");
-                        myStartActivity(MeetingGridActivity.class);
+                        myStartActivity(MainActivity.class);
                         finish();
                     }
                 } else {
@@ -79,7 +79,7 @@ public class MeetingAttendActivity extends AppCompatActivity implements View.OnC
         DocumentReference newUser = db.collection("meetings").document(code);
         newUser.update("userID", FieldValue.arrayUnion(user.getUid()));
         startToast("새로운 모임에 참가했습니다.");
-        myStartActivity(MeetingGridActivity.class);
+        myStartActivity(MainActivity.class);
         finish();
     }
 
