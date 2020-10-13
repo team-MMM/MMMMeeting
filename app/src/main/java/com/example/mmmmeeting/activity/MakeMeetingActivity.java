@@ -19,14 +19,16 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 public class MakeMeetingActivity extends BasicActivity implements View.OnClickListener {
     Button makeMeeting;
-
+    Button back1;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_make_meeting);
         makeMeeting = findViewById(R.id.makeMeetingBtn);
+        back1 = findViewById(R.id.backBtn1);
 
         makeMeeting.setOnClickListener(this);
+        back1.setOnClickListener(this);
     }
 
     @Override
@@ -34,6 +36,11 @@ public class MakeMeetingActivity extends BasicActivity implements View.OnClickLi
         switch (v.getId()){
             case R.id.makeMeetingBtn:
                 meetingUpdate();
+                break;
+
+            case R.id.backBtn1:
+                myStartActivity(MainActivity.class);
+                finish();
                 break;
         }
 

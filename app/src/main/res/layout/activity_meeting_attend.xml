@@ -38,20 +38,20 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="20sp"
-            android:padding="20sp"
+            android:padding="10sp"
             android:text="모임 참가"
             android:background="@drawable/button_shape"
-            android:textSize="20sp" />
+             />
 
         <Button
-            android:id="@+id/backBtn1"
+            android:id="@+id/backBtn2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="20sp"
-            android:padding="20sp"
+            android:padding="10sp"
             android:text="뒤로가기"
             android:background="@drawable/button_shape"
-            android:textSize="20sp" />
+             />
 
     </LinearLayout>
 

@@ -146,6 +146,7 @@ public class MainActivity extends BasicActivity implements View.OnClickListener 
         switch (v.getId()){
             case (R.id.meetingAdd):
                 myStartActivity(MakeMeetingActivity.class);
+                finish();
                 break;
             case(R.id.meetingDelete):
                 myStartActivity(MeetingDeleteActivity.class);

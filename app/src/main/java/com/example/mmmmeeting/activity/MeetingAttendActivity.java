@@ -24,7 +24,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 public class MeetingAttendActivity extends AppCompatActivity implements View.OnClickListener {
 
     Button attend;
-    Button back1;
+    Button back2;
     FirebaseFirestore db = FirebaseFirestore.getInstance();
 
     @Override
@@ -33,9 +33,9 @@ public class MeetingAttendActivity extends AppCompatActivity implements View.OnC
         setContentView(R.layout.activity_meeting_attend);
 
         attend = findViewById(R.id.attendBtn);
-        back1 = findViewById(R.id.backBtn1);
+        back2 = findViewById(R.id.backBtn2);
         attend.setOnClickListener(this);
-        back1.setOnClickListener(this);
+        back2.setOnClickListener(this);
     }
 
     @Override
@@ -44,7 +44,7 @@ public class MeetingAttendActivity extends AppCompatActivity implements View.OnC
             case R.id.attendBtn:
                 checkCode();
                 break;
-            case R.id.backBtn1:
+            case R.id.backBtn2:
                 myStartActivity(MainActivity.class);
                 finish();
         }

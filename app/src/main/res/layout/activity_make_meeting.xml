@@ -22,7 +22,7 @@
         android:layout_height="wrap_content"
         android:layout_margin="20sp"
         android:ems="10"
-        android:hint="모임 이름을 입력해주세요."
+        android:hint="모임 이름"
         android:inputType="textPersonName" />
 
     <EditText
@@ -31,17 +31,35 @@
         android:layout_height="wrap_content"
         android:layout_margin="20sp"
         android:ems="10"
-        android:hint="모임 설명을 입력해주세요."
+        android:hint="모임 설명"
         android:inputType="textPersonName" />
 
-    <Button
-        android:id="@+id/makeMeetingBtn"
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="입력"
-        android:padding="20sp"
-        android:layout_margin="20sp"
-        android:background="@drawable/button_shape"
-        android:textSize="20sp"/>
+        android:gravity="center">
+
+        <Button
+            android:id="@+id/makeMeetingBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="입력"
+            android:padding="10sp"
+            android:layout_margin="20sp"
+            android:background="@drawable/button_shape"
+            />
+
+        <Button
+            android:id="@+id/backBtn1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="20sp"
+            android:padding="10sp"
+            android:text="뒤로가기"
+            android:background="@drawable/button_shape"
+            />
+
+    </LinearLayout>
+
 
 </LinearLayout>
