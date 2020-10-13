@@ -18,15 +18,13 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 public class MakeMeetingActivity extends BasicActivity implements View.OnClickListener {
-    private FirebaseAuth mAuth ;
     Button makeMeeting;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_make_meeting);
-        mAuth = FirebaseAuth.getInstance();
-        makeMeeting = (Button) findViewById(R.id.makeMeetingBtn);
+        makeMeeting = findViewById(R.id.makeMeetingBtn);
 
         makeMeeting.setOnClickListener(this);
     }
@@ -57,8 +55,6 @@ public class MakeMeetingActivity extends BasicActivity implements View.OnClickLi
                         .addOnSuccessListener(new OnSuccessListener<Void>() {
                             @Override
                             public void onSuccess(Void aVoid) {
-                                addMeetingCode();
-
                                 startToast("미팅 생성에 성공하였습니다.");
                                 myStartActivity(MainActivity.class);
                                 finish();
@@ -74,11 +70,6 @@ public class MakeMeetingActivity extends BasicActivity implements View.OnClickLi
                 startToast("회원정보를 입력해주세요.");
             }
         }
-    }
-
-    private void addMeetingCode() {
-        //member 정보에 모임 코드 추가
-
     }
 
     private void startToast(String msg){
