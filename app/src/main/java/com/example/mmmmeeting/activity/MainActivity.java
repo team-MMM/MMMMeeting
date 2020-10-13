@@ -31,7 +31,7 @@ public class MainActivity extends BasicActivity implements View.OnClickListener 
         btnLogout = (Button) findViewById(R.id.btn_logout);
         btnMemberInfo = (Button) findViewById(R.id.btn_memberInfo);
         btnMyMeeting = (Button) findViewById(R.id.btn_checkMeeting);
-        btnMyMap = (Button) findViewById(R.id.btn_checkMap);
+        btnMyMap = (Button) findViewById(R.id.btn_myMap);
 
 
         btnRevoke.setOnClickListener(this);
@@ -70,8 +70,8 @@ public class MainActivity extends BasicActivity implements View.OnClickListener 
                 break;
 
             // 지도 화면으로 이동
-            case R.id.btn_checkMap:
-                myStartActivity(MapMainActivity.class);
+            case R.id.btn_myMap:
+                myStartActivity(MapPlaceActivity.class);
                 break;
         }
     }

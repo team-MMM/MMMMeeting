@@ -11,6 +11,7 @@ import android.widget.LinearLayout;
 import androidx.annotation.Nullable;
 
 import com.bumptech.glide.Glide;
+import com.example.mmmmeeting.R;
 
 public class ContentsItemView extends LinearLayout {
     private ImageView imageView;

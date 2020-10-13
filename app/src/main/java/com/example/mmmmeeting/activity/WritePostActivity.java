@@ -1,6 +1,5 @@
 package com.example.mmmmeeting.activity;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -14,9 +13,9 @@ import android.widget.RelativeLayout;
 import androidx.annotation.NonNull;
 
 import com.bumptech.glide.Glide;
-import com.example.mmmmeeting.R;
 import com.example.mmmmeeting.ContentsItemView;
 import com.example.mmmmeeting.Info.PostInfo;
+import com.example.mmmmeeting.R;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
@@ -101,7 +100,7 @@ public class WritePostActivity extends BasicActivity {
         super.onActivityResult(requestCode, resultCode, data);
         switch (requestCode) {
             case 0:
-                if (resultCode == Activity.RESULT_OK) {
+                if (resultCode == RESULT_OK) {
                     String path = data.getStringExtra(INTENT_PATH);
                     pathList.add(path);
 
@@ -131,7 +130,7 @@ public class WritePostActivity extends BasicActivity {
                 }
                 break;
             case 1:
-                if (resultCode == Activity.RESULT_OK) {
+                if (resultCode == RESULT_OK) {
                     String path = data.getStringExtra(INTENT_PATH);
                     pathList.set(parent.indexOfChild((View) selectedImageVIew.getParent()) - 1, path);
                     Glide.with(this).load(path).override(1000).into(selectedImageVIew);
@@ -285,7 +284,7 @@ public class WritePostActivity extends BasicActivity {
                         loaderLayout.setVisibility(View.GONE);
                         Intent resultIntent = new Intent();
                         resultIntent.putExtra("postinfo", postInfo);
-                        setResult(Activity.RESULT_OK, resultIntent);
+                        setResult(RESULT_OK, resultIntent);
                         finish();
                     }
                 })

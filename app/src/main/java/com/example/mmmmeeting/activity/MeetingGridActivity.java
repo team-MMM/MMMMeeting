@@ -11,8 +11,8 @@ import android.widget.GridView;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.mmmmeeting.R;
 import com.example.mmmmeeting.Info.GridItems;
+import com.example.mmmmeeting.R;
 import com.example.mmmmeeting.adapter.GridListAdapter;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;

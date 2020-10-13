@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.example.mmmmeeting">
+
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+    <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES" />
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <application
         android:allowBackup="true"
@@ -8,8 +14,14 @@
         android:label="우리 지금 만나"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
-        <activity android:name=".activity.MeetingDeleteActivity"></activity>
+        android:theme="@style/AppTheme"
+        tools:replace="android:allowBackup,android:label">
+
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyDGHEER3zfPOuW0-yj2kw609KTERmsCnfw" />
+
+        <activity android:name=".activity.MeetingDeleteActivity"/>
         <activity android:name=".activity.MeetingAttendActivity" />
         <activity android:name=".activity.SignActivity">
             <intent-filter>
@@ -26,15 +38,9 @@
         <activity android:name=".activity.MeetingGridActivity" />
         <activity android:name=".activity.WritePostActivity" />
         <activity android:name=".activity.MemberInitActivity" />
-        <activity android:name=".activity.MapMainActivity" />
+        <activity android:name=".activity.MapPlaceActivity"/>
 
-        <meta-data
-            android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyB0_yYCWRjfJoPOhDAPnZ4l2-mu6IbLbv0" />
     </application>
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-    <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES" />
 
-    <uses-permission android:name="android.permission.INTERNET" />
 
 </manifest>
