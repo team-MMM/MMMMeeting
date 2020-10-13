@@ -76,7 +76,7 @@ public class MapPlaceActivity extends AppCompatActivity
 
     //소연 코드 변수들
 
-    private static final String API_KEY="AIzaSyCaoVruvFz2VBzyFMTWi9c9UTK2cgp13xM";
+    private static final String API_KEY="AIzaSyB0_yYCWRjfJoPOhDAPnZ4l2-mu6IbLbv0";
 
     private static final String TAG = "googlemap_example";
     private static final int GPS_ENABLE_REQUEST_CODE = 2001;
@@ -179,7 +179,7 @@ public class MapPlaceActivity extends AppCompatActivity
         switch(category){//카테고리별 검색
             case 0: new NRPlaces.Builder()
                     .listener(MapPlaceActivity.this)
-                    .key("AIzaSyCaoVruvFz2VBzyFMTWi9c9UTK2cgp13xM")
+                    .key(API_KEY)
                     .latlng(location.latitude, location.longitude)//현재 위치
                     .radius(500) //500 미터 내에서 검색
                     .build()
@@ -187,7 +187,7 @@ public class MapPlaceActivity extends AppCompatActivity
                 break;
             case 1: new NRPlaces.Builder()
                     .listener(MapPlaceActivity.this)
-                    .key("AIzaSyCaoVruvFz2VBzyFMTWi9c9UTK2cgp13xM")
+                    .key(API_KEY)
                     .latlng(location.latitude, location.longitude)//현재 위치
                     .radius(500) //500 미터 내에서 검색
                     .type(PlaceType.RESTAURANT) //음식점
@@ -196,7 +196,7 @@ public class MapPlaceActivity extends AppCompatActivity
                 break;
             case 2: new NRPlaces.Builder()
                     .listener(MapPlaceActivity.this)
-                    .key("AIzaSyCaoVruvFz2VBzyFMTWi9c9UTK2cgp13xM")
+                    .key(API_KEY)
                     .latlng(location.latitude, location.longitude)//현재 위치
                     .radius(500) //500 미터 내에서 검색
                     .type(PlaceType.CAFE) //카페
@@ -205,7 +205,7 @@ public class MapPlaceActivity extends AppCompatActivity
                 break;
             case 3: new NRPlaces.Builder()
                     .listener(MapPlaceActivity.this)
-                    .key("AIzaSyCaoVruvFz2VBzyFMTWi9c9UTK2cgp13xM")
+                    .key(API_KEY)
                     .latlng(location.latitude, location.longitude)//현재 위치
                     .radius(500) //500 미터 내에서 검색
                     .type(PlaceType.BUS_STATION) //버스 정류장
@@ -214,7 +214,7 @@ public class MapPlaceActivity extends AppCompatActivity
                 break;
             case 4: new NRPlaces.Builder()
                     .listener(MapPlaceActivity.this)
-                    .key("AIzaSyCaoVruvFz2VBzyFMTWi9c9UTK2cgp13xM")
+                    .key(API_KEY)
                     .latlng(location.latitude, location.longitude)//현재 위치
                     .radius(500) //500 미터 내에서 검색
                     .type(PlaceType.BANK) //은행
@@ -223,7 +223,7 @@ public class MapPlaceActivity extends AppCompatActivity
                 break;
             case 5: new NRPlaces.Builder()
                     .listener(MapPlaceActivity.this)
-                    .key("AIzaSyCaoVruvFz2VBzyFMTWi9c9UTK2cgp13xM")
+                    .key(API_KEY)
                     .latlng(location.latitude, location.longitude)//현재 위치
                     .radius(500) //500 미터 내에서 검색
                     .type(PlaceType.PARK) //공원
