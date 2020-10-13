@@ -37,7 +37,6 @@ public class SignActivity extends BasicActivity {
         setContentView(R.layout.activity_login);
         setToolbarTitle("우리 지금 만나");
 
-// branch test
 
         signInButton = findViewById(R.id.signInButton);
         mAuth = FirebaseAuth.getInstance();
@@ -45,6 +44,7 @@ public class SignActivity extends BasicActivity {
         if (mAuth.getCurrentUser() != null) {
             Intent intent = new Intent(getApplication(), MainActivity.class);
             startActivity(intent);
+            finish();
         }
 
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)

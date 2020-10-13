@@ -104,8 +104,8 @@ public class MeetingGridActivity extends BasicActivity implements View.OnClickLi
                 // 선택한 모임 삭제
                 break;
             case(R.id.meetingAttend):
-                // 모임 코드 입력창
-                // 모임에 user 추가
+                myStartActivity(MeetingAttendActivity.class);
+                finish();
                 break;
 
         }
