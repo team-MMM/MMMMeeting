@@ -4,10 +4,12 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.GridView;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.mmmmeeting.R;
 import com.example.mmmmeeting.Info.GridItems;
@@ -20,7 +22,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
-public class MeetingGridActivity extends BasicActivity implements View.OnClickListener {
+public class MeetingGridActivity extends AppCompatActivity implements View.OnClickListener {
     private FirebaseAuth mAuth ;
     Button addMeeting;
     Button deleteMeeting;
@@ -100,12 +102,12 @@ public class MeetingGridActivity extends BasicActivity implements View.OnClickLi
                 myStartActivity(MakeMeetingActivity.class);
                 break;
             case(R.id.meetingDelete):
-                // 삭제할 모임 선택
-                // 선택한 모임 삭제
+                myStartActivity(MeetingDeleteActivity.class);
+                finish();
                 break;
             case(R.id.meetingAttend):
-                // 모임 코드 입력창
-                // 모임에 user 추가
+                myStartActivity(MeetingAttendActivity.class);
+                finish();
                 break;
 
         }

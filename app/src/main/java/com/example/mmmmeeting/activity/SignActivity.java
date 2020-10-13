@@ -38,13 +38,13 @@ public class SignActivity extends BasicActivity {
         setToolbarTitle("우리 지금 만나");
 
 
-
         signInButton = findViewById(R.id.signInButton);
         mAuth = FirebaseAuth.getInstance();
 
         if (mAuth.getCurrentUser() != null) {
             Intent intent = new Intent(getApplication(), MainActivity.class);
             startActivity(intent);
+            finish();
         }
 
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
