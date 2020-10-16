@@ -5,7 +5,6 @@ import java.util.ArrayList;
 public class MemberInfo {
     private String name;
     private String address;
-    private ArrayList<Integer> meetingCode;
 
     public MemberInfo(String name,String address){
         this.name = name;
@@ -26,14 +25,6 @@ public class MemberInfo {
 
     public void setAddress(String address){
         this.address = address;
-    }
-
-    public String getMeetingCode(){
-        return this.address;
-    }
-
-    public void setMeetingCode(Integer meetingCode){
-        this.meetingCode.add(meetingCode);
     }
 
 }

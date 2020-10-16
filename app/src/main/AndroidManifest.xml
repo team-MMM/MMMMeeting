@@ -3,12 +3,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.example.mmmmeeting">
 
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
-    <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES" />
-    <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -18,12 +12,10 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:replace="android:allowBackup,android:label">
+        <activity android:name=".activity.inviteActivity"></activity>
 
-        <meta-data
-            android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyDGHEER3zfPOuW0-yj2kw609KTERmsCnfw" />
+        <activity android:name=".activity.MeetingDeleteActivity" />
 
-        <activity android:name=".activity.MeetingDeleteActivity"/>
         <activity android:name=".activity.MeetingAttendActivity" />
         <activity android:name=".activity.SignActivity">
             <intent-filter>
@@ -33,17 +25,24 @@
             </intent-filter>
         </activity>
         <activity android:name=".activity.BasicActivity" />
-        <activity android:name=".activity.EachMeetingActivity" />
-        <activity android:name=".activity.MeetingActivity"/>
+        <activity android:name=".activity.MeetingActivity" />
         <activity android:name=".activity.GalleryActivity" />
         <activity android:name=".activity.MainActivity" />
         <activity android:name=".activity.MakeMeetingActivity" />
         <activity android:name=".activity.WritePostActivity" />
         <activity android:name=".activity.MemberInitActivity" />
-        <activity android:name=".activity.MapPlaceActivity"/>
-        <activity android:name=".activity.PostActivity"/>
-
+        <activity android:name=".activity.MapPlaceActivity" />
+        <activity android:name=".activity.PostActivity" />
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyDGHEER3zfPOuW0-yj2kw609KTERmsCnfw" />
     </application>
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.SEND_SMS" />
 
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
 </manifest>

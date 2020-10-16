@@ -13,7 +13,6 @@ import android.widget.Toast;
 
 import com.example.mmmmeeting.R;
 import com.example.mmmmeeting.Info.GridItems;
-import com.example.mmmmeeting.activity.EachMeetingActivity;
 import com.example.mmmmeeting.activity.MeetingActivity;
 
 import java.util.ArrayList;
