@@ -1,7 +1,11 @@
 package com.example.mmmmeeting.activity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -20,16 +24,42 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 public class MeetingActivity extends AppCompatActivity {
 
     private BottomNavigationView bottomNavigationView;
+    TextView name, description;
+    Button invite;
+
     private FragmentManager fm;
     private FragmentTransaction ft;
     private FragCalendar fragCalendar;
     private FragPhoto fragPhoto;
     private FragAlarm fragAlarm;
     private FragAccount fragAccount;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.frag_main);
+
+        name = (TextView) findViewById(R.id.name);
+        description = (TextView) findViewById(R.id.description);
+        invite = (Button) findViewById(R.id.inviteBtn);
+
+        Intent intent = getIntent();
+        String meetingname = intent.getExtras().getString("Name");
+        String meetingdescription = intent.getExtras().getString("Description");
+
+        name.setText(meetingname);
+        description.setText(meetingdescription);
+        invite.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MeetingActivity.this,inviteActivity.class);
+                intent.addFlags(intent.FLAG_ACTIVITY_CLEAR_TOP);
+                intent.putExtra("Name",meetingname);
+                intent.putExtra("Description",meetingdescription);
+                startActivity(intent);
+            }
+        });
+
 
         FragHome fragHome = new FragHome();
         getSupportFragmentManager().beginTransaction()
@@ -98,4 +128,5 @@ public class MeetingActivity extends AppCompatActivity {
                 break;
         }
     }
+
 }

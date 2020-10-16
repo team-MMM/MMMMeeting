@@ -6,6 +6,39 @@
     android:layout_height="match_parent"
     tools:context=".activity.MeetingActivity">
 
+    <TextView
+        android:id="@+id/name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="35sp"
+        android:text="name"
+        android:textStyle="bold"
+        android:layout_margin="10sp"
+        android:textColor="@color/fui_bgFacebook"
+        />
+
+    <TextView
+        android:id="@+id/description"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@+id/name"
+        android:layout_alignBottom="@+id/name"
+        android:layout_margin="10sp"
+        android:textSize="15sp"
+        android:text="description"
+        />
+
+    <Button
+        android:id="@+id/inviteBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignRight="@id/main_frame"
+        android:layout_alignBottom="@+id/name"
+        android:padding="10sp"
+        android:layout_marginRight="10sp"
+        android:background="@drawable/button_shape"
+        android:text="초대하기"
+        android:textSize="15sp"/>
 
     <FrameLayout
         android:id="@+id/main_frame"
