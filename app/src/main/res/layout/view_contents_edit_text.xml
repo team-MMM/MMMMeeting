@@ -8,3 +8,4 @@
     android:gravity="top"
     android:hint="내용"
     android:inputType="textMultiLine" />
+

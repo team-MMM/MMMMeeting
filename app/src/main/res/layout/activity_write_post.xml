@@ -101,12 +101,6 @@
                     android:text="이미지 수정" />
 
                 <Button
-                    android:id="@+id/videoModify"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="비디오 수정" />
-
-                <Button
                     android:id="@+id/delete"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"

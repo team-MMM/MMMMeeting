@@ -13,7 +13,7 @@ import android.widget.RelativeLayout;
 import androidx.annotation.NonNull;
 
 import com.bumptech.glide.Glide;
-import com.example.mmmmeeting.ContentsItemView;
+import com.example.mmmmeeting.view.ContentsItemView;
 import com.example.mmmmeeting.Info.PostInfo;
 import com.example.mmmmeeting.R;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -40,7 +40,6 @@ import static com.example.mmmmeeting.Util.INTENT_MEDIA;
 import static com.example.mmmmeeting.Util.INTENT_PATH;
 import static com.example.mmmmeeting.Util.isImageFile;
 import static com.example.mmmmeeting.Util.isStorageUrl;
-import static com.example.mmmmeeting.Util.isVideoFile;
 import static com.example.mmmmeeting.Util.showToast;
 import static com.example.mmmmeeting.Util.storageUrlToName;
 
@@ -74,7 +73,6 @@ public class WritePostActivity extends BasicActivity {
         findViewById(R.id.check).setOnClickListener(onClickListener);
         findViewById(R.id.image).setOnClickListener(onClickListener);
         findViewById(R.id.imageModify).setOnClickListener(onClickListener);
-        findViewById(R.id.videoModify).setOnClickListener(onClickListener);
         findViewById(R.id.delete).setOnClickListener(onClickListener);
 
         buttonsBackgroundLayout.setOnClickListener(onClickListener);
@@ -158,10 +156,6 @@ public class WritePostActivity extends BasicActivity {
                     myStartActivity(GalleryActivity.class, GALLERY_IMAGE, 1);
                     buttonsBackgroundLayout.setVisibility(View.GONE);
                     break;
-                case R.id.videoModify:
-                    myStartActivity(GalleryActivity.class, GALLERY_VIDEO, 1);
-                    buttonsBackgroundLayout.setVisibility(View.GONE);
-                    break;
                 case R.id.delete:
                     final View selectedView = (View) selectedImageVIew.getParent();
                     String path = pathList.get(parent.indexOfChild(selectedView) - 1);
@@ -228,8 +222,6 @@ public class WritePostActivity extends BasicActivity {
                         contentsList.add(path);
                         if(isImageFile(path)){
                             formatList.add("image");
-                        }else if (isVideoFile(path)){
-                            formatList.add("video");
                         }else{
                             formatList.add("text");
                         }

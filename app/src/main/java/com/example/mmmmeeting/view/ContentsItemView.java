@@ -1,4 +1,4 @@
-package com.example.mmmmeeting;
+package com.example.mmmmeeting.view;
 
 import android.content.Context;
 import android.util.AttributeSet;

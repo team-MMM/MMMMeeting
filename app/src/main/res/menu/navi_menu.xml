@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/menu_home"
+        android:enabled="true"
+        android:icon="@drawable/menu_home"
+        android:title="홈"/>
+
+    <item
+        android:id="@+id/menu_calendar"
+        android:enabled="true"
+        android:icon="@drawable/menu_calendar"
+        android:title="캘린더"/>
+
+    <item
+        android:id="@+id/menu_photo"
+        android:enabled="true"
+        android:icon="@drawable/menu_photo"
+        android:title="사진"/>
+
+    <item
+        android:id="@+id/menu_alarm"
+        android:enabled="true"
+        android:icon="@drawable/menu_alarm"
+        android:title="지각자"/>
+
+    <item
+        android:id="@+id/menu_account"
+        android:enabled="true"
+        android:icon="@drawable/menu_account"
+        android:title="정산"/>
+
+
+</menu>

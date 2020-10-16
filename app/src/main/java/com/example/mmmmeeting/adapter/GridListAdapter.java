@@ -14,6 +14,7 @@ import android.widget.Toast;
 import com.example.mmmmeeting.R;
 import com.example.mmmmeeting.Info.GridItems;
 import com.example.mmmmeeting.activity.EachMeetingActivity;
+import com.example.mmmmeeting.activity.MeetingActivity;
 
 import java.util.ArrayList;
 
@@ -64,7 +65,7 @@ public class GridListAdapter extends BaseAdapter {
             @Override
             public void onClick(View v) {
                 //Toast.makeText(context, "동작 확인 : "+listItem.getName(), Toast.LENGTH_SHORT).show();
-                Intent intent = new Intent(context, EachMeetingActivity.class);
+                Intent intent = new Intent(context, MeetingActivity.class);
                 intent.putExtra("Name",listItem.getName());
                 Log.d("getName",listItem.getName());
                 intent.putExtra("Description",listItem.getDescription());

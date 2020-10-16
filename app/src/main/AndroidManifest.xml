@@ -7,11 +7,13 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
     <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES" />
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="우리 지금 만나"
+        android:requestLegacyExternalStorage="true"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
@@ -32,12 +34,14 @@
         </activity>
         <activity android:name=".activity.BasicActivity" />
         <activity android:name=".activity.EachMeetingActivity" />
+        <activity android:name=".activity.MeetingActivity"/>
         <activity android:name=".activity.GalleryActivity" />
         <activity android:name=".activity.MainActivity" />
         <activity android:name=".activity.MakeMeetingActivity" />
         <activity android:name=".activity.WritePostActivity" />
         <activity android:name=".activity.MemberInitActivity" />
         <activity android:name=".activity.MapPlaceActivity"/>
+        <activity android:name=".activity.PostActivity"/>
 
     </application>
 
