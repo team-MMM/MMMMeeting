@@ -72,6 +72,20 @@ public class MeetingInfoActivity extends AppCompatActivity {
 
         codeFind(meetingname);
 
+        code.setOnTouchListener(new View.OnTouchListener(){ //터치 이벤트 리스너 등록(누를때)
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if(event.getAction()==MotionEvent.ACTION_DOWN){ //눌렀을 때 동작
+                    //클립보드 사용 코드
+                    ClipboardManager clipboardManager = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+                    ClipData clipData = ClipData.newPlainText("Code",code.getText().toString()); //클립보드에 ID라는 이름표로 id 값을 복사하여 저장
+                    Toast.makeText(MeetingInfoActivity.this, "모임코드가 복사되었습니다.", Toast.LENGTH_SHORT).show();
+                    clipboardManager.setPrimaryClip(clipData);
+                }
+                return true;
+            }
+        });
+
     }
 
     private void codeFind(String meetingname) {
