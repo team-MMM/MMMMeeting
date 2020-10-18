@@ -1,7 +1,8 @@
 package com.example.mmmmeeting.activity;
-
+//AppCompatActivity
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -21,12 +22,9 @@ import com.example.mmmmeeting.fragment.FragHome;
 import com.example.mmmmeeting.fragment.FragPhoto;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
-public class MeetingActivity extends AppCompatActivity {
+public class MeetingActivity extends BasicActivity {
 
     private BottomNavigationView bottomNavigationView;
-    TextView name, description;
-    Button invite;
-
     private FragmentManager fm;
     private FragmentTransaction ft;
     private FragCalendar fragCalendar;
@@ -39,27 +37,7 @@ public class MeetingActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.frag_main);
 
-        name = (TextView) findViewById(R.id.name);
-        description = (TextView) findViewById(R.id.description);
-        invite = (Button) findViewById(R.id.inviteBtn);
-
-        Intent intent = getIntent();
-        String meetingname = intent.getExtras().getString("Name");
-        String meetingdescription = intent.getExtras().getString("Description");
-
-        name.setText(meetingname);
-        description.setText(meetingdescription);
-        invite.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(MeetingActivity.this,inviteActivity.class);
-                intent.addFlags(intent.FLAG_ACTIVITY_CLEAR_TOP);
-                intent.putExtra("Name",meetingname);
-                intent.putExtra("Description",meetingdescription);
-                startActivity(intent);
-            }
-        });
-
+        setToolbarTitle(getIntent().getExtras().getString("Name"));
 
         FragHome fragHome = new FragHome();
         getSupportFragmentManager().beginTransaction()
@@ -93,6 +71,29 @@ public class MeetingActivity extends AppCompatActivity {
 
 
     }
+
+    //메뉴바 코드
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.meetinginfo,menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()){
+            case R.id.meetingInfo:
+                Intent intent = new Intent(MeetingActivity.this, MeetingInfoActivity.class);
+                intent.addFlags(intent.FLAG_ACTIVITY_CLEAR_TOP);
+                intent.putExtra("Name",getIntent().getExtras().getString("Name"));
+                intent.putExtra("Description",getIntent().getExtras().getString("Description"));
+                startActivity(intent);
+                return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+    //
 
     private void setFrag(int n){
         switch (n){

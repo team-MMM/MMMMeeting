@@ -12,10 +12,9 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:replace="android:allowBackup,android:label">
-        <activity android:name=".activity.inviteActivity"></activity>
-
+        <activity android:name=".activity.MeetingInfoActivity"></activity>
+        <activity android:name=".activity.inviteActivity" />
         <activity android:name=".activity.MeetingDeleteActivity" />
-
         <activity android:name=".activity.MeetingAttendActivity" />
         <activity android:name=".activity.SignActivity">
             <intent-filter>
@@ -33,16 +32,17 @@
         <activity android:name=".activity.MemberInitActivity" />
         <activity android:name=".activity.MapPlaceActivity" />
         <activity android:name=".activity.PostActivity" />
+
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyDGHEER3zfPOuW0-yj2kw609KTERmsCnfw" />
     </application>
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.SEND_SMS" />
-
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 
 </manifest>
