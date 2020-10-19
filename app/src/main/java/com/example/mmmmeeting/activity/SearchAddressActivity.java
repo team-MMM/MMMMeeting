@@ -88,13 +88,13 @@ public class SearchAddressActivity extends AppCompatActivity {
 
                                         switch (j) {
                                             case 0:
-                                                tvPost.setText("우편번호: " + addressGroup.get(i).get(j));
+                                                tvPost.setText(addressGroup.get(i).get(j));
                                                 break;
                                             case 1:
-                                                tvRoad.setText("도로명주소: " + addressGroup.get(i).get(j));
+                                                tvRoad.setText(addressGroup.get(i).get(j));
                                                 break;
                                             case 2:
-                                                tvJibun.setText("지번주소: " + addressGroup.get(i).get(j));
+                                                tvJibun.setText(addressGroup.get(i).get(j));
                                                 break;
                                         }
                                     }
