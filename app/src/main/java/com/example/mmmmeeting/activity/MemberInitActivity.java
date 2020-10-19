@@ -1,6 +1,7 @@
 package com.example.mmmmeeting.activity;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -24,8 +25,10 @@ import java.util.Objects;
 public class MemberInitActivity extends BasicActivity implements View.OnClickListener {
 
     Button checkButton;
-    Button addressSerch;
-    TextView address;
+    Button addressSearch;
+    TextView addressTv;
+    TextView nameTv;
+    SharedPreferences sp;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -33,20 +36,36 @@ public class MemberInitActivity extends BasicActivity implements View.OnClickLis
         setContentView(R.layout.activity_edit_info);
 
         checkButton = findViewById(R.id.checkButton);
-        addressSerch = findViewById(R.id.addressSearchBtn);
-        address = findViewById(R.id.addressText);
+        addressSearch = findViewById(R.id.addressSearchBtn);
+        addressTv = findViewById(R.id.addressText);
+        nameTv = (EditText)findViewById(R.id.nameEditText);
+
+        // 이전 저장 값 보여주기
+        sp = getSharedPreferences("sp", MODE_PRIVATE);
+        String save = sp.getString("name", "");
+        nameTv.setText(save); // 뷰에 반영
 
         checkButton.setOnClickListener(this);
-        addressSerch.setOnClickListener(this);
+        addressSearch.setOnClickListener(this);
+    }
+
+    @Override protected void onStop() {
+        super.onStop();
+        // 액티비티 종료전 저장
+        sp = getSharedPreferences("sp", MODE_PRIVATE);
+        SharedPreferences.Editor editor = sp.edit(); // editor 사용해 저장
+        editor.putString("name", nameTv.getText().toString()); // 사용자 입력 값 입력
+        editor.commit(); // 저장 반영
     }
 
     @Override
     protected void onResume() {
         super.onResume();
 
+        // 주소 검색 후 도로명 전달받아 텍스트뷰에 설정
         if(getIntent().getExtras()!=null) {
             Intent intent = getIntent();
-            address.setText(intent.getExtras().getString("road"));
+            addressTv.setText(intent.getExtras().getString("road"));
             Log.d("Setting",intent.getExtras().getString("road"));
         }
 
@@ -61,8 +80,7 @@ public class MemberInitActivity extends BasicActivity implements View.OnClickLis
 
             case R.id.addressSearchBtn:
                 myStartActivity(SearchAddressActivity.class);
-
-
+                finish();
                 break;
         }
     }

@@ -55,7 +55,7 @@
         android:layout_height="wrap_content"
         android:layout_margin="20sp"
         android:background="@drawable/button_shape"
-        android:text="확인"/>
+        android:text="저장"/>
 
 </LinearLayout>
 

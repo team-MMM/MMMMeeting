@@ -2,19 +2,15 @@ package com.example.mmmmeeting.activity;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.example.mmmmeeting.Info.MeetingInfo;
 import com.example.mmmmeeting.R;
 import com.example.mmmmeeting.view.subAddress;
 
@@ -34,6 +30,7 @@ public class SearchAddressActivity extends AppCompatActivity {
     EditText address;
 
     String data;
+    // 공공데이터 포털, 도로명 주소 자료 API 키
     String key="9sQrn%2BLJVkLWA9IjevFFxgzbIzondfA7i7DDYdaOioStlNxjDZkdHQ9KCDEQ%2FxSUjav04A7zzo60de%2Bp4FV%2FSA%3D%3D";
 
     private ArrayList<ArrayList<String>> addressGroup = null;
@@ -73,16 +70,20 @@ public class SearchAddressActivity extends AppCompatActivity {
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
+                                // 서브 레이아웃(결과 나올 레이아웃) 초기화
                                 LinearLayout sublayer = (LinearLayout) findViewById(R.id.sublayer);
                                 sublayer.removeAllViews();
 
+                                // 주소 묶음 사이즈 만큼 (도로명, 우편, 지번 묶음 개수만큼 반복)
                                 for(int i =0; i<addressGroup.size(); i++) {
                                     Log.d("address test", " " + i);
+                                    // 주소 아이템 레이아웃 설정
                                     subAddress sublayout = new subAddress(getApplicationContext());
                                     final TextView tvPost = (TextView) sublayout.findViewById(R.id.postno);
                                     final TextView tvRoad = (TextView) sublayout.findViewById(R.id.addr_road);
                                     final TextView tvJibun = (TextView) sublayout.findViewById(R.id.addr_jibun);
 
+                                    // 도로명, 우편, 지번 각각에 대한 결과 텍스트로 반환
                                     for (int j = 0; j < addresslset.size(); j++) {
                                         Log.d("address test", " " + addressGroup.get(i).get(j));
 
@@ -99,12 +100,14 @@ public class SearchAddressActivity extends AppCompatActivity {
                                         }
                                     }
 
+                                    // 각 주소 아이템 클릭시 동작 설정
                                     sublayout.setOnClickListener(new View.OnClickListener() {
                                         @Override
                                         public void onClick(View v) {
                                             Log.d("address test", "sub Click");
 
                                             //Toast.makeText(SearchAddressActivity.this, "Click Listener", Toast.LENGTH_SHORT).show();
+                                            // MemberInitActivity 주소 정보 전달
                                             Intent intent = new Intent(SearchAddressActivity.this, MemberInitActivity.class);
 
                                             intent.putExtra("road", tvRoad.getText());
@@ -116,7 +119,9 @@ public class SearchAddressActivity extends AppCompatActivity {
                                         }
                                     });
 
-                                    sublayer.addView(sublayout);
+                                    // 하나의 아이템 (도로명, 우편, 지번) 텍스트 뷰 설정후
+                                    // 해당 레이아웃 서브 레이아웃에 추가가
+                                   sublayer.addView(sublayout);
                                 }
                             }
                         });
@@ -161,6 +166,7 @@ public class SearchAddressActivity extends AppCompatActivity {
             xpp.next();
             int eventType= xpp.getEventType();
 
+            // 오픈 API로 받은 xml 파일 파싱 (구분, 분리)
             while( eventType != XmlPullParser.END_DOCUMENT ){
                 switch( eventType ){
                     case XmlPullParser.START_DOCUMENT:
