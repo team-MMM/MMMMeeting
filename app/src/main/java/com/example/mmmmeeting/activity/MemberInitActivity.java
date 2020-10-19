@@ -44,7 +44,12 @@ public class MemberInitActivity extends BasicActivity implements View.OnClickLis
 
             case R.id.addressSearchBtn:
                 myStartActivity(SearchAddressActivity.class);
+                addressSetting();
+                break;
         }
+    }
+
+    private void addressSetting() {
 
     }
 

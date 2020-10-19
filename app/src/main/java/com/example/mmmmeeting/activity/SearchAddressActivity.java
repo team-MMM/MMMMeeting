@@ -2,45 +2,51 @@ package com.example.mmmmeeting.activity;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.example.mmmmeeting.Info.MeetingInfo;
 import com.example.mmmmeeting.R;
+import com.example.mmmmeeting.view.subAddress;
 
 import org.xmlpull.v1.XmlPullParser;
-import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlPullParserFactory;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.util.ArrayList;
 
 public class SearchAddressActivity extends AppCompatActivity {
 
     Button search;
-    TextView result;
     EditText address;
-
-    XmlPullParser xpp;
 
     String data;
     String key="9sQrn%2BLJVkLWA9IjevFFxgzbIzondfA7i7DDYdaOioStlNxjDZkdHQ9KCDEQ%2FxSUjav04A7zzo60de%2Bp4FV%2FSA%3D%3D";
+
+    private ArrayList<ArrayList<String>> addressGroup = null;
+    private ArrayList<String> addresslset = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search_address);
 
+        addressGroup = new ArrayList<ArrayList<String>>();
+
         search = findViewById(R.id.getAddress);
-        result = findViewById(R.id.Addressresult);
         address = findViewById(R.id.editAddress);
 
         search.setOnClickListener(this::mOnClick);
@@ -67,13 +73,57 @@ public class SearchAddressActivity extends AppCompatActivity {
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                result.setText(data); //TextView에 문자열  data 출력
+                                LinearLayout sublayer = (LinearLayout) findViewById(R.id.sublayer);
+                                sublayer.removeAllViews();
+
+                                for(int i =0; i<addressGroup.size(); i++) {
+                                    Log.d("address test", " " + i);
+                                    subAddress sublayout = new subAddress(getApplicationContext());
+                                    final TextView tvPost = (TextView) sublayout.findViewById(R.id.postno);
+                                    final TextView tvRoad = (TextView) sublayout.findViewById(R.id.addr_road);
+                                    final TextView tvJibun = (TextView) sublayout.findViewById(R.id.addr_jibun);
+
+                                    for (int j = 0; j < addresslset.size(); j++) {
+                                        Log.d("address test", " " + addressGroup.get(i).get(j));
+
+                                        switch (j) {
+                                            case 0:
+                                                tvPost.setText("우편번호: " + addressGroup.get(i).get(j));
+                                                break;
+                                            case 1:
+                                                tvRoad.setText("도로명주소: " + addressGroup.get(i).get(j));
+                                                break;
+                                            case 2:
+                                                tvJibun.setText("지번주소: " + addressGroup.get(i).get(j));
+                                                break;
+                                        }
+                                    }
+
+                                    sublayout.setOnClickListener(new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View v) {
+                                            Log.d("address test", "sub Click");
+
+                                            //Toast.makeText(SearchAddressActivity.this, "Click Listener", Toast.LENGTH_SHORT).show();
+                                            Intent intent = new Intent(SearchAddressActivity.this, MemberInitActivity.class);
+                                            intent.putExtra("road", tvRoad.getText());
+                                            intent.putExtra("post", tvPost.getText());
+                                            intent.putExtra("jibun", tvJibun.getText());
+
+                                            startActivity(intent);
+                                            finish();
+                                        }
+                                    });
+
+                                    sublayer.addView(sublayout);
+                                }
                             }
                         });
                     }
                 }).start();
                 break;
         }
+
     }//mOnClick method..
 
 
@@ -125,18 +175,26 @@ public class SearchAddressActivity extends AppCompatActivity {
                             xpp.next();
                             buffer.append(xpp.getText());//title 요소의 TEXT 읽어와서 문자열버퍼에 추가
                             buffer.append("\n"); //줄바꿈 문자 추가
+
+                            addresslset = new ArrayList<String>();
+                            addresslset.add(xpp.getText());
                         }
                         else if(tag.equals("rnAdres")){
                             buffer.append("지번주소 : ");
                             xpp.next();
                             buffer.append(xpp.getText());//category 요소의 TEXT 읽어와서 문자열버퍼에 추가
                             buffer.append("\n");//줄바꿈 문자 추가
+
+                            addresslset.add(xpp.getText());
                         }
                         else if(tag.equals("lnmAdres")){
                             buffer.append("도로명주소 :");
                             xpp.next();
                             buffer.append(xpp.getText());//description 요소의 TEXT 읽어와서 문자열버퍼에 추가
                             buffer.append("\n");//줄바꿈 문자 추가
+
+                            addresslset.add(xpp.getText());
+                            addressGroup.add(addresslset);
                         }
                         break;
 
