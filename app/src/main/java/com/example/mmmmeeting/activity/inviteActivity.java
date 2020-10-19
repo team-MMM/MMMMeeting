@@ -36,6 +36,7 @@ public class inviteActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_invite);
 
+        // 문자 권한이 허가되어있지 않은 경우
         if(ContextCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS)!= PackageManager.PERMISSION_GRANTED){
             if(ActivityCompat.shouldShowRequestPermissionRationale(this,Manifest.permission.SEND_SMS)){
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -59,6 +60,7 @@ public class inviteActivity extends AppCompatActivity {
         send = findViewById(R.id.sendBtn);
         phone = findViewById(R.id.phone_number);
 
+        // 문자 전송 버튼 클릭시 동작
         send.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -66,40 +68,22 @@ public class inviteActivity extends AppCompatActivity {
                 FirebaseFirestore db = FirebaseFirestore.getInstance();
                 Intent intent = getIntent();
                 String meetingname = intent.getExtras().getString("Name");
+                String code = intent.getExtras().getString("Code");
+                sendSMS(meetingname, code);
+
+                Log.d("SendSMS", code);
                 Log.d("SendSMS",meetingname);
-
-                db.collection("meetings").get()
-                        .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                            @Override
-                            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                                if (task.isSuccessful()) {
-                                    //모든 document 확인 (dou id + data arr { : , ... ,  })
-                                    for (QueryDocumentSnapshot document : task.getResult()) {
-                                        if(document.get("name").toString().equals(meetingname)){
-                                            Log.d("SendSMS",meetingname+"//"+document.get("name"));
-                                            sendSMS(document.getId());
-                                            break;
-                                        }
-                                    }
-                                } else {
-                                    Log.d("SendSMS", "Error getting documents: ", task.getException());
-                                }
-                            }
-                        });
-
             }
         });
     }
 
-    private void sendSMS(String code){
-        Intent intent = getIntent();
-        String meetingname = intent.getExtras().getString("Name");
-
-        String phoneNo = phone.getText().toString();
+    // 문자보내기
+    private void sendSMS(String meetingname, String code){
+        String phoneNo = phone.getText().toString(); // phone Edit Text 에 있는 숫자 저장
         String sms = meetingname+"에서의 초대 코드 : " + code;
 
         try {
-            //전송
+            //번호로 문자 전송
             SmsManager smsManager = SmsManager.getDefault();
             smsManager.sendTextMessage(phoneNo, null, sms, null, null);
             Log.d("SendSMS", phoneNo+"//"+sms);
@@ -111,6 +95,7 @@ public class inviteActivity extends AppCompatActivity {
 
     }
 
+    // 권한 허가 요청
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         switch (requestCode){

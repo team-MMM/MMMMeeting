@@ -83,6 +83,7 @@ public class MeetingActivity extends BasicActivity {
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()){
             case R.id.meetingInfo:
+                // 미팅 정보 아이콘 클릭시 미팅 정보 출력하는 액티비티로 이동
                 Intent intent = new Intent(MeetingActivity.this, MeetingInfoActivity.class);
                 intent.addFlags(intent.FLAG_ACTIVITY_CLEAR_TOP);
                 intent.putExtra("Name",getIntent().getExtras().getString("Name"));

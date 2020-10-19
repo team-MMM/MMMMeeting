@@ -41,8 +41,8 @@ public class MeetingInfoActivity extends AppCompatActivity {
         String meetingname = intent.getExtras().getString("Name");
         String meetingdescription = intent.getExtras().getString("Description");
 
-        name = (TextView) findViewById(R.id.meetingName);
-        description = (TextView) findViewById(R.id.meetingDescription);
+        name = findViewById(R.id.meetingName);
+        description = findViewById(R.id.meetingDescription);
         code = findViewById(R.id.meetingCode);
         user = findViewById(R.id.meetingUsers);
         invite = findViewById(R.id.inviteBtn);
@@ -51,13 +51,14 @@ public class MeetingInfoActivity extends AppCompatActivity {
         name.setText(meetingname);
         description.setText(meetingdescription);
 
+        // 초대 버튼 클릭시 -> inviteActivity 넘어가서 초대문자 보내기
         invite.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(MeetingInfoActivity.this, inviteActivity.class);
                 intent.addFlags(intent.FLAG_ACTIVITY_CLEAR_TOP);
                 intent.putExtra("Name", meetingname);
-                intent.putExtra("Description", meetingdescription);
+                intent.putExtra("Code", code.getText().toString());
                 startActivity(intent);
             }
         });
@@ -72,6 +73,7 @@ public class MeetingInfoActivity extends AppCompatActivity {
 
         codeFind(meetingname);
 
+        // 코드가 출력되는 TextView 클릭시 -> 코드 클립보드에 복사되도록
         code.setOnTouchListener(new View.OnTouchListener(){ //터치 이벤트 리스너 등록(누를때)
             @Override
             public boolean onTouch(View v, MotionEvent event) {
@@ -88,6 +90,7 @@ public class MeetingInfoActivity extends AppCompatActivity {
 
     }
 
+    // 모임코드 출력 위해 현재 모임 이름에 해당하는 모임 코드 찾기
     private void codeFind(String meetingname) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
@@ -98,8 +101,10 @@ public class MeetingInfoActivity extends AppCompatActivity {
                         if (task.isSuccessful()) {
                             //모든 document 출력 (dou id + data arr { : , ... ,  })
                             for (QueryDocumentSnapshot document : task.getResult()) {
+                                // 모임 이름이 같은 경우 해당 모임의 코드를 텍스트뷰에 출력
                                 if (document.get("name").toString().equals(meetingname)) {
                                     code.setText(document.getId());
+                                    // 찾은 모임의 사용자 확인
                                     userFind(document.getData().get("userID"));
                                     Log.d("Document Read", document.getId() + " => " + document.getData());
                                     break;
@@ -118,6 +123,7 @@ public class MeetingInfoActivity extends AppCompatActivity {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         final String[] users = {""};
 
+        // 모든 유저 정보를 확인 -> 모임에 속한 유저와 같은 uid 발견시 해당 유저의 이름을 출력
         db.collection("users").get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
@@ -132,6 +138,7 @@ public class MeetingInfoActivity extends AppCompatActivity {
                                     Log.d("Document Snapshot", "No Document");
                                 }
                             }
+                            // 찾은 유저 이름을 텍스트뷰에 설정
                             user.setText(Arrays.toString(users));
                         } else {
                             Log.d("Document Read", "Error getting documents: ", task.getException());

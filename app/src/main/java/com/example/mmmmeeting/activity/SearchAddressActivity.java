@@ -29,11 +29,13 @@ public class SearchAddressActivity extends AppCompatActivity {
     Button search;
     EditText address;
 
-    String data;
     // 공공데이터 포털, 도로명 주소 자료 API 키
     String key="9sQrn%2BLJVkLWA9IjevFFxgzbIzondfA7i7DDYdaOioStlNxjDZkdHQ9KCDEQ%2FxSUjav04A7zzo60de%2Bp4FV%2FSA%3D%3D";
 
+    // 검색 결과로 나오는 모든 주소 (도로명, 지번, 우편)들의 리스트
     private ArrayList<ArrayList<String>> addressGroup = null;
+
+    // 결과로 나오는 각각의 (도로명, 지번, 우편) 리스트
     private ArrayList<String> addresslset = null;
 
     @Override
@@ -50,7 +52,7 @@ public class SearchAddressActivity extends AppCompatActivity {
     }
 
     //Button을 클릭했을 때 자동으로 호출되는 callback method....
-    public void mOnClick(View v){
+    private void mOnClick(View v){
         switch( v.getId() ){
             case R.id.getAddress:
 
@@ -60,7 +62,7 @@ public class SearchAddressActivity extends AppCompatActivity {
                     @Override
                     public void run() {
                         try {
-                            data= getXmlData();//아래 메소드를 호출하여 XML data를 파싱해서 String 객체로 얻어오기
+                            getXmlData();//아래 메소드를 호출하여 XML data를 파싱해서 String 객체로 얻어오기
                         } catch (UnsupportedEncodingException e) {
                             e.printStackTrace();
                         }
@@ -134,11 +136,9 @@ public class SearchAddressActivity extends AppCompatActivity {
 
 
     //XmlPullParser를 이용하여 Naver 에서 제공하는 OpenAPI XML 파일 파싱하기(parsing)
-    String getXmlData() throws UnsupportedEncodingException {
+    private void getXmlData() throws UnsupportedEncodingException {
 
         Log.d("address test","getXml");
-
-        StringBuffer buffer=new StringBuffer();
 
         String str= address.getText().toString();//EditText에 작성된 Text얻어오기
         String location = URLEncoder.encode(str,"UTF-8");//한글의 경우 인식이 안되기에 utf-8 방식으로 encoding..
@@ -159,7 +159,7 @@ public class SearchAddressActivity extends AppCompatActivity {
 
             XmlPullParserFactory factory= XmlPullParserFactory.newInstance();
             XmlPullParser xpp= factory.newPullParser();
-            xpp.setInput( new InputStreamReader(is, "UTF-8") ); //inputstream 으로부터 xml 입력받기
+            xpp.setInput( new InputStreamReader(is, "UTF-8") ); //inputstream 으로부터 xml 입력받기, 한글 사용 위해 utf-8 설정
 
             String tag;
 
@@ -170,7 +170,6 @@ public class SearchAddressActivity extends AppCompatActivity {
             while( eventType != XmlPullParser.END_DOCUMENT ){
                 switch( eventType ){
                     case XmlPullParser.START_DOCUMENT:
-                        buffer.append("파싱 시작...\n\n");
                         break;
 
                     case XmlPullParser.START_TAG:
@@ -178,28 +177,16 @@ public class SearchAddressActivity extends AppCompatActivity {
 
                         if(tag.equals("item")) ;// 첫번째 검색결과
                         else if(tag.equals("zipNo")){
-                            buffer.append("우편번호 : ");
                             xpp.next();
-                            buffer.append(xpp.getText());//title 요소의 TEXT 읽어와서 문자열버퍼에 추가
-                            buffer.append("\n"); //줄바꿈 문자 추가
-
                             addresslset = new ArrayList<String>();
                             addresslset.add(xpp.getText());
                         }
                         else if(tag.equals("rnAdres")){
-                            buffer.append("지번주소 : ");
                             xpp.next();
-                            buffer.append(xpp.getText());//category 요소의 TEXT 읽어와서 문자열버퍼에 추가
-                            buffer.append("\n");//줄바꿈 문자 추가
-
                             addresslset.add(xpp.getText());
                         }
                         else if(tag.equals("lnmAdres")){
-                            buffer.append("도로명주소 :");
                             xpp.next();
-                            buffer.append(xpp.getText());//description 요소의 TEXT 읽어와서 문자열버퍼에 추가
-                            buffer.append("\n");//줄바꿈 문자 추가
-
                             addresslset.add(xpp.getText());
                             addressGroup.add(addresslset);
                         }
@@ -210,8 +197,7 @@ public class SearchAddressActivity extends AppCompatActivity {
 
                     case XmlPullParser.END_TAG:
                         tag= xpp.getName(); //테그 이름 얻어오기
-
-                        if(tag.equals("item")) buffer.append("\n");// 첫번째 검색결과종료..줄바꿈
+                        if(tag.equals("item"));// 첫번째 검색결과종료
                         break;
                 }
 
@@ -222,8 +208,7 @@ public class SearchAddressActivity extends AppCompatActivity {
             Log.d("address test", "error : " + e);
         }
 
-        buffer.append("파싱 끝\n");
-        return buffer.toString();//StringBuffer 문자열 객체 반환
+        return;
 
     }//getXmlData method....
 

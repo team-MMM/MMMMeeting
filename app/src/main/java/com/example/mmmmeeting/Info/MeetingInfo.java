@@ -2,6 +2,7 @@ package com.example.mmmmeeting.Info;
 
 import java.util.ArrayList;
 
+// 모임 정보 : 모임이름, 모임 설명, 모임원에 대한 정보 저장, 가져오기 가능
 public class MeetingInfo {
     private String meetingName;
     private String description;

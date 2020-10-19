@@ -40,7 +40,7 @@ public class MemberInitActivity extends BasicActivity implements View.OnClickLis
         addressTv = findViewById(R.id.addressText);
         nameTv = (EditText)findViewById(R.id.nameEditText);
 
-        // 이전 저장 값 보여주기
+        // 이전 저장 값 보여주기 -> 창 띄울 때 이름 자동으로 띄워져 있게
         sp = getSharedPreferences("sp", MODE_PRIVATE);
         String save = sp.getString("name", "");
         nameTv.setText(save); // 뷰에 반영
@@ -74,10 +74,12 @@ public class MemberInitActivity extends BasicActivity implements View.OnClickLis
     @Override
     public void onClick(View v) {
         switch (v.getId()){
+            // 저장 버튼 -> 유저 정보 db 저장
             case R.id.checkButton:
                 profileUpdate();
                 break;
 
+            // 주소 찾기
             case R.id.addressSearchBtn:
                 myStartActivity(SearchAddressActivity.class);
                 finish();
@@ -86,15 +88,17 @@ public class MemberInitActivity extends BasicActivity implements View.OnClickLis
     }
 
 
+    // 변경된 유저 정보 db에 저장
     private void profileUpdate(){
         String address = ((TextView)findViewById(R.id.addressText)).getText().toString();
         String name = ((EditText)findViewById(R.id.nameEditText)).getText().toString();
 
-
+        // 이름은 필수 입력 항목
         if(name.length()>0) {
             FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
             FirebaseFirestore db = FirebaseFirestore.getInstance();
 
+            // 멤버 정보 객체 생성 -> db저장
             MemberInfo memberInfo = new MemberInfo(name, address);
 
             if (user != null) {
