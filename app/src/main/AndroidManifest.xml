@@ -7,12 +7,15 @@
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="우리 지금 만나"
+        android:usesCleartextTraffic = "true"
+
         android:requestLegacyExternalStorage="true"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:replace="android:allowBackup,android:label">
-        <activity android:name=".activity.MeetingInfoActivity"></activity>
+        <activity android:name=".activity.SearchAddressActivity"></activity>
+        <activity android:name=".activity.MeetingInfoActivity" />
         <activity android:name=".activity.inviteActivity" />
         <activity android:name=".activity.MeetingDeleteActivity" />
         <activity android:name=".activity.MeetingAttendActivity" />
@@ -37,12 +40,12 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyDGHEER3zfPOuW0-yj2kw609KTERmsCnfw" />
     </application>
-    <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.SEND_SMS" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+
+    <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES" />
 
 </manifest>

@@ -20,16 +20,18 @@ import com.google.firebase.firestore.FirebaseFirestore;
 public class MemberInitActivity extends BasicActivity implements View.OnClickListener {
 
     Button checkButton;
+    Button addressSerch;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_info);
 
-
-
         checkButton = (Button) findViewById(R.id.checkButton);
+        addressSerch = findViewById(R.id.addressSearchBtn);
+
         checkButton.setOnClickListener(this);
+        addressSerch.setOnClickListener(this);
     }
 
 
@@ -40,6 +42,8 @@ public class MemberInitActivity extends BasicActivity implements View.OnClickLis
                 profileUpdate();
                 break;
 
+            case R.id.addressSearchBtn:
+                myStartActivity(SearchAddressActivity.class);
         }
 
     }
