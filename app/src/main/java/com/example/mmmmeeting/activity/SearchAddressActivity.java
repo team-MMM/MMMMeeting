@@ -106,6 +106,7 @@ public class SearchAddressActivity extends AppCompatActivity {
 
                                             //Toast.makeText(SearchAddressActivity.this, "Click Listener", Toast.LENGTH_SHORT).show();
                                             Intent intent = new Intent(SearchAddressActivity.this, MemberInitActivity.class);
+
                                             intent.putExtra("road", tvRoad.getText());
                                             intent.putExtra("post", tvPost.getText());
                                             intent.putExtra("jibun", tvJibun.getText());

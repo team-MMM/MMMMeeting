@@ -1,9 +1,6 @@
 package com.example.mmmmeeting.view;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Context;
-import android.os.Bundle;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.widget.LinearLayout;
@@ -23,6 +20,6 @@ public class subAddress extends LinearLayout {
     }
     private void init(Context context){
         LayoutInflater inflater =(LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        inflater.inflate(R.layout.activity_sub_address,this,true);
+        inflater.inflate(R.layout.sub_address,this,true);
     }
 }

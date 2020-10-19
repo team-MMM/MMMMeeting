@@ -20,20 +20,22 @@
         android:layout_margin="10sp"
         android:ems="10"
         android:hint="이름"
+        android:textColor="@android:color/black"
         android:inputType="textPersonName"/>
 
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:layout_margin="10sp">
 
-        <EditText
-            android:id="@+id/addressEditText"
-            android:layout_width="wrap_content"
+        <TextView
+            android:id="@+id/addressText"
+            android:layout_width="250sp"
             android:layout_height="wrap_content"
             android:layout_margin="10sp"
-            android:ems="13"
+            android:textColor="@android:color/black"
+            android:textSize="15sp"
             android:hint="주소" />
 
         <Button
@@ -41,10 +43,11 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="찾기"
+            android:layout_toRightOf="@+id/addressText"
             android:background="@drawable/button_shape"
             />
 
-    </LinearLayout>
+    </RelativeLayout>
 
     <Button
         android:id="@+id/checkButton"

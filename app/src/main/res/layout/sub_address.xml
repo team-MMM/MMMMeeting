@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".view.subAddress">
+
+    <TextView
+        android:id="@+id/addr_road"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="도로명주소: "
+        android:textStyle="bold"
+        android:textColor="@android:color/black"
+        android:textSize="15sp"
+        />
+    <TextView
+        android:id="@+id/postno"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="우편번호: "
+        android:textColor="@android:color/black"
+        android:textSize="15sp"
+        />
+    <TextView
+        android:id="@+id/addr_jibun"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="지번주소: "
+        android:textColor="@android:color/black"
+        android:textSize="15sp"
+        />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="3dp"
+        android:layout_marginTop="5sp"
+        android:layout_marginBottom="5sp"
+        android:background="@color/colorPrimaryDark"/>
+
+</LinearLayout>

@@ -2,9 +2,11 @@ package com.example.mmmmeeting.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -17,23 +19,38 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.util.Objects;
+
 public class MemberInitActivity extends BasicActivity implements View.OnClickListener {
 
     Button checkButton;
     Button addressSerch;
+    TextView address;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_info);
 
-        checkButton = (Button) findViewById(R.id.checkButton);
+        checkButton = findViewById(R.id.checkButton);
         addressSerch = findViewById(R.id.addressSearchBtn);
+        address = findViewById(R.id.addressText);
 
         checkButton.setOnClickListener(this);
         addressSerch.setOnClickListener(this);
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        if(getIntent().getExtras()!=null) {
+            Intent intent = getIntent();
+            address.setText(intent.getExtras().getString("road"));
+            Log.d("Setting",intent.getExtras().getString("road"));
+        }
+
+    }
 
     @Override
     public void onClick(View v) {
@@ -44,17 +61,15 @@ public class MemberInitActivity extends BasicActivity implements View.OnClickLis
 
             case R.id.addressSearchBtn:
                 myStartActivity(SearchAddressActivity.class);
-                addressSetting();
+
+
                 break;
         }
     }
 
-    private void addressSetting() {
-
-    }
 
     private void profileUpdate(){
-        String address = ((EditText)findViewById(R.id.addressEditText)).getText().toString();
+        String address = ((TextView)findViewById(R.id.addressText)).getText().toString();
         String name = ((EditText)findViewById(R.id.nameEditText)).getText().toString();
 
 
