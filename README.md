@@ -6,18 +6,18 @@
 * UI 변경 (기존 GridView => Main으로 통합)
 
 // 흐름도 <br>
-SignAct->MainAct(초기 화면)->GridAdapter(모임 목록 관리)->MeetingAct(한 모임 내부) <br>
-->FragHome(약속 목록 홈 화면)->MakeScheduleAct(약속 만들기)->ScheduleAdapter(약속 목록 관리)-> <br>
-ContentScheduleAct(약속 내용 보기/날짜, 장소 정하기)-> <br>
+SignAct -> MainAct(초기 화면) -> GridAdapter(모임 목록 관리) -> MeetingAct(한 모임 내부) <br>
+-> FragHome(약속 목록 홈 화면) -> MakeScheduleAct(약속 만들기) -> ScheduleAdapter(약속 목록 관리)-> <br>
+ContentScheduleAct(약속 내용 보기/날짜, 장소 정하기) -> <br>
 <h1>★주영 코드 부분★</h1>
     1. CalendarAct(공유 달력) - activity_calendar.xml 
     <h1>★소연 코드 부분★</h1>
     2. PlaceChoiceAct(장소 선택)
         -> 1.MiddlePlaceAct(중간지점) - activity_place_middle.xml
-           2.SearchPlaceAct(장소찾기) - activity_place_search.xml <br>
+           2.SearchPlaceAct(장소찾기) - activity_place_search.xml 
 
 
-
+<br><br>
 // 2020.10.21 변경
 * 약속 화면 추가
 * 캘린더/장소 선택 화면 추가
@@ -39,15 +39,8 @@ ContentScheduleAct(약속 내용 보기/날짜, 장소 정하기)-> <br>
 
 
 //해야 함
-1. 프래그먼트로 액티비티 분할 (모임 내부 메뉴 만들기) //완료 =>fragment 패키지 .java, frag_*.xml 파일
-* 메뉴 탭을 5개까지만 만들라고 권장해서 채팅 빼고 만들었습니다 (홈/캘린더/사진/지각자/정산)
-* 게시판에 사진도 여러장 올라가니까 사진탭을 지우고 지도탭을 넣는게 어떤지?
-* 채팅은 메인 화면에도 메뉴 만들어서 넣는게 좋을거 같음! (모임/채팅/내정보)
-2. 사진첩 (게시판) //완료
-=> 게시판 모든 모임이 공통으로 나타남 : 모임별로 게시판 다르게 나타나도록 변경필요 
-(DB - post에 모임 코드 추가해서 비교하는 거 필요할 듯)
-3. 채팅
-<h1>★ 4. 중간지점 ★</h1>
+<h1>★ 1. 중간지점 ★</h1>
+2. 
 
 
 // 해야하지 않을까?
