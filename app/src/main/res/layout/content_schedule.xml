@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+
+    <LinearLayout
+        android:id="@+id/schedule_frame"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentTop="true"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_gravity="center"
+            android:padding="10dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:text="약속 내용"
+                android:layout_margin="20sp"
+                android:textColor="#000000"
+                android:textSize="30sp"
+                android:textStyle="bold" />
+
+            <com.example.mmmmeeting.view.ReadScheduleView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20sp"
+                android:id="@+id/readScheduleView">
+
+            </com.example.mmmmeeting.view.ReadScheduleView>
+
+
+
+            <Button
+                android:id="@+id/calendarBtn"
+                android:layout_width="match_parent"
+                android:layout_height="100dp"
+                android:layout_margin="20sp"
+                android:ems="10"
+                android:text="언제?"
+                android:textSize="20sp"
+                android:background="@drawable/button_shape" />
+
+            <Button
+                android:id="@+id/placeBtn"
+                android:layout_width="match_parent"
+                android:layout_height="100dp"
+                android:layout_margin="20sp"
+                android:ems="10"
+                android:text="어디서?"
+                android:textSize="20sp"
+                android:background="@drawable/button_shape" />
+        </LinearLayout>
+    </LinearLayout>
+
+
+</RelativeLayout>

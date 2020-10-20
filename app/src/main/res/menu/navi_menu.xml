@@ -9,16 +9,16 @@
         android:title="홈"/>
 
     <item
-        android:id="@+id/menu_calendar"
+        android:id="@+id/menu_chat"
         android:enabled="true"
-        android:icon="@drawable/menu_calendar"
-        android:title="캘린더"/>
+        android:icon="@drawable/menu_chat"
+        android:title="채팅"/>
 
     <item
-        android:id="@+id/menu_photo"
+        android:id="@+id/menu_board"
         android:enabled="true"
-        android:icon="@drawable/menu_photo"
-        android:title="사진"/>
+        android:icon="@drawable/menu_board"
+        android:title="게시판"/>
 
     <item
         android:id="@+id/menu_alarm"

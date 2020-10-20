@@ -5,15 +5,29 @@
     android:layout_height="match_parent"
     tools:context=".fragment.FragHome">
 
+    <TextView
+        android:id="@+id/schedule_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="20sp"
+        android:text="name"
+        android:textStyle="bold"
+        android:layout_margin="10sp"
+        android:textColor="@color/fui_bgFacebook"
+        android:layout_centerHorizontal="true"
+        />
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:layout_below="@+id/schedule_name"
+        android:layout_marginTop="10dp">
 
     </androidx.recyclerview.widget.RecyclerView>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/floatingActionButton"
+        android:id="@+id/write_schedule"
         android:layout_width="80dp"
         android:layout_height="80dp"
         android:layout_alignParentEnd="true"
@@ -21,6 +35,6 @@
         android:layout_marginEnd="10dp"
         android:layout_marginBottom="10dp"
         android:clickable="true"
-        android:src="@drawable/ic_baseline_add_circle_24" />
+        android:src="@drawable/plus"/>
 
 </RelativeLayout>

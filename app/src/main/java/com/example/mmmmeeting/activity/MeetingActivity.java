@@ -10,15 +10,13 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
 
 import com.example.mmmmeeting.R;
 import com.example.mmmmeeting.fragment.FragAccount;
 import com.example.mmmmeeting.fragment.FragAlarm;
-import com.example.mmmmeeting.fragment.FragCalendar;
+import com.example.mmmmeeting.fragment.FragChat;
 import com.example.mmmmeeting.fragment.FragHome;
-import com.example.mmmmeeting.fragment.FragPhoto;
+import com.example.mmmmeeting.fragment.FragBoard;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class MeetingActivity extends AppCompatActivity {
@@ -27,17 +25,10 @@ public class MeetingActivity extends AppCompatActivity {
     TextView name, description;
     Button invite;
 
-    private FragmentManager fm;
-    private FragmentTransaction ft;
-    private FragCalendar fragCalendar;
-    private FragPhoto fragPhoto;
-    private FragAlarm fragAlarm;
-    private FragAccount fragAccount;
-
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.frag_main);
+        setContentView(R.layout.frag_default);
 
         name = (TextView) findViewById(R.id.name);
         description = (TextView) findViewById(R.id.description);
@@ -67,24 +58,42 @@ public class MeetingActivity extends AppCompatActivity {
                 .commit();
 
         bottomNavigationView = findViewById(R.id.bottomNavi);
+        // 메뉴 바 아이콘을 눌렀을 때의 화면 동작
+        // 각 화면 코드는 fragment 폴더에 있음
         bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 switch(item.getItemId()){
+                    // 홈 화면(약속 목록)으로 이동
                     case R.id.menu_home:
-                        setFrag(0);
+                        FragHome fragHome = new FragHome();
+                        getSupportFragmentManager().beginTransaction()
+                                .replace(R.id.main_frame,fragHome)
+                                .commit();
                         return true;
-                    case R.id.menu_calendar:
-                        setFrag(1);
+                    case R.id.menu_chat:
+                        FragChat fragChat = new FragChat();
+                        getSupportFragmentManager().beginTransaction()
+                                .replace(R.id.main_frame, fragChat)
+                                .commit();
                         return true;
-                    case R.id.menu_photo:
-                        setFrag(2);
+                    case R.id.menu_board:
+                        FragBoard fragBoard = new FragBoard();
+                        getSupportFragmentManager().beginTransaction()
+                                .replace(R.id.main_frame, fragBoard)
+                                .commit();
                         return true;
                     case R.id.menu_alarm:
-                        setFrag(3);
+                        FragAlarm fragAlarm = new FragAlarm();
+                        getSupportFragmentManager().beginTransaction()
+                                .replace(R.id.main_frame,fragAlarm)
+                                .commit();
                         return true;
                     case R.id.menu_account:
-                        setFrag(4);
+                        FragAccount fragAccount = new FragAccount();
+                        getSupportFragmentManager().beginTransaction()
+                                .replace(R.id.main_frame,fragAccount)
+                                .commit();
                         return true;
                 }
                 return false;
@@ -92,41 +101,6 @@ public class MeetingActivity extends AppCompatActivity {
         });
 
 
-    }
-
-    private void setFrag(int n){
-        switch (n){
-            case 0:
-                FragHome fragHome = new FragHome();
-                getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.main_frame,fragHome)
-                        .commit();
-                break;
-            case 1:
-                FragCalendar fragCalendar = new FragCalendar();
-                getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.main_frame,fragCalendar)
-                        .commit();
-                break;
-            case 2:
-                FragPhoto fragPhoto = new FragPhoto();
-                getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.main_frame,fragPhoto)
-                        .commit();
-                break;
-            case 3:
-                FragAlarm fragAlarm = new FragAlarm();
-                getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.main_frame,fragAlarm)
-                        .commit();
-                break;
-            case 4:
-                FragAccount fragAccount = new FragAccount();
-                getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.main_frame,fragAccount)
-                        .commit();
-                break;
-        }
     }
 
 }

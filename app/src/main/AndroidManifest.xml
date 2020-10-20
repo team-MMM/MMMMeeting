@@ -29,10 +29,17 @@
         <activity android:name=".activity.GalleryActivity" />
         <activity android:name=".activity.MainActivity" />
         <activity android:name=".activity.MakeMeetingActivity" />
-        <activity android:name=".activity.WritePostActivity" />
+        <activity android:name=".activity.MakePostActivity" />
         <activity android:name=".activity.MemberInitActivity" />
         <activity android:name=".activity.MapPlaceActivity" />
-        <activity android:name=".activity.PostActivity" />
+        <activity android:name=".activity.ContentBoardActivity" />
+        <activity android:name=".activity.MakeScheduleActivity"/>
+        <activity android:name=".activity.ContentScheduleActivity"/>
+        <activity android:name=".activity.MiddlePlaceActivity"/>
+        <activity android:name=".activity.SearchPlaceActivity"/>
+        <activity android:name=".activity.CalendarActivity"/>
+        <activity android:name=".activity.PlaceChoiceActivity"/>
+
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyDGHEER3zfPOuW0-yj2kw609KTERmsCnfw" />

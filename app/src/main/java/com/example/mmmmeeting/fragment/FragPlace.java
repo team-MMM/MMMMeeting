@@ -1,5 +1,6 @@
 package com.example.mmmmeeting.fragment;
 
+
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,13 +12,13 @@ import androidx.fragment.app.Fragment;
 
 import com.example.mmmmeeting.R;
 
-public class FragCalendar extends Fragment {
+public class FragPlace extends Fragment {
     private View view;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        view = inflater.inflate(R.layout.activity_calendar,container,false);
+        view = inflater.inflate(R.layout.activity_place_choice,container,false);
         return view;
     }
 }

@@ -1,9 +1,9 @@
+// 소연+주영 코드 합친건데 어플이랑 연결하지는 않았습니다. 새로 추가하는게 편하면 지워도 됨!!
 package com.example.mmmmeeting.activity;
 
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.widget.Button;
 
@@ -35,7 +35,6 @@ import android.os.Looper;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -243,7 +242,7 @@ public class MapPlaceActivity extends AppCompatActivity
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON,
                 WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
-        setContentView(R.layout.activity_map_place);
+        setContentView(R.layout.frag_map);
 
         previous_marker = new ArrayList<Marker>();
 

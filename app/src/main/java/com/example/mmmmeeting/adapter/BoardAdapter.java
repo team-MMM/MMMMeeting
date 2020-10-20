@@ -1,5 +1,6 @@
-package com.example.mmmmeeting.adapter;
+// 게시판의 카드뷰 생성, 게시글 생성, 수정, 삭제와 연결됨
 
+package com.example.mmmmeeting.adapter;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -17,21 +18,21 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.example.mmmmeeting.FirebaseHelper;
+import com.example.mmmmeeting.BoardDeleter;
 import com.example.mmmmeeting.Info.PostInfo;
 import com.example.mmmmeeting.R;
-import com.example.mmmmeeting.activity.PostActivity;
-import com.example.mmmmeeting.activity.WritePostActivity;
+import com.example.mmmmeeting.activity.ContentBoardActivity;
+import com.example.mmmmeeting.activity.MakePostActivity;
 import com.example.mmmmeeting.OnPostListener;
 import com.example.mmmmeeting.view.ReadContentsView;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 
 import java.util.ArrayList;
 
-public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.MainViewHolder> {
+public class BoardAdapter extends RecyclerView.Adapter<BoardAdapter.MainViewHolder> {
     private ArrayList<PostInfo> mDataset;
     private Activity activity;
-    private FirebaseHelper firebaseHelper;
+    private BoardDeleter boardDeleter; //Firestore db에서 삭제 되도록 연동
     private ArrayList<ArrayList<SimpleExoPlayer>> playerArrayListArrayList = new ArrayList<>();
     private final int MORE_INDEX = 2;
 
@@ -43,15 +44,17 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.MainViewHolder
         }
     }
 
-    public HomeAdapter(Activity activity, ArrayList<PostInfo> myDataset) {
+    public BoardAdapter(Activity activity, ArrayList<PostInfo> myDataset) {
         this.mDataset = myDataset;
         this.activity = activity;
 
-        firebaseHelper = new FirebaseHelper(activity);
+        boardDeleter = new BoardDeleter(activity);
     }
 
+
+
     public void setOnPostListener(OnPostListener onPostListener){
-        firebaseHelper.setOnPostListener(onPostListener);
+        boardDeleter.setOnPostListener(onPostListener);
     }
 
     @Override
@@ -61,13 +64,13 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.MainViewHolder
 
     @NonNull
     @Override
-    public HomeAdapter.MainViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        CardView cardView = (CardView) LayoutInflater.from(parent.getContext()).inflate(R.layout.item_post, parent, false);
+    public BoardAdapter.MainViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        CardView cardView = (CardView) LayoutInflater.from(parent.getContext()).inflate(R.layout.list_board, parent, false);
         final MainViewHolder mainViewHolder = new MainViewHolder(cardView);
         cardView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(activity, PostActivity.class);
+                Intent intent = new Intent(activity, ContentBoardActivity.class);
                 intent.putExtra("postInfo", mDataset.get(mainViewHolder.getAdapterPosition()));
                 activity.startActivity(intent);
             }
@@ -120,10 +123,10 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.MainViewHolder
             public boolean onMenuItemClick(MenuItem menuItem) {
                 switch (menuItem.getItemId()) {
                     case R.id.modify:
-                        myStartActivity(WritePostActivity.class, mDataset.get(position));
+                        myStartActivity(MakePostActivity.class, mDataset.get(position));
                         return true;
                     case R.id.delete:
-                        firebaseHelper.storageDelete(mDataset.get(position));
+                        boardDeleter.storageDelete(mDataset.get(position));
                         return true;
                     default:
                         return false;

@@ -37,7 +37,7 @@ public class GalleryAdapter  extends RecyclerView.Adapter<GalleryAdapter.Gallery
     @NonNull
     @Override
     public GalleryAdapter.GalleryViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        CardView cardView = (CardView) LayoutInflater.from(parent.getContext()).inflate(R.layout.item_gallery, parent, false);
+        CardView cardView = (CardView) LayoutInflater.from(parent.getContext()).inflate(R.layout.list_gallery, parent, false);
         final GalleryViewHolder galleryViewHolder = new GalleryViewHolder(cardView);
         cardView.setOnClickListener(new View.OnClickListener() {
             @Override
