@@ -88,16 +88,18 @@
             android:text="초대하기"
             android:textSize="15sp"/>
 
-        <Button
-            android:id="@+id/backBtn4"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="10sp"
-            android:layout_margin="10sp"
-            android:background="@drawable/button_shape"
-            android:text="확인"
-            android:textSize="15sp"
-            />
+<!--        모임에서 나가기 버튼이 여기에 있는게 좋을까 -->
+<!--        <Button-->
+<!--            android:id="@+id/delete"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:padding="10sp"-->
+<!--            android:layout_margin="10sp"-->
+<!--            android:background="@drawable/button_shape"-->
+<!--            android:text="확인"-->
+<!--            android:textSize="15sp"-->
+<!--            />-->
+
     </LinearLayout>
 
 

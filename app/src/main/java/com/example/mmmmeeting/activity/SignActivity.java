@@ -31,12 +31,12 @@ public class SignActivity extends BasicActivity {
     private GoogleSignInClient mGoogleSignInClient;
     private static final int RC_SIGN_IN = 9001;
     private SignInButton signInButton;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         setToolbarTitle("우리 지금 만나");
-
 
         signInButton = findViewById(R.id.signInButton);
         mAuth = FirebaseAuth.getInstance();
@@ -102,11 +102,11 @@ public class SignActivity extends BasicActivity {
     private void updateUI(boolean check) { //update ui code here
         Intent intent;
         if(check){
-            // 같은 uid 존재
+            // 같은 uid 존재 -> 바로 메인 화면으로
             Log.d("Document Read","exist uid");
             intent = new Intent(this,MainActivity.class);
         }else{
-            // 같은 uid 없으면
+            // 같은 uid 없으면 -> 회원 정보 입력 창으로
             Log.d("Document Read","new uid");
             intent = new Intent(this, MemberInitActivity.class);
         }
@@ -117,6 +117,7 @@ public class SignActivity extends BasicActivity {
         Toast.makeText(this,msg,Toast.LENGTH_SHORT).show();
     }
 
+    // user table 읽어서 같은 uid가 존재하는지 확인
     private void readDocId(final FirebaseUser user){
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         if(user!=null){
@@ -127,9 +128,11 @@ public class SignActivity extends BasicActivity {
                     if(task.isSuccessful()){
                         DocumentSnapshot document = task.getResult();
                         if (document.exists()) {
+                            // 로그인 시도한 uid가 이미 document에 존재
                             Log.d("Document Snapshot", "Data is : "+document.getId());
                             updateUI(true);
                         } else {
+                            // 로그인 시도한 uid가 document에 없음
                             Log.d("Document Snapshot", "No Document");
                             updateUI(false);
                         }

@@ -1,7 +1,6 @@
 package com.example.mmmmeeting.Info;
 
-import java.util.ArrayList;
-
+// 사용자에 대한 정보 : 이름, 주소
 public class MemberInfo {
     private String name;
     private String address;
