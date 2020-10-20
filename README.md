@@ -5,6 +5,24 @@
 * 모임방 클릭시 (grid item 클릭시) 모임 방 내부로 들어가기 동작
 * UI 변경 (기존 GridView => Main으로 통합)
 
+// 흐름도
+SignAct->MainAct(초기 화면)->GridAdapter(모임 목록 관리)->MeetingAct(한 모임 내부)
+->FragHome(약속 목록 홈 화면)->MakeScheduleAct(약속 만들기)->ScheduleAdapter(약속 목록 관리)->
+ContentScheduleAct(약속 내용 보기/날짜, 장소 정하기)->
+    1. CalendarAct(공유 달력) - activity_calendar.xml </h1>★주영 코드 부분★</h1>
+    2. PlaceChoiceAct(장소 선택) </h1>★소연 코드 부분★</h1>
+        -> 1.MiddlePlaceAct(중간지점) - activity_place_middle.xml
+           2.SearchPlaceAct(장소찾기) - activity_place_search.xml
+
+
+
+// 2020.10.21 변경
+* 약속 화면 추가
+* 캘린더/장소 선택 화면 추가
+* 게시판 이동
+* 메뉴 탭 변경 (홈/채팅/게시판/지각자/정산)
+* schedule db에 올라가는거 확인 했습니다 (모임 ID는 임의로 넣었는데 곧 추가해야 할듯)
+
 // 2020 .10 .20 변경
 
 *주소 검색
