@@ -2,6 +2,7 @@ package com.example.mmmmeeting.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -16,9 +17,11 @@ import androidx.fragment.app.FragmentTransaction;
 import com.example.mmmmeeting.R;
 import com.example.mmmmeeting.fragment.FragAccount;
 import com.example.mmmmeeting.fragment.FragAlarm;
+import com.example.mmmmeeting.fragment.FragBoard;
 import com.example.mmmmeeting.fragment.FragCalendar;
+import com.example.mmmmeeting.fragment.FragChat;
 import com.example.mmmmeeting.fragment.FragHome;
-import com.example.mmmmeeting.fragment.FragPhoto;
+import com.example.mmmmeeting.fragment.FragChat;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class MeetingActivity extends BasicActivity {
@@ -30,7 +33,7 @@ public class MeetingActivity extends BasicActivity {
     private FragmentManager fm;
     private FragmentTransaction ft;
     private FragCalendar fragCalendar;
-    private FragPhoto fragPhoto;
+    private FragChat fragChat;
     private FragAlarm fragAlarm;
     private FragAccount fragAccount;
 
