@@ -21,10 +21,9 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 
-public class MeetingAttendActivity extends AppCompatActivity implements View.OnClickListener {
+public class MeetingAttendActivity extends AppCompatActivity {
 
     Button attend;
-    Button back2;
     FirebaseFirestore db = FirebaseFirestore.getInstance();
 
     @Override
@@ -33,21 +32,12 @@ public class MeetingAttendActivity extends AppCompatActivity implements View.OnC
         setContentView(R.layout.activity_meeting_attend);
 
         attend = findViewById(R.id.attendBtn);
-        back2 = findViewById(R.id.backBtn2);
-        attend.setOnClickListener(this);
-        back2.setOnClickListener(this);
-    }
-
-    @Override
-    public void onClick(View v) {
-        switch (v.getId()){
-            case R.id.attendBtn:
+        attend.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
                 checkCode();
-                break;
-            case R.id.backBtn2:
-                myStartActivity(MainActivity.class);
-                finish();
-        }
+            }
+        });
     }
 
     // 입력한 코드가 db에 존재하는 미팅 코드인지 확인

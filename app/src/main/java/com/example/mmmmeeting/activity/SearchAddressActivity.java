@@ -113,8 +113,8 @@ public class SearchAddressActivity extends AppCompatActivity {
                                             Intent intent = new Intent(SearchAddressActivity.this, MemberInitActivity.class);
 
                                             intent.putExtra("road", tvRoad.getText());
-                                            intent.putExtra("post", tvPost.getText());
-                                            intent.putExtra("jibun", tvJibun.getText());
+//                                            intent.putExtra("post", tvPost.getText());
+//                                            intent.putExtra("jibun", tvJibun.getText());
 
                                             startActivity(intent);
                                             finish();

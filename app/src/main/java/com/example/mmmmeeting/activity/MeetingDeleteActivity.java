@@ -24,10 +24,9 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
-public class MeetingDeleteActivity extends AppCompatActivity implements View.OnClickListener {
+public class MeetingDeleteActivity extends AppCompatActivity {
 
     Button delete;
-    Button back3;
     FirebaseFirestore db = FirebaseFirestore.getInstance();
 
     @Override
@@ -36,24 +35,13 @@ public class MeetingDeleteActivity extends AppCompatActivity implements View.OnC
         setContentView(R.layout.activity_meeting_delete);
 
         delete = findViewById(R.id.deleteBtn);
-        back3 = findViewById(R.id.backBtn3);
 
-        delete.setOnClickListener(this);
-        back3.setOnClickListener(this);
-    }
-
-    @Override
-    public void onClick(View v) {
-        switch (v.getId()){
-            case R.id.deleteBtn:
+        delete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
                 checkCode();
-                break;
-
-            case R.id.backBtn3:
-                myStartActivity(MainActivity.class);
-                finish();
-                break;
-        }
+            }
+        });
     }
 
     // 입력한 코드가 존재하는지 확인
@@ -87,8 +75,7 @@ public class MeetingDeleteActivity extends AppCompatActivity implements View.OnC
     private void checkUser(String code) {
         final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 
-        db.collection("meetings")
-                .get()
+        db.collection("meetings").get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {

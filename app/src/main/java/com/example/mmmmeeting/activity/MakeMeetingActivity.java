@@ -17,36 +17,24 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 
-public class MakeMeetingActivity extends BasicActivity implements View.OnClickListener {
+public class MakeMeetingActivity extends BasicActivity {
     Button makeMeeting;
-    Button back1;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_make_meeting);
         makeMeeting = findViewById(R.id.makeMeetingBtn);
-        back1 = findViewById(R.id.backBtn1);
 
-        makeMeeting.setOnClickListener(this);
-        back1.setOnClickListener(this);
-    }
-
-    @Override
-    public void onClick(View v) {
-        switch (v.getId()){
-            case R.id.makeMeetingBtn:
+        makeMeeting.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
                 // 모임 이름이 이미 존재하는지 확인 메서드.. 나중에..추가
 
                 // 모임 정보 저장
                 meetingUpdate();
-                break;
-
-            case R.id.backBtn1:
-                myStartActivity(MainActivity.class);
-                finish();
-                break;
-        }
-
+            }
+        });
     }
 
     private void meetingUpdate(){

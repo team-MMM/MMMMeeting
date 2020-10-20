@@ -45,8 +45,12 @@ public class MainActivity extends BasicActivity implements View.OnClickListener 
         deleteMeeting.setOnClickListener(this);
         attendMeeting.setOnClickListener(this);
 
-        showMeetings();
+    }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        showMeetings();
     }
 
     // 모임 목록을 보여줌
@@ -162,15 +166,12 @@ public class MainActivity extends BasicActivity implements View.OnClickListener 
         switch (v.getId()){
             case (R.id.meetingAdd):
                 myStartActivity(MakeMeetingActivity.class);
-                finish();
                 break;
             case(R.id.meetingDelete):
                 myStartActivity(MeetingDeleteActivity.class);
-                finish();
                 break;
             case(R.id.meetingAttend):
                 myStartActivity(MeetingAttendActivity.class);
-                finish();
                 break;
         }
 
