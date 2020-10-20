@@ -13,7 +13,7 @@ ContentScheduleAct(약속 내용 보기/날짜, 장소 정하기) -> <br>
     1. CalendarAct(공유 달력) - activity_calendar.xml 
     <h1>★소연 코드 부분★</h1>
     2. PlaceChoiceAct(장소 선택)
-        -> 1.MiddlePlaceAct(중간지점) - activity_place_middle.xml
+        -> 1.MiddlePlaceAct(중간지점) - activity_place_middle.xml <br>
            2.SearchPlaceAct(장소찾기) - activity_place_search.xml 
 
 
@@ -24,7 +24,7 @@ ContentScheduleAct(약속 내용 보기/날짜, 장소 정하기) -> <br>
 * 게시판 이동
 * 메뉴 탭 변경 (홈/채팅/게시판/지각자/정산)
 * schedule db에 올라가는거 확인 했습니다 (모임 ID는 임의로 넣었는데 곧 추가해야 할듯)
-
+<br>
 // 2020 .10 .20 변경
 
 *주소 검색
@@ -40,7 +40,6 @@ ContentScheduleAct(약속 내용 보기/날짜, 장소 정하기) -> <br>
 
 //해야 함
 <h1>★ 1. 중간지점 ★</h1>
-2. 
 
 
 // 해야하지 않을까?
