@@ -9,18 +9,18 @@ import android.widget.BaseAdapter;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.example.mmmmeeting.Info.AddressItems;
 import com.example.mmmmeeting.R;
-import com.example.mmmmeeting.Info.GridItems;
-import com.example.mmmmeeting.activity.MeetingActivity;
+import com.example.mmmmeeting.activity.MemberInitActivity;
 
 import java.util.ArrayList;
 
-public class GridListAdapter extends BaseAdapter {
-    ArrayList<GridItems> items = new ArrayList<GridItems>();
+public class AddressAdapter extends BaseAdapter {
+    ArrayList<AddressItems> items = new ArrayList<AddressItems>();
     Context context; // activity 정보 저장
 
     // 아이템 추가
-    public  void addItem(GridItems item) {
+    public void addItem(AddressItems item) {
         items.add(item);
     }
 
@@ -47,33 +47,34 @@ public class GridListAdapter extends BaseAdapter {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         context = parent.getContext(); // activity 정보 읽기
-        GridItems listItem = items.get(position); //position 해당하는 listItem
+        AddressItems listItem = items.get(position); //position 해당하는 listItem
 
         //list_item inflate => convertView 참조
-        if(convertView==null){
-            LayoutInflater inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            convertView = inflater.inflate(R.layout.my_meeting_grid_item,parent,false);
+        if (convertView == null) {
+            LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            convertView = inflater.inflate(R.layout.sub_address, parent, false);
         }
 
         // 텍스트뷰 설정
-        TextView nameText = convertView.findViewById(R.id.roomName);
-        TextView descriptText = convertView.findViewById(R.id.roomDescription);
+        TextView road = convertView.findViewById(R.id.addr_road);
+        TextView jibun = convertView.findViewById(R.id.addr_jibun);
+        TextView post = convertView.findViewById(R.id.postno);
 
         // 텍스트뷰에 글자 지정
-        descriptText.setText(listItem.getDescription());
-        nameText.setText(listItem.getName());
+        road.setText(listItem.getRoad());
+        jibun.setText(listItem.getJibun());
+        post.setText(listItem.getPost());
 
-        LinearLayout gridItem = (LinearLayout) convertView.findViewById(R.id.gridItem);
 
-        // 다음 액티비티 넘어가게
-        gridItem.setOnClickListener(new View.OnClickListener() {
+        LinearLayout addressItem = (LinearLayout) convertView.findViewById(R.id.addressItem);
+        addressItem.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //Toast.makeText(context, "동작 확인 : " + listItem.getRoad(), Toast.LENGTH_SHORT).show();
                 // MemberInitActivity 주소 정보 전달
-                Intent intent = new Intent(context, MeetingActivity.class);
-                intent.putExtra("Name",listItem.getName());
-                intent.putExtra("Description",listItem.getDescription());
+                Intent intent = new Intent(context, MemberInitActivity.class);
+                intent.putExtra("road", listItem.getRoad());
+//                intent.putExtra("post", listItem.getJibun());
+//                intent.putExtra("jibun", listItem.getPost());
                 context.startActivity(intent);
             }
         });

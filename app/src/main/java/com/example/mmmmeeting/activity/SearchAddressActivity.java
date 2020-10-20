@@ -2,17 +2,16 @@ package com.example.mmmmeeting.activity;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.LinearLayout;
-import android.widget.TextView;
+import android.widget.ListView;
 
 import com.example.mmmmeeting.R;
-import com.example.mmmmeeting.view.subAddress;
+import com.example.mmmmeeting.Info.AddressItems;
+import com.example.mmmmeeting.adapter.AddressAdapter;
 
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserFactory;
@@ -43,8 +42,6 @@ public class SearchAddressActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search_address);
 
-        addressGroup = new ArrayList<ArrayList<String>>();
-
         search = findViewById(R.id.getAddress);
         address = findViewById(R.id.editAddress);
 
@@ -56,82 +53,42 @@ public class SearchAddressActivity extends AppCompatActivity {
         switch( v.getId() ){
             case R.id.getAddress:
 
+                // 저장되는 주소 목록 초기화
+                addressGroup = new ArrayList<ArrayList<String>>();
+
+                // 서브 레이아웃(결과 나올 레이아웃) 초기화
                 //Android 4.0 이상 부터는 네트워크를 이용할 때 반드시 Thread 사용해야 함
                 new Thread(new Runnable() {
-
                     @Override
                     public void run() {
                         try {
-                            getXmlData();//아래 메소드를 호출하여 XML data를 파싱해서 String 객체로 얻어오기
-                        } catch (UnsupportedEncodingException e) {
+                            getXmlData();
+                        }catch (UnsupportedEncodingException e){
                             e.printStackTrace();
                         }
 
-                        //UI Thread(Main Thread)를 제외한 어떤 Thread도 화면을 변경할 수 없기때문에
-                        //runOnUiThread()를 이용하여 UI Thread가 TextView 글씨 변경하도록 함
+                        // Thread를 통해 UI 변경
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                // 서브 레이아웃(결과 나올 레이아웃) 초기화
-                                LinearLayout sublayer = (LinearLayout) findViewById(R.id.sublayer);
-                                sublayer.removeAllViews();
+                                // List View 설정
+                                final ListView listView = findViewById(R.id.sublayer);
+                                final AddressAdapter adapter = new AddressAdapter();
 
-                                // 주소 묶음 사이즈 만큼 (도로명, 우편, 지번 묶음 개수만큼 반복)
                                 for(int i =0; i<addressGroup.size(); i++) {
-                                    Log.d("address test", " " + i);
-                                    // 주소 아이템 레이아웃 설정
-                                    subAddress sublayout = new subAddress(getApplicationContext());
-                                    final TextView tvPost = (TextView) sublayout.findViewById(R.id.postno);
-                                    final TextView tvRoad = (TextView) sublayout.findViewById(R.id.addr_road);
-                                    final TextView tvJibun = (TextView) sublayout.findViewById(R.id.addr_jibun);
+                                    String post = addressGroup.get(i).get(0);
+                                    String road = addressGroup.get(i).get(1);
+                                    String jibun = addressGroup.get(i).get(2);
 
-                                    // 도로명, 우편, 지번 각각에 대한 결과 텍스트로 반환
-                                    for (int j = 0; j < addresslset.size(); j++) {
-                                        Log.d("address test", " " + addressGroup.get(i).get(j));
-
-                                        switch (j) {
-                                            case 0:
-                                                tvPost.setText(addressGroup.get(i).get(j));
-                                                break;
-                                            case 1:
-                                                tvRoad.setText(addressGroup.get(i).get(j));
-                                                break;
-                                            case 2:
-                                                tvJibun.setText(addressGroup.get(i).get(j));
-                                                break;
-                                        }
-                                    }
-
-                                    // 각 주소 아이템 클릭시 동작 설정
-                                    sublayout.setOnClickListener(new View.OnClickListener() {
-                                        @Override
-                                        public void onClick(View v) {
-                                            Log.d("address test", "sub Click");
-
-                                            //Toast.makeText(SearchAddressActivity.this, "Click Listener", Toast.LENGTH_SHORT).show();
-                                            // MemberInitActivity 주소 정보 전달
-                                            Intent intent = new Intent(SearchAddressActivity.this, MemberInitActivity.class);
-
-                                            intent.putExtra("road", tvRoad.getText());
-//                                            intent.putExtra("post", tvPost.getText());
-//                                            intent.putExtra("jibun", tvJibun.getText());
-
-                                            startActivity(intent);
-                                            finish();
-                                        }
-                                    });
-
-                                    // 하나의 아이템 (도로명, 우편, 지번) 텍스트 뷰 설정후
-                                    // 해당 레이아웃 서브 레이아웃에 추가가
-                                   sublayer.addView(sublayout);
+                                    adapter.addItem(new AddressItems(road, jibun, post));
                                 }
+                                listView.setAdapter(adapter);
                             }
                         });
                     }
                 }).start();
                 break;
         }
-
     }//mOnClick method..
 
 

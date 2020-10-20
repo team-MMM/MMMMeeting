@@ -39,12 +39,12 @@
         android:layout_marginBottom="10sp"
         android:background="@color/colorPrimaryDark"/>
 
-    <LinearLayout
+    <ListView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/sublayer"
         android:orientation="vertical">
 
-    </LinearLayout>
+    </ListView>
 
 </LinearLayout>
