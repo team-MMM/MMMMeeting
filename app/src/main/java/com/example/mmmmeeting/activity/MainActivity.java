@@ -8,6 +8,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.GridView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
@@ -20,6 +21,8 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -149,9 +152,34 @@ public class MainActivity extends BasicActivity implements View.OnClickListener 
                     }
                 });
 
-        // 모임에서 uid 제거 필요 -> 모임 인원이 0이면 모임 삭제
-        // Meeting Delete 참고
+//      현재 user가 속한 모임의 모임원 정보에서 uid 제거
+        db.collection("meetings").get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            //모든 document 확인
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                // 현재 uid가 모임 정보에 존재하는 경우
+                                if(document.getData().get("userID").toString().contains(mAuth.getUid())){
+                                    // db에서 현재 유저 uid 삭제
+                                    DocumentReference userdel = db.collection("meetings").document(document.getId());
+                                    userdel.update("userID", FieldValue.arrayRemove(mAuth.getUid()));
+                                    Log.d("Delete", document.getId() + " => " + document.getData());
+                                    finish();
+                                    break;
+                                } else {
+                                    Log.d("Delete", "No Document");
+                                    finish();
+                                }
+                            }
+                        } else {
+                            Log.d("Delete", "Error getting documents: ", task.getException());
+                        }
+                    }
+                });
 
+        Toast.makeText(MainActivity.this, "회원탈퇴를 완료했습니다.", Toast.LENGTH_SHORT).show();
     }
 
 

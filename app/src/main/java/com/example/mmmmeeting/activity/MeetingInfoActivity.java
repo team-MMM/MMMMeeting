@@ -30,7 +30,7 @@ import java.util.Arrays;
 public class MeetingInfoActivity extends AppCompatActivity {
 
     TextView name, description, code, user;
-    Button invite, back4;
+    Button invite;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,7 +46,6 @@ public class MeetingInfoActivity extends AppCompatActivity {
         code = findViewById(R.id.meetingCode);
         user = findViewById(R.id.meetingUsers);
         invite = findViewById(R.id.inviteBtn);
-        back4 = findViewById(R.id.backBtn4);
 
         name.setText(meetingname);
         description.setText(meetingdescription);
@@ -62,15 +61,7 @@ public class MeetingInfoActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
-
-
-        back4.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-        });
-
+        
         codeFind(meetingname);
 
         // 코드가 출력되는 TextView 클릭시 -> 코드 클립보드에 복사되도록
