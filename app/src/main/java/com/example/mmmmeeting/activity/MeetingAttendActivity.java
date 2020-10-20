@@ -21,10 +21,9 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 
-public class MeetingAttendActivity extends AppCompatActivity implements View.OnClickListener {
+public class MeetingAttendActivity extends AppCompatActivity {
 
     Button attend;
-    Button back2;
     FirebaseFirestore db = FirebaseFirestore.getInstance();
 
     @Override
@@ -33,22 +32,15 @@ public class MeetingAttendActivity extends AppCompatActivity implements View.OnC
         setContentView(R.layout.activity_meeting_attend);
 
         attend = findViewById(R.id.attendBtn);
-        back2 = findViewById(R.id.backBtn2);
-        attend.setOnClickListener(this);
-        back2.setOnClickListener(this);
+        attend.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                checkCode();
+            }
+        });
     }
 
-    @Override
-    public void onClick(View v) {
-        switch (v.getId()){
-            case R.id.attendBtn:
-                checkCode();
-                break;
-            case R.id.backBtn2:
-                myStartActivity(MainActivity.class);
-                finish();
-        }
-    }
+    // 입력한 코드가 db에 존재하는 미팅 코드인지 확인
     private void checkCode() {
         final String code = ((EditText)findViewById(R.id.attendCode)).getText().toString();
         DocumentReference docRef = db.collection("meetings").document(code);
@@ -59,11 +51,12 @@ public class MeetingAttendActivity extends AppCompatActivity implements View.OnC
                 if (task.isSuccessful()) {
                     DocumentSnapshot document = task.getResult();
                     if (document.exists()) {
+                        // 입력한 코드에 해당하는 문서가 존재하는 경우
                         Log.d("Attend", "Data is : " + document.getId());
                         updateUser(code);
                     } else {
                         Log.d("Attend", "No Document");
-                        // 3. code 없으면 dialog or toast Message -> 존재하지 않음 알림
+                        // 3. code 없으면 dialog or toast Message -> 존재하지 않음 알리고 종료, 메인으로 복귀
                         startToast("존재하지 않는 코드입니다.");
                         myStartActivity(MainActivity.class);
                         finish();

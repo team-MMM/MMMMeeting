@@ -10,47 +10,36 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.example.mmmmeeting.R;
 import com.example.mmmmeeting.fragment.FragAccount;
 import com.example.mmmmeeting.fragment.FragAlarm;
-import com.example.mmmmeeting.fragment.FragChat;
+import com.example.mmmmeeting.fragment.FragCalendar;
 import com.example.mmmmeeting.fragment.FragHome;
-import com.example.mmmmeeting.fragment.FragBoard;
+import com.example.mmmmeeting.fragment.FragPhoto;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
-public class MeetingActivity extends AppCompatActivity {
+public class MeetingActivity extends BasicActivity {
 
     private BottomNavigationView bottomNavigationView;
     TextView name, description;
     Button invite;
+
+    private FragmentManager fm;
+    private FragmentTransaction ft;
+    private FragCalendar fragCalendar;
+    private FragPhoto fragPhoto;
+    private FragAlarm fragAlarm;
+    private FragAccount fragAccount;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.frag_default);
 
-        name = (TextView) findViewById(R.id.name);
-        description = (TextView) findViewById(R.id.description);
-        invite = (Button) findViewById(R.id.inviteBtn);
-
-        Intent intent = getIntent();
-        String meetingname = intent.getExtras().getString("Name");
-        String meetingdescription = intent.getExtras().getString("Description");
-
-        name.setText(meetingname);
-        description.setText(meetingdescription);
-        invite.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(MeetingActivity.this,inviteActivity.class);
-                intent.addFlags(intent.FLAG_ACTIVITY_CLEAR_TOP);
-                intent.putExtra("Name",meetingname);
-                intent.putExtra("Description",meetingdescription);
-                startActivity(intent);
-            }
-        });
-
+        setToolbarTitle(getIntent().getExtras().getString("Name"));
 
         FragHome fragHome = new FragHome();
         getSupportFragmentManager().beginTransaction()
@@ -102,5 +91,29 @@ public class MeetingActivity extends AppCompatActivity {
 
 
     }
+
+    //메뉴바 코드
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.meetinginfo,menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()){
+            case R.id.meetingInfo:
+                // 미팅 정보 아이콘 클릭시 미팅 정보 출력하는 액티비티로 이동
+                Intent intent = new Intent(MeetingActivity.this, MeetingInfoActivity.class);
+                intent.addFlags(intent.FLAG_ACTIVITY_CLEAR_TOP);
+                intent.putExtra("Name",getIntent().getExtras().getString("Name"));
+                intent.putExtra("Description",getIntent().getExtras().getString("Description"));
+                startActivity(intent);
+                return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+    //
 
 }

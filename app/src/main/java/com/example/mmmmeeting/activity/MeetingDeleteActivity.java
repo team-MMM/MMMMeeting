@@ -24,10 +24,9 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
-public class MeetingDeleteActivity extends AppCompatActivity implements View.OnClickListener {
+public class MeetingDeleteActivity extends AppCompatActivity {
 
     Button delete;
-    Button back3;
     FirebaseFirestore db = FirebaseFirestore.getInstance();
 
     @Override
@@ -36,26 +35,16 @@ public class MeetingDeleteActivity extends AppCompatActivity implements View.OnC
         setContentView(R.layout.activity_meeting_delete);
 
         delete = findViewById(R.id.deleteBtn);
-        back3 = findViewById(R.id.backBtn3);
 
-        delete.setOnClickListener(this);
-        back3.setOnClickListener(this);
-    }
-
-    @Override
-    public void onClick(View v) {
-        switch (v.getId()){
-            case R.id.deleteBtn:
+        delete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
                 checkCode();
-                break;
-
-            case R.id.backBtn3:
-                myStartActivity(MainActivity.class);
-                finish();
-                break;
-        }
+            }
+        });
     }
 
+    // 입력한 코드가 존재하는지 확인
     private void checkCode() {
         final String code = ((EditText)findViewById(R.id.deleteCode)).getText().toString();
         DocumentReference docRef = db.collection("meetings").document(code);
@@ -82,18 +71,20 @@ public class MeetingDeleteActivity extends AppCompatActivity implements View.OnC
         });
     }
 
+    // 존재하는 코드인 경우 해당 모임에 현재 유저가 존재하는지 확인
     private void checkUser(String code) {
         final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 
-        db.collection("meetings")
-                .get()
+        db.collection("meetings").get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         if (task.isSuccessful()) {
-                            //모든 document 확인 (dou id + data arr { : , ... ,  })
+                            //모든 document 확인
                             for (QueryDocumentSnapshot document : task.getResult()) {
+                                // 현재 uid가 모임 정보에 존재하는 경우
                                 if(document.getData().get("userID").toString().contains(user.getUid())){
+                                    // db에서 현재 유저 uid 삭제
                                     DocumentReference userdel = db.collection("meetings").document(code);
                                     userdel.update("userID", FieldValue.arrayRemove(user.getUid()));
                                     startToast("모임에서 탈퇴했습니다.");

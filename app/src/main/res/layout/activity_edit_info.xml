@@ -13,43 +13,49 @@
         android:textSize="24dp"
         android:textStyle="bold" />
 
-    <LinearLayout
+    <EditText
+        android:id="@+id/nameEditText"
         android:layout_width="match_parent"
-        android:layout_height="400dp"
-        android:orientation="vertical"
-        android:padding="10dp">
+        android:layout_height="wrap_content"
+        android:layout_margin="10sp"
+        android:ems="10"
+        android:hint="이름"
+        android:textColor="@android:color/black"
+        android:inputType="textPersonName"/>
 
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_margin="10sp">
 
-
-        <EditText
-            android:id="@+id/nameEditText"
-            android:layout_width="match_parent"
+        <TextView
+            android:id="@+id/addressText"
+            android:layout_width="250sp"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="5dp"
-            android:ems="10"
-            android:hint="이름"
-            android:inputType="textPersonName"/>
-
-        <EditText
-            android:id="@+id/addressEditText"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="5dp"
-            android:ems="10"
+            android:layout_margin="10sp"
+            android:textColor="@android:color/black"
+            android:textSize="15sp"
             android:hint="주소" />
 
         <Button
-            android:id="@+id/checkButton"
-            android:layout_width="match_parent"
+            android:id="@+id/addressSearchBtn"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="확인"/>
+            android:text="찾기"
+            android:layout_toRightOf="@+id/addressText"
+            android:background="@drawable/button_shape"
+            />
 
+    </RelativeLayout>
 
-
-
-
-    </LinearLayout>
-
+    <Button
+        android:id="@+id/checkButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="20sp"
+        android:background="@drawable/button_shape"
+        android:text="저장"/>
 
 </LinearLayout>
 
