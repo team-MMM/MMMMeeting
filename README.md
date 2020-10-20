@@ -10,11 +10,11 @@ SignAct -> MainAct(초기 화면) -> GridAdapter(모임 목록 관리) -> Meetin
 -> FragHome(약속 목록 홈 화면) -> MakeScheduleAct(약속 만들기) -> ScheduleAdapter(약속 목록 관리)-> <br>
 ContentScheduleAct(약속 내용 보기/날짜, 장소 정하기) -> <br>
 <h1>★주영 코드 부분★</h1>
-    1. CalendarAct(공유 달력) - activity_calendar.xml 
-    <h1>★소연 코드 부분★</h1>
-    2. PlaceChoiceAct(장소 선택)
-        -> 1.MiddlePlaceAct(중간지점) - activity_place_middle.xml <br>
-           2.SearchPlaceAct(장소찾기) - activity_place_search.xml 
+1. CalendarAct(공유 달력) - activity_calendar.xml 
+<h1>★소연 코드 부분★</h1>
+2. PlaceChoiceAct(장소 선택)<br>
+*1.MiddlePlaceAct(중간지점) - activity_place_middle.xml<br>
+*2.SearchPlaceAct(장소찾기) - activity_place_search.xml 
 
 
 <br><br>
