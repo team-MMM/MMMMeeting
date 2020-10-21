@@ -11,6 +11,9 @@ SignAct -> MainAct(초기 화면) -> GridAdapter(모임 목록 관리) -> Meetin
 ContentScheduleAct(약속 내용 보기/날짜, 장소 정하기) -> <br>
 <h1>★주영 코드 부분★</h1>
 1. CalendarAct(공유 달력) - activity_calendar.xml 
+-> 일단 메모 기능 있는 달력으로 올림
+-> 각자 계정으로 기록하면 공유가 되는지는 확인해봐야 함
+-> 지금은 안드로이드 스튜디오 저장소(?)에 저장하는 방식이라 firebase로 올려야 함
 <h1>★소연 코드 부분★</h1>
 2. PlaceChoiceAct(장소 선택)<br>
 *1.MiddlePlaceAct(중간지점) - activity_place_middle.xml<br>
