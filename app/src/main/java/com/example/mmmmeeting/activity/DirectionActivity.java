@@ -97,7 +97,7 @@ public class DirectionActivity extends AppCompatActivity
 
     private GpsTracker gpsTracker;
 
-    private static final String TAG = "googlemap_example";
+    private static final String TAG = "directions";
     private static final int GPS_ENABLE_REQUEST_CODE = 2001;
     private static final int UPDATE_INTERVAL_MS = 1000;  // 1초
     private static final int FASTEST_UPDATE_INTERVAL_MS = 500; // 0.5초
