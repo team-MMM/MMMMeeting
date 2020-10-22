@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+
+    <fragment
+        android:id="@+id/map"
+        android:layout_width="match_parent"
+        android:layout_height="300dp"
+        tools:context=".DirectionActivity"
+        android:name="com.google.android.gms.maps.SupportMapFragment"/>
+
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="20dp"
+        android:layout_below="@id/map"
+        >
+
+        <RelativeLayout
+            android:id="@+id/rl_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/map"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="20dp"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <RelativeLayout
+                android:id="@+id/rl_route_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="50dp"
+                android:visibility="gone">
+
+                <TextView
+                    android:id="@+id/recommend_route"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp"
+                    android:text="추천 경로"
+                    android:textSize="16dp"/>
+
+                <TextView
+                    android:id="@+id/during_time"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:gravity="right"
+                    android:paddingLeft="5dp"
+                    android:paddingRight="5dp"
+                    android:textSize="28dp"/>
+
+                <org.apmem.tools.layouts.FlowLayout
+                    android:id="@+id/fl_route"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/during_time"
+                    android:background="#ffffff"
+                    android:layout_marginBottom="10dp">
+
+                </org.apmem.tools.layouts.FlowLayout>
+            </RelativeLayout>
+
+
+            <RelativeLayout
+                android:id="@+id/rl_another_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/rl_route_view"
+                android:visibility="gone">
+
+                <TextView
+                    android:id="@+id/another_route"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="다른 경로 더 보기"
+                    android:textSize="16dp"/>
+
+                <LinearLayout
+                    android:id="@+id/ll_flow_container"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/another_route"
+                    android:orientation="vertical">
+                </LinearLayout>
+
+            </RelativeLayout>
+
+        </RelativeLayout>
+
+    </ScrollView>
+
+    <LinearLayout
+        android:id="@+id/ll_detail_course_container"
+        android:layout_below="@+id/map"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="-20dp"
+        android:background="@drawable/rounded"
+        android:backgroundTint="#ffffff"
+        android:visibility="gone"
+        android:orientation="vertical">
+
+        <ImageButton
+            android:id="@+id/goback"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginTop="5dp"
+            android:layout_gravity="right"
+            android:src="@drawable/undo"
+            android:adjustViewBounds="true"
+            android:scaleType="fitCenter"/>
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <LinearLayout
+                android:id="@+id/ll_traffic_detail_route_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="10dp"
+                android:paddingBottom="20dp"
+                android:orientation="vertical">
+
+            </LinearLayout>
+        </ScrollView>
+    </LinearLayout>
+
+</RelativeLayout>

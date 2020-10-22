@@ -39,10 +39,12 @@
         <activity android:name=".activity.SearchPlaceActivity"/>
         <activity android:name=".activity.CalendarActivity"/>
         <activity android:name=".activity.PlaceChoiceActivity"/>
+        <activity android:name=".activity.SearchPlaceActivity"></activity>
+        <activity android:name=".activity.DirectionActivity"></activity>
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyDGHEER3zfPOuW0-yj2kw609KTERmsCnfw" />
+            android:value="AIzaSyAMjzNcvmVwExmuyfw82V-G-DXmhVAUymY" />
     </application>
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.SEND_SMS" />
