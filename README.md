@@ -17,13 +17,13 @@ ContentScheduleAct(약속 내용 보기/날짜, 장소 정하기) -> <br>
 <h1>★소연 코드 부분★</h1>
 2. PlaceChoiceAct(장소 선택)<br>
 *1.MiddlePlaceAct(중간지점) - activity_place_middle.xml<br>
-*2.SearchPlaceAct(장소찾기) - activity_place_search.xml 
-
-추가된 Activity >> DirectionActivity, GpsTracker, SampleItem
-추가된 xml >> activity_direction_map
-수정사항
-* UI 정리 ( 추천경로와 그 외의 경로를 보여줌 , 경로를 선택하면 상세정보를 볼 수 있음)
-* Polyline 합치기 (선택된 경로의 Polyline을 볼 수 있도록 수정함)
+*2.SearchPlaceAct(장소찾기) - activity_place_search.xml <br>
+<br>
+추가된 Activity >> DirectionActivity, GpsTracker, SampleItem<br>
+추가된 xml >> activity_direction_map<br>
+수정사항<br>
+* UI 정리 ( 추천경로와 그 외의 경로를 보여줌 , 경로를 선택하면 상세정보를 볼 수 있음)<br>
+* Polyline 합치기 (선택된 경로의 Polyline을 볼 수 있도록 수정함)<br>
 
 
 <br><br>
