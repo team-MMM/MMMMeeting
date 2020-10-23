@@ -18,13 +18,15 @@ ContentScheduleAct(약속 내용 보기/날짜, 장소 정하기) -> <br>
 2. PlaceChoiceAct(장소 선택)<br>
 *1.MiddlePlaceAct(중간지점) - activity_place_middle.xml<br>
 *2.SearchPlaceAct(장소찾기) - activity_place_search.xml <br>
-<br>
-추가된 Activity >> DirectionActivity, GpsTracker, SampleItem<br>
-추가된 xml >> activity_direction_map<br>
+<br><br>
+//2020.10.23 변경 사항
+*추가된 Activity >> DirectionActivity, GpsTracker, SampleItem<br>
+*추가된 xml >> activity_direction_map<br>
 <br>
 수정사항<br>
 * UI 정리 ( 추천경로와 그 외의 경로를 보여줌 , 경로를 선택하면 상세정보를 볼 수 있음)<br>
 * Polyline 합치기 (선택된 경로의 Polyline을 볼 수 있도록 수정함)<br>
+* 아직 코드 정리가 안돼서 다시 정리하고 주석 달아서 올릴 예정임
 
 
 <br><br>
