@@ -20,6 +20,7 @@ ContentScheduleAct(약속 내용 보기/날짜, 장소 정하기) -> <br>
 *2.SearchPlaceAct(장소찾기) - activity_place_search.xml <br>
 <br><br>
 //2020.10.23 변경 사항
+<br>
 *추가된 Activity >> DirectionActivity, GpsTracker, SampleItem<br>
 *추가된 xml >> activity_direction_map<br>
 <br>
