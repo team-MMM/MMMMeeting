@@ -1,4 +1,5 @@
 // 장소 검색 화면
+
 package com.example.mmmmeeting.activity;
 
 /*
@@ -395,3 +396,4 @@ public class SearchPlaceActivity extends AppCompatActivity
         return point;
     }
 }
+

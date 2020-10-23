@@ -8,6 +8,7 @@
         android:icon="@mipmap/ic_launcher"
         android:label="우리 지금 만나"
         android:requestLegacyExternalStorage="true"
+        android:usesCleartextTraffic="true"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
@@ -31,16 +32,16 @@
         <activity android:name=".activity.MakeMeetingActivity" />
         <activity android:name=".activity.MakePostActivity" />
         <activity android:name=".activity.MemberInitActivity" />
-        <activity android:name=".activity.MapPlaceActivity" />
         <activity android:name=".activity.ContentBoardActivity" />
         <activity android:name=".activity.MakeScheduleActivity"/>
         <activity android:name=".activity.ContentScheduleActivity"/>
         <activity android:name=".activity.MiddlePlaceActivity"/>
+        <activity android:name=".activity.MeetingInfoActivity"/>
         <activity android:name=".activity.SearchPlaceActivity"/>
+        <activity android:name=".activity.SearchAddressActivity"/>
         <activity android:name=".activity.CalendarActivity"/>
         <activity android:name=".activity.PlaceChoiceActivity"/>
-        <activity android:name=".activity.SearchPlaceActivity"></activity>
-        <activity android:name=".activity.DirectionActivity"></activity>
+        <activity android:name=".activity.DirectionActivity"/>
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"

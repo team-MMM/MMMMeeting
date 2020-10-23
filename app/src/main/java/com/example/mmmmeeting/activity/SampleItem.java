@@ -1,6 +1,5 @@
 package com.example.mmmmeeting.activity;
 
-
 public class SampleItem {
     String text;
     int img_num;
