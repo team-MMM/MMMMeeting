@@ -39,10 +39,9 @@ public class FragHome extends Fragment {
     private boolean updating;
     private boolean topScrolled;
     private TextView name;
-
+    private String meetingName;
 
     public FragHome() { }
-
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -51,6 +50,13 @@ public class FragHome extends Fragment {
         View view = inflater.inflate(R.layout.frag_home, container, false);
         name = (TextView)view.findViewById(R.id.schedule_name);
         name.setText("약속 목록");
+
+        Bundle bundle = this.getArguments();
+        if(bundle != null) {
+            bundle = getArguments();
+            meetingName = bundle.getString("Name");
+        }
+        Log.d("get Name Test: ", meetingName);
 
         firebaseFirestore = FirebaseFirestore.getInstance();
         postList = new ArrayList<>();
@@ -196,6 +202,7 @@ public class FragHome extends Fragment {
 
     private void myStartActivity(Class c) {
         Intent intent = new Intent(getActivity(), c);
+        intent.putExtra("Name", meetingName);
         startActivityForResult(intent, 0);
     }
 }

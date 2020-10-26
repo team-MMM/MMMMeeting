@@ -51,6 +51,7 @@ public class MakeScheduleActivity extends AppCompatActivity {
     private EditText titleEditText;
     private ScheduleInfo scheduleInfo;
     private int pathCount, successCount;
+    private String meetingName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,6 +61,15 @@ public class MakeScheduleActivity extends AppCompatActivity {
         parent = findViewById(R.id.contentsLayout);
         contentsEditText = findViewById(R.id.contentsEditText);
         titleEditText = findViewById(R.id.titleEditText);
+
+        Bundle bundle = getIntent().getExtras();
+        if (bundle != null) {
+            meetingName = bundle.getString("Name");
+            Log.d("get Name Test2: ",meetingName);
+        } else {
+            Log.d("get Name Test2: ","ERROR");
+            // handle case
+        }
 
         findViewById(R.id.check).setOnClickListener(onClickListener);
 

@@ -2,6 +2,7 @@ package com.example.mmmmeeting.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -45,6 +46,11 @@ public class MeetingActivity extends BasicActivity {
         setToolbarTitle(getIntent().getExtras().getString("Name"));
 
         FragHome fragHome = new FragHome();
+
+        Bundle bundle = new Bundle();
+        bundle.putString("Name", getIntent().getExtras().getString("Name"));
+        fragHome.setArguments(bundle);
+
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.main_frame,fragHome)
                 .commit();
@@ -62,6 +68,7 @@ public class MeetingActivity extends BasicActivity {
                         getSupportFragmentManager().beginTransaction()
                                 .replace(R.id.main_frame,fragHome)
                                 .commit();
+
                         return true;
                     case R.id.menu_chat:
                         FragChat fragChat = new FragChat();
