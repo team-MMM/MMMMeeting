@@ -18,11 +18,14 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.mmmmeeting.Info.ScheduleInfo;
 import com.example.mmmmeeting.OnScheduleListener;
 import com.example.mmmmeeting.R;
+import com.example.mmmmeeting.activity.MainActivity;
 import com.example.mmmmeeting.activity.MakeScheduleActivity;
 import com.example.mmmmeeting.adapter.ScheduleAdapter;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -173,13 +176,15 @@ public class FragHome extends Fragment {
                             }
                             for (QueryDocumentSnapshot document : task.getResult()) {
                                 Log.d(TAG, document.getId() + " => " + document.getData());
-                                postList.add(new ScheduleInfo(
-                                        document.getData().get("title").toString(),
-                                        document.getData().get("meetingID").toString(),
-                                        (ArrayList<String>) document.getData().get("contents"),
-                                        new Date(document.getDate("createdAt").getTime()),
-                                        document.getId()));
-
+                                if(document.getData().get("meetingID").toString().equals(meetingName)){
+                                    Log.d("update Test", meetingName);
+                                    postList.add(new ScheduleInfo(
+                                            document.getData().get("title").toString(),
+                                            document.getData().get("meetingID").toString(),
+                                            (ArrayList<String>) document.getData().get("contents"),
+                                            new Date(document.getDate("createdAt").getTime()),
+                                            document.getId()));
+                                }
                                         /*
                                         document.getData().get("title").toString(),
                                         (ArrayList<String>) document.getData().get("contents"),

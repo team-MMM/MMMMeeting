@@ -65,6 +65,11 @@ public class MeetingActivity extends BasicActivity {
                     // 홈 화면(약속 목록)으로 이동
                     case R.id.menu_home:
                         FragHome fragHome = new FragHome();
+
+                        Bundle bundle = new Bundle();
+                        bundle.putString("Name", getIntent().getExtras().getString("Name"));
+                        fragHome.setArguments(bundle);
+
                         getSupportFragmentManager().beginTransaction()
                                 .replace(R.id.main_frame,fragHome)
                                 .commit();

@@ -17,12 +17,16 @@ import com.bumptech.glide.Glide;
 import com.example.mmmmeeting.view.ContentsItemView;
 import com.example.mmmmeeting.Info.ScheduleInfo;
 import com.example.mmmmeeting.R;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageMetadata;
 import com.google.firebase.storage.StorageReference;
@@ -153,6 +157,7 @@ public class MakeScheduleActivity extends AppCompatActivity {
     // Firestore에 약속 정보 업로드 하는 함수
     private void storageUpload() {
         final String title = ((EditText) findViewById(R.id.titleEditText)).getText().toString();
+
         if (title.length() > 0) {
             final ArrayList<String> contentsList = new ArrayList<>();
             final ArrayList<String> lateComerList = new ArrayList<>();
@@ -202,7 +207,7 @@ public class MakeScheduleActivity extends AppCompatActivity {
                                             if (successCount == 0) {
                                                 // 미팅 id 받아오는거 아직 모르겠어서 임의로 넣음
                                                 // 처음 생성할 때는 [약속 이름, 미팅 이름, 내용, 날짜, 약속 생성자]
-                                                ScheduleInfo scheduleInfo = new ScheduleInfo(title, "meetingID", contentsList, date, user.getUid());
+                                                ScheduleInfo scheduleInfo = new ScheduleInfo(title, meetingName, contentsList, date, user.getUid());
                                                 storeUpload(documentReference, scheduleInfo);
                                             }
                                         }
@@ -217,7 +222,7 @@ public class MakeScheduleActivity extends AppCompatActivity {
                 }
             }
             if (successCount == 0) {
-                storeUpload(documentReference, new ScheduleInfo(title, "meetingID", contentsList, date, user.getUid()));
+                storeUpload(documentReference, new ScheduleInfo(title, meetingName, contentsList, date, user.getUid()));
             }
         } else {
             showToast(MakeScheduleActivity.this, "제목을 입력해주세요.");
@@ -281,4 +286,5 @@ public class MakeScheduleActivity extends AppCompatActivity {
         intent.putExtra(INTENT_MEDIA, media);
         startActivityForResult(intent, requestCode);
     }
+
 }
