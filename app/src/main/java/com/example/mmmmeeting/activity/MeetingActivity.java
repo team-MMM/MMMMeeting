@@ -2,6 +2,7 @@ package com.example.mmmmeeting.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -45,6 +46,11 @@ public class MeetingActivity extends BasicActivity {
         setToolbarTitle(getIntent().getExtras().getString("Name"));
 
         FragHome fragHome = new FragHome();
+
+        Bundle bundle = new Bundle();
+        bundle.putString("Name", getIntent().getExtras().getString("Name"));
+        fragHome.setArguments(bundle);
+
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.main_frame,fragHome)
                 .commit();
@@ -59,9 +65,15 @@ public class MeetingActivity extends BasicActivity {
                     // 홈 화면(약속 목록)으로 이동
                     case R.id.menu_home:
                         FragHome fragHome = new FragHome();
+
+                        Bundle bundle = new Bundle();
+                        bundle.putString("Name", getIntent().getExtras().getString("Name"));
+                        fragHome.setArguments(bundle);
+
                         getSupportFragmentManager().beginTransaction()
                                 .replace(R.id.main_frame,fragHome)
                                 .commit();
+
                         return true;
                     case R.id.menu_chat:
                         FragChat fragChat = new FragChat();
