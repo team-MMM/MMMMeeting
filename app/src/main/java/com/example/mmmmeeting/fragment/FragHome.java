@@ -150,12 +150,12 @@ public class FragHome extends Fragment {
         public void onDelete(ScheduleInfo postInfo) {
             postList.remove(postInfo);
             scheduleAdapter.notifyDataSetChanged();
-
             Log.e("로그: ","삭제 성공");
         }
 
         @Override
         public void onModify() {
+
             Log.e("로그: ","수정 성공");
         }
     };
@@ -184,15 +184,6 @@ public class FragHome extends Fragment {
                                             new Date(document.getDate("createdAt").getTime()),
                                             document.getId()));
                                 }
-                                        /*
-                                        document.getData().get("title").toString(),
-                                        (ArrayList<String>) document.getData().get("contents"),
-                                        (ArrayList<String>) document.getData().get("formats"),
-                                        document.getData().get("publisher").toString(),
-                                        new Date(document.getDate("createdAt").getTime()),
-                                        document.getId()
-                                        ));
-                                         */
                             }
                             scheduleAdapter.notifyDataSetChanged();
                         } else {
@@ -206,6 +197,7 @@ public class FragHome extends Fragment {
 
     private void myStartActivity(Class c) {
         Intent intent = new Intent(getActivity(), c);
+        intent.putExtra("Name",meetingName);
         startActivityForResult(intent, 0);
     }
 }
