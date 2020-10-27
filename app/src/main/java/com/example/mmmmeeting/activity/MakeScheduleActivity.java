@@ -66,15 +66,6 @@ public class MakeScheduleActivity extends AppCompatActivity {
         contentsEditText = findViewById(R.id.contentsEditText);
         titleEditText = findViewById(R.id.titleEditText);
 
-        Bundle bundle = getIntent().getExtras();
-        if (bundle != null) {
-            meetingName = bundle.getString("Name");
-            Log.d("get Name Test2: ",meetingName);
-        } else {
-            Log.d("get Name Test2: ","ERROR");
-            // handle case
-        }
-
         findViewById(R.id.check).setOnClickListener(onClickListener);
 
         contentsEditText.setOnFocusChangeListener(onFocusChangeListener);
@@ -207,7 +198,7 @@ public class MakeScheduleActivity extends AppCompatActivity {
                                             if (successCount == 0) {
                                                 // 미팅 id 받아오는거 아직 모르겠어서 임의로 넣음
                                                 // 처음 생성할 때는 [약속 이름, 미팅 이름, 내용, 날짜, 약속 생성자]
-                                                ScheduleInfo scheduleInfo = new ScheduleInfo(title, meetingName, contentsList, date, user.getUid());
+                                                ScheduleInfo scheduleInfo = new ScheduleInfo(title, "meetingID", contentsList, date, user.getUid());
                                                 storeUpload(documentReference, scheduleInfo);
                                             }
                                         }
@@ -222,7 +213,7 @@ public class MakeScheduleActivity extends AppCompatActivity {
                 }
             }
             if (successCount == 0) {
-                storeUpload(documentReference, new ScheduleInfo(title, meetingName, contentsList, date, user.getUid()));
+                storeUpload(documentReference, new ScheduleInfo(title, "meetingID", contentsList, date, user.getUid()));
             }
         } else {
             showToast(MakeScheduleActivity.this, "제목을 입력해주세요.");

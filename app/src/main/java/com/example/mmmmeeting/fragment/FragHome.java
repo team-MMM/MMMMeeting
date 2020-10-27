@@ -151,7 +151,6 @@ public class FragHome extends Fragment {
             postList.remove(postInfo);
             scheduleAdapter.notifyDataSetChanged();
 
-
             Log.e("로그: ","삭제 성공");
         }
 
@@ -207,7 +206,6 @@ public class FragHome extends Fragment {
 
     private void myStartActivity(Class c) {
         Intent intent = new Intent(getActivity(), c);
-        intent.putExtra("Name", meetingName);
         startActivityForResult(intent, 0);
     }
 }
