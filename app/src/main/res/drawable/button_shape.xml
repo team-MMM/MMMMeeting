@@ -11,10 +11,10 @@
 
     <!--여백-->
     <padding
-        android:bottom="4sp"
-        android:left="4sp"
-        android:right="4sp"
-        android:top="4sp" />
+        android:bottom="2sp"
+        android:left="2sp"
+        android:right="2sp"
+        android:top="2sp" />
 
     <!--둥글게-->
     <corners

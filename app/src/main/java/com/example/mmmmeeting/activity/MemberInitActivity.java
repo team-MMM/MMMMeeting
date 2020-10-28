@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -22,12 +23,11 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.Objects;
 
-public class MemberInitActivity extends BasicActivity implements View.OnClickListener {
+public class MemberInitActivity extends BasicActivity implements View.OnClickListener, RatingBar.OnRatingBarChangeListener {
 
-    Button checkButton;
-    Button addressSearch;
-    TextView addressTv;
-    TextView nameTv;
+    Button checkButton,addressSearch;
+    TextView addressTv, nameTv;
+    RatingBar restaurant, cafe, shopping, subway;
     SharedPreferences sp;
 
     @Override
@@ -40,6 +40,11 @@ public class MemberInitActivity extends BasicActivity implements View.OnClickLis
         addressTv = findViewById(R.id.addressText);
         nameTv = (EditText)findViewById(R.id.nameEditText);
 
+        restaurant = findViewById(R.id.restaurantRate);
+        cafe = findViewById(R.id.cafetRate);
+        shopping = findViewById(R.id.shoppingRate);
+        subway = findViewById(R.id.subwayRate);
+
         // 이전 저장 값 보여주기 -> 창 띄울 때 이름 자동으로 띄워져 있게
         sp = getSharedPreferences("sp", MODE_PRIVATE);
         String save = sp.getString("name", "");
@@ -47,6 +52,11 @@ public class MemberInitActivity extends BasicActivity implements View.OnClickLis
 
         checkButton.setOnClickListener(this);
         addressSearch.setOnClickListener(this);
+
+        restaurant.setOnRatingBarChangeListener(this);
+        cafe.setOnRatingBarChangeListener(this);
+        shopping.setOnRatingBarChangeListener(this);
+        subway.setOnRatingBarChangeListener(this);
     }
 
     @Override protected void onStop() {
@@ -100,6 +110,10 @@ public class MemberInitActivity extends BasicActivity implements View.OnClickLis
 
             // 멤버 정보 객체 생성 -> db저장
             MemberInfo memberInfo = new MemberInfo(name, address);
+            memberInfo.setRating("restaurant", restaurant.getRating());
+            memberInfo.setRating("cafe", cafe.getRating());
+            memberInfo.setRating("shopping", shopping.getRating());
+            memberInfo.setRating("subway", subway.getRating());
 
             if (user != null) {
                 db.collection("users").document(user.getUid()).set(memberInfo)
@@ -131,5 +145,23 @@ public class MemberInitActivity extends BasicActivity implements View.OnClickLis
         Intent intent = new Intent(this,c);
         intent.addFlags(intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(intent);
+    }
+
+    @Override
+    public void onRatingChanged(RatingBar ratingBar, float rating, boolean fromUser) {
+        switch (ratingBar.getId()){
+            case R.id.restaurantRate:
+                Log.d("Rate Test", "restaurant change"+restaurant.getRating());
+                break;
+            case R.id.cafetRate:
+                Log.d("Rate Test", "cafe change"+cafe.getRating());
+                break;
+            case R.id.shoppingRate:
+                Log.d("Rate Test", "shopping change"+shopping.getRating());
+                break;
+            case R.id.subwayRate:
+                Log.d("Rate Test", "subway change"+ subway.getRating());
+                break;
+        }
     }
 }

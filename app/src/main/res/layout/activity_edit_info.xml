@@ -6,7 +6,7 @@
 
     <TextView
         android:layout_width="match_parent"
-        android:layout_height="200dp"
+        android:layout_height="80dp"
         android:gravity="center"
         android:text="회원정보"
         android:textColor="#000000"
@@ -27,11 +27,12 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_margin="10sp">
+        android:layout_marginRight="10sp"
+        >
 
         <TextView
             android:id="@+id/addressText"
-            android:layout_width="250sp"
+            android:layout_width="300sp"
             android:layout_height="wrap_content"
             android:layout_margin="10sp"
             android:textColor="@android:color/black"
@@ -43,10 +44,147 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="찾기"
+            android:layout_alignParentRight="true"
             android:layout_toRightOf="@+id/addressText"
             android:background="@drawable/button_shape"
             />
 
+    </RelativeLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="3sp"
+        android:layout_margin="10sp"
+        android:background="@color/colorPrimaryDark"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10sp"
+        android:textColor="@android:color/black"
+        android:textSize="20sp"
+        android:gravity="center"
+        android:text="모임 장소별 선호도를 입력해 주세요." />
+
+    <RelativeLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    >
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@android:color/black"
+        android:layout_marginLeft="10sp"
+        android:textSize="20sp"
+        android:layout_alignParentLeft="true"
+        android:layout_centerInParent="true"
+        android:text="식당"
+        />
+
+    <RatingBar
+        android:id="@+id/restaurantRate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="10sp"
+        android:layout_alignParentRight="true"
+        android:isIndicator="false"
+        android:numStars="5"
+        android:rating="0"
+        android:stepSize="1.0"
+        android:max = "5"
+        style="@style/Widget.AppCompat.RatingBar.Indicator"
+        />
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        >
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@android:color/black"
+        android:layout_marginLeft="10sp"
+        android:textSize="20sp"
+        android:layout_alignParentLeft="true"
+        android:layout_centerInParent="true"
+        android:text="카페"
+        />
+
+    <RatingBar
+        android:id="@+id/cafetRate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="10sp"
+        android:layout_alignParentRight="true"
+        android:isIndicator="false"
+        android:numStars="5"
+        android:rating="0"
+        android:stepSize="1.0"
+        android:max = "5"
+        style="@style/Widget.AppCompat.RatingBar.Indicator"
+        />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        >
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@android:color/black"
+        android:layout_marginLeft="10sp"
+        android:textSize="20sp"
+        android:layout_alignParentLeft="true"
+        android:layout_centerInParent="true"
+        android:text="지하철"
+        />
+
+    <RatingBar
+        android:id="@+id/subwayRate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="10sp"
+        android:layout_alignParentRight="true"
+        android:isIndicator="false"
+        android:numStars="5"
+        android:rating="0"
+        android:stepSize="1.0"
+        android:max = "5"
+        style="@style/Widget.AppCompat.RatingBar.Indicator"
+        />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        >
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@android:color/black"
+        android:layout_marginLeft="10sp"
+        android:textSize="20sp"
+        android:layout_alignParentLeft="true"
+        android:layout_centerInParent="true"
+        android:text="쇼핑몰"
+        />
+
+    <RatingBar
+        android:id="@+id/shoppingRate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="10sp"
+        android:layout_alignParentRight="true"
+        android:isIndicator="false"
+        android:numStars="5"
+        android:rating="0"
+        android:stepSize="1.0"
+        android:max = "5"
+        style="@style/Widget.AppCompat.RatingBar.Indicator"
+        />
     </RelativeLayout>
 
     <Button
