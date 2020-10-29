@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     android:id="@+id/layout_search"
-    tools:context=".SearchPlaceActivity">
+    tools:context="activity.SearchPlaceActivity">
 
     <fragment android:id="@+id/search_map"
         android:layout_width="match_parent"
