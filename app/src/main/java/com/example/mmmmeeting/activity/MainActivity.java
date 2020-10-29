@@ -22,6 +22,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -166,6 +167,9 @@ public class MainActivity extends BasicActivity implements View.OnClickListener 
                                     DocumentReference userdel = db.collection("meetings").document(document.getId());
                                     userdel.update("userID", FieldValue.arrayRemove(mAuth.getUid()));
                                     Log.d("Delete", document.getId() + " => " + document.getData());
+
+                                    meetingMemberCheck(document.getId());
+
                                     finish();
                                     break;
                                 } else {
@@ -180,6 +184,33 @@ public class MainActivity extends BasicActivity implements View.OnClickListener 
                 });
 
         Toast.makeText(MainActivity.this, "회원탈퇴를 완료했습니다.", Toast.LENGTH_SHORT).show();
+    }
+
+    private void meetingMemberCheck(String code) {
+        DocumentReference meetingdel = db.collection("meetings").document(code);
+
+        meetingdel.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    Log.d("Delete3", document.get("userID").toString());
+                    // 모임원 없는 모임이 된 경우 모임 삭제
+
+                    Log.d("Delete3 Test", "users:"+(document.get("userID").toString().length()));
+                    // 모임원 없음 = 2
+                    // 모임원 한 명 = 30
+                    // 이 후 모임원 한 명 증가시마다 length +30 씩 증가
+
+                    if (document.get("userID").toString().length()==2) {
+                        // 모임에 있는 약속, 게시판 내용도 전부 삭제해야..
+                        meetingdel.delete();
+                    }
+                } else {
+                    Log.d("Delete", "Task Fail : " + task.getException());
+                }
+            }
+        });
     }
 
 

@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -22,12 +23,11 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.Objects;
 
-public class MemberInitActivity extends BasicActivity implements View.OnClickListener {
+public class MemberInitActivity extends BasicActivity implements View.OnClickListener, RatingBar.OnRatingBarChangeListener {
 
-    Button checkButton;
-    Button addressSearch;
-    TextView addressTv;
-    TextView nameTv;
+    Button checkButton,addressSearch;
+    TextView addressTv, nameTv;
+    RatingBar restaurant, cafe, shopping, subway;
     SharedPreferences sp;
 
     @Override
@@ -40,13 +40,39 @@ public class MemberInitActivity extends BasicActivity implements View.OnClickLis
         addressTv = findViewById(R.id.addressText);
         nameTv = (EditText)findViewById(R.id.nameEditText);
 
-        // 이전 저장 값 보여주기 -> 창 띄울 때 이름 자동으로 띄워져 있게
-        sp = getSharedPreferences("sp", MODE_PRIVATE);
-        String save = sp.getString("name", "");
-        nameTv.setText(save); // 뷰에 반영
+        restaurant = findViewById(R.id.restaurantRate);
+        cafe = findViewById(R.id.cafetRate);
+        shopping = findViewById(R.id.shoppingRate);
+        subway = findViewById(R.id.subwayRate);
 
+        beforeInfo();
+        
         checkButton.setOnClickListener(this);
         addressSearch.setOnClickListener(this);
+
+        restaurant.setOnRatingBarChangeListener(this);
+        cafe.setOnRatingBarChangeListener(this);
+        shopping.setOnRatingBarChangeListener(this);
+        subway.setOnRatingBarChangeListener(this);
+    }
+
+    private void beforeInfo() {
+        // 이전 저장 값 보여주기 -> 창 띄울 때 이름 자동으로 띄워져 있게
+        sp = getSharedPreferences("sp", MODE_PRIVATE);
+        String name = sp.getString("name", "");
+        String address = sp.getString("address","");
+        float restaurantBar = sp.getFloat("restaurant",0);
+        float cafeBar = sp.getFloat("cafe",0);
+        float shoppingBar = sp.getFloat("shopping",0);
+        float subwayBar = sp.getFloat("subway",0);
+
+        // 뷰에 반영
+        nameTv.setText(name);
+        addressTv.setText(address);
+        restaurant.setRating(restaurantBar);
+        cafe.setRating(cafeBar);
+        shopping.setRating(shoppingBar);
+        subway.setRating(subwayBar);
     }
 
     @Override protected void onStop() {
@@ -54,7 +80,14 @@ public class MemberInitActivity extends BasicActivity implements View.OnClickLis
         // 액티비티 종료전 저장
         sp = getSharedPreferences("sp", MODE_PRIVATE);
         SharedPreferences.Editor editor = sp.edit(); // editor 사용해 저장
-        editor.putString("name", nameTv.getText().toString()); // 사용자 입력 값 입력
+
+        // 사용자 입력 값 입력
+        editor.putString("name", nameTv.getText().toString());
+        editor.putString("address", addressTv.getText().toString());
+        editor.putFloat("restaurant", restaurant.getRating());
+        editor.putFloat("cafe", cafe.getRating());
+        editor.putFloat("shopping", shopping.getRating());
+        editor.putFloat("subway", subway.getRating());
         editor.commit(); // 저장 반영
     }
 
@@ -66,7 +99,6 @@ public class MemberInitActivity extends BasicActivity implements View.OnClickLis
         if(getIntent().getExtras()!=null) {
             Intent intent = getIntent();
             addressTv.setText(intent.getExtras().getString("road"));
-            Log.d("Setting",intent.getExtras().getString("road"));
         }
 
     }
@@ -100,6 +132,10 @@ public class MemberInitActivity extends BasicActivity implements View.OnClickLis
 
             // 멤버 정보 객체 생성 -> db저장
             MemberInfo memberInfo = new MemberInfo(name, address);
+            memberInfo.setRating("restaurant", restaurant.getRating());
+            memberInfo.setRating("cafe", cafe.getRating());
+            memberInfo.setRating("shopping", shopping.getRating());
+            memberInfo.setRating("subway", subway.getRating());
 
             if (user != null) {
                 db.collection("users").document(user.getUid()).set(memberInfo)
@@ -131,5 +167,23 @@ public class MemberInitActivity extends BasicActivity implements View.OnClickLis
         Intent intent = new Intent(this,c);
         intent.addFlags(intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(intent);
+    }
+
+    @Override
+    public void onRatingChanged(RatingBar ratingBar, float rating, boolean fromUser) {
+        switch (ratingBar.getId()){
+            case R.id.restaurantRate:
+                Log.d("Rate Test", "restaurant change"+restaurant.getRating());
+                break;
+            case R.id.cafetRate:
+                Log.d("Rate Test", "cafe change"+cafe.getRating());
+                break;
+            case R.id.shoppingRate:
+                Log.d("Rate Test", "shopping change"+shopping.getRating());
+                break;
+            case R.id.subwayRate:
+                Log.d("Rate Test", "subway change"+ subway.getRating());
+                break;
+        }
     }
 }
