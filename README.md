@@ -32,9 +32,9 @@ ContentScheduleAct(약속 내용 보기/날짜, 장소 정하기) -> <br>
 //2020.10.29 변경 사항
 <br>
 * 중간지점 찾기
- -> 모든 user의 주소를 이용해 중간지점 찾음 
-* 추가된 Activity >> GrahamScan, Point, Stack
-* 수정된 Activity >> MiddlePlaceActivity
+ -> 모든 user의 주소를 이용해 중간지점 찾음 <br>
+* 추가된 Activity >> GrahamScan, Point, Stack <br>
+* 수정된 Activity >> MiddlePlaceActivity <br>
 
 
 <br><br>
