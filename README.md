@@ -1,5 +1,17 @@
 <모임+지도 합친 최종 버전>
 
+//2020.10.29 변경 사항
+<br>
+ * 중간지점 찾기
+ -> 모든 user의 주소를 이용해 중간지점 찾음 <br>
+ * 추가된 Activity >> GrahamScan, Point, Stack <br>
+ * 수정된 Activity >> MiddlePlaceActivity <br>
+
+ * 회원정보 입력창에 별점 입력, DB 저장 (Map 형식)
+ * 모임나가기, 회원 탈퇴시 모임방 인원이 0명이 되면 그 모임 DB에서 삭제
+  -> 모임 나가기에서 동작 확인, 회원 탈퇴 모임방 나가기 코드 복붙 (테스트 X)
+
+
 // dev branch 코드 변경
 * 모임 참가, 모임 탈퇴 버튼 동작 (코드 입력시 해당 코드 모임 참가 / 탈퇴)
 * 모임방 클릭시 (grid item 클릭시) 모임 방 내부로 들어가기 동작
@@ -29,13 +41,6 @@ ContentScheduleAct(약속 내용 보기/날짜, 장소 정하기) -> <br>
 * Polyline 합치기 (선택된 경로의 Polyline을 볼 수 있도록 수정함)<br>
 * 아직 코드 정리가 안돼서 다시 정리하고 주석 달아서 올릴 예정임
 <br><br>
-//2020.10.29 변경 사항
-<br>
-* 중간지점 찾기
- -> 모든 user의 주소를 이용해 중간지점 찾음 <br>
-* 추가된 Activity >> GrahamScan, Point, Stack <br>
-* 수정된 Activity >> MiddlePlaceActivity <br>
-
 
 <br><br>
 // 2020.10.21 변경
