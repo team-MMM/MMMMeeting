@@ -14,6 +14,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.bumptech.glide.Glide;
+import com.example.mmmmeeting.Info.PostInfo;
 import com.example.mmmmeeting.view.ContentsItemView;
 import com.example.mmmmeeting.Info.ScheduleInfo;
 import com.example.mmmmeeting.R;
@@ -67,12 +68,22 @@ public class MakeScheduleActivity extends AppCompatActivity {
         titleEditText = findViewById(R.id.titleEditText);
 
         Bundle bundle = getIntent().getExtras();
-        if (bundle != null) {
+
+        // 새로 작성한 경우 FragHome에서 bundle로 미팅 이름 받아옴
+        if (bundle != null && meetingName != null) {
             meetingName = bundle.getString("Name");
             Log.d("update Test2", meetingName);
 
-        } else {
-            Log.d("update Test", "ERROR");
+            // 수정하는 경우 ContentSceduleAct에서 수정할 Post의 미팅 이름 받아옴
+        }else if (getIntent().getSerializableExtra("scheduleInfo")!=null) {
+            scheduleInfo = (ScheduleInfo) getIntent().getSerializableExtra("scheduleInfo");
+            if (scheduleInfo.getMeetingID() != null) {
+                meetingName = scheduleInfo.getMeetingID();
+            }
+        }else{
+            // 글 작성 후에는 외부에서 받아온 미팅 이름이 없어져서 MakeSchedule 자체에서 다시 미팅 이름 전달한거 받음
+            // storeUpload->onSuccess
+            meetingName = getIntent().getExtras().getString("Name");
         }
 
         findViewById(R.id.check).setOnClickListener(onClickListener);
@@ -154,7 +165,7 @@ public class MakeScheduleActivity extends AppCompatActivity {
         }
     };
 
-    // Firestore에 약속 정보 업로드 하는 함수
+    // 글 ID 찾기, ScheduleInfo 정보 생성, 글 업로드
     private void storageUpload() {
         final String title = ((EditText) findViewById(R.id.titleEditText)).getText().toString();
 
@@ -167,7 +178,9 @@ public class MakeScheduleActivity extends AppCompatActivity {
             FirebaseStorage storage = FirebaseStorage.getInstance();
             StorageReference storageRef = storage.getReference();
             FirebaseFirestore firebaseFirestore = FirebaseFirestore.getInstance();
-            // DB schedule 테이블에 접근
+
+            // 만약 새로 작성한 글이면 scInfo == null -> schedule 밑에 새 ID로 문서 생성
+            // 기존 글을 수정하는거면 scInfo != null -> scInfo ID 찾아서 해당 글 문서에 다시 업로드
             final DocumentReference documentReference = scheduleInfo == null ? firebaseFirestore.collection("schedule").document() : firebaseFirestore.collection("schedule").document(scheduleInfo.getId());
 
             final Date date = scheduleInfo == null ? new Date() : scheduleInfo.getCreatedAt();
@@ -186,6 +199,7 @@ public class MakeScheduleActivity extends AppCompatActivity {
                         successCount++;
                         contentsList.add(path);
                         String[] pathArray = path.split("\\.");
+                        // schedule 테이블의 문서 ID 받아서 해당 문서에 정보 업로드
                         final StorageReference mountainImagesRef = storageRef.child("schedule/" + documentReference.getId() + "/" + pathCount + "." + pathArray[pathArray.length - 1]);
                         try {
                             InputStream stream = new FileInputStream(new File(pathList.get(pathCount)));
@@ -205,8 +219,6 @@ public class MakeScheduleActivity extends AppCompatActivity {
                                             successCount--;
                                             contentsList.set(index, uri.toString());
                                             if (successCount == 0) {
-                                                // 미팅 id 받아오는거 아직 모르겠어서 임의로 넣음
-                                                // 처음 생성할 때는 [약속 이름, 미팅 이름, 내용, 날짜, 약속 생성자]
                                                 ScheduleInfo scheduleInfo = new ScheduleInfo(title, meetingName, contentsList, date, user.getUid());
                                                 storeUpload(documentReference, scheduleInfo);
                                             }
@@ -229,6 +241,7 @@ public class MakeScheduleActivity extends AppCompatActivity {
         }
     }
 
+    // db에 등록 성공했는지 검사, 다시 FragHome으로 돌아옴
     private void storeUpload(DocumentReference documentReference, final ScheduleInfo scheduleInfo) {
         documentReference.set(scheduleInfo.getScheduleInfo())
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
@@ -236,7 +249,9 @@ public class MakeScheduleActivity extends AppCompatActivity {
                     public void onSuccess(Void aVoid) {
                         Log.d(TAG, "DocumentSnapshot successfully written!");
                         Intent resultIntent = new Intent();
-                        resultIntent.putExtra("scheduleinfo", scheduleInfo);
+                        resultIntent.putExtra("scheduleInfo", scheduleInfo);
+                        // 글 작성 후 다시 MakeSc로 돌아오면 meetingName이 사라져서 다시 전달함
+                        resultIntent.putExtra("Name",meetingName);
                         setResult(RESULT_OK, resultIntent);
                         finish();
                     }

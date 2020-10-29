@@ -2,6 +2,7 @@ package com.example.mmmmeeting.fragment;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,8 +17,11 @@ import androidx.fragment.app.Fragment;
 
 import com.example.mmmmeeting.Info.ChatItem;
 import com.example.mmmmeeting.Info.MemberInfo;
+import com.example.mmmmeeting.Info.ScheduleInfo;
 import com.example.mmmmeeting.R;
 import com.example.mmmmeeting.adapter.ChatAdapter;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.ChildEventListener;
@@ -25,10 +29,14 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 
 public class FragChat extends Fragment {
     private FirebaseDatabase firebaseDatabase;
@@ -57,7 +65,8 @@ public class FragChat extends Fragment {
         listView.setAdapter(adapter);
 
         firebaseDatabase= FirebaseDatabase.getInstance();
-        chatRef= firebaseDatabase.getReference("chat");
+        chatRef= firebaseDatabase.getReference("chat").child("meetingID");
+
 
         //RealtimeDB에서 채팅 메세지들 실시간 읽어오기..
         //'chat'노드에 저장되어 있는 데이터들을 읽어오기

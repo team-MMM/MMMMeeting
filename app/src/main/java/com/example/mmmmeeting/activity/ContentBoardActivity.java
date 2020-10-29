@@ -20,6 +20,7 @@ public class ContentBoardActivity extends BasicActivity {
     private BoardDeleter boardDeleter;
     private ReadContentsView readContentsVIew;
     private LinearLayout contentsLayout;
+    private String meetingName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,6 +63,7 @@ public class ContentBoardActivity extends BasicActivity {
                 boardDeleter.storageDelete(postInfo);
                 return true;
             case R.id.modify:
+                // MakePost에서 다시 업로드
                 myStartActivity(MakePostActivity.class, postInfo);
                 return true;
             default:

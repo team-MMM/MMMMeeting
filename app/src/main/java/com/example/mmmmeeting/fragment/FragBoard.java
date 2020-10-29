@@ -37,6 +37,7 @@ public class FragBoard extends Fragment {
     private ArrayList<PostInfo> postList;
     private boolean updating;
     private boolean topScrolled;
+    private String meetingName;
 
     public FragBoard() { }
 
@@ -50,6 +51,13 @@ public class FragBoard extends Fragment {
                              Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.frag_board, container, false);
+
+        Bundle bundle = this.getArguments();
+        if(bundle != null) {
+            bundle = getArguments();
+            meetingName = bundle.getString("Name");
+        }
+        Log.d("get Name Test: ", meetingName);
 
         firebaseFirestore = FirebaseFirestore.getInstance();
         postList = new ArrayList<>();
@@ -167,13 +175,17 @@ public class FragBoard extends Fragment {
                             }
                             for (QueryDocumentSnapshot document : task.getResult()) {
                                 Log.d(TAG, document.getId() + " => " + document.getData());
-                                postList.add(new PostInfo(
-                                        document.getData().get("title").toString(),
-                                        (ArrayList<String>) document.getData().get("contents"),
-                                        (ArrayList<String>) document.getData().get("formats"),
-                                        document.getData().get("publisher").toString(),
-                                        new Date(document.getDate("createdAt").getTime()),
-                                        document.getId()));
+                                if(document.getData().get("meetingID").toString().equals(meetingName)) {
+                                    Log.d("update Test", meetingName);
+                                    postList.add(new PostInfo(
+                                            document.getData().get("title").toString(),
+                                            document.getData().get("meetingID").toString(),
+                                            (ArrayList<String>) document.getData().get("contents"),
+                                            (ArrayList<String>) document.getData().get("formats"),
+                                            document.getData().get("publisher").toString(),
+                                            new Date(document.getDate("createdAt").getTime()),
+                                            document.getId()));
+                                }
                             }
                             boardAdapter.notifyDataSetChanged();
                         } else {
@@ -187,6 +199,7 @@ public class FragBoard extends Fragment {
 
     private void myStartActivity(Class c) {
         Intent intent = new Intent(getActivity(), c);
+        intent.putExtra("Name",meetingName);
         startActivityForResult(intent, 0);
     }
 }

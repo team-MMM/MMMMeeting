@@ -16,7 +16,7 @@ public class ScheduleInfo implements Serializable {
     private Date createdAt;
     private String id;
 
-    // 약속 첫 생성할 때 지각자, 장소, 날짜 빼고 생성하는 생성자
+
     public ScheduleInfo(String title, String meetingID, ArrayList<String> contents, Date createdAt, String id){
         this.title = title;
         this.meetingID = meetingID;
@@ -50,8 +50,8 @@ public class ScheduleInfo implements Serializable {
     public String getTitle(){ return this.title; }
     public void setTitle(String title){ this.title = title; }
 
-    public String getMeetingID(){ return this.meetingID; }
-    public void setMeetingID(String title){ this.title = meetingID; }
+    public String getMeetingID(){return this.meetingID;}
+    public void setMeetingID(){this.meetingID = meetingID;}
 
     public ArrayList<String> getContents(){ return this.contents; }
     public void setContents(ArrayList<String> contents){ this.contents = contents; }
@@ -75,4 +75,5 @@ public class ScheduleInfo implements Serializable {
 
     public String getId(){ return this.id; }
     public void setId(String id){ this.id = id; }
+
 }

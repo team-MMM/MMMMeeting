@@ -9,13 +9,14 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 
 import com.bumptech.glide.Glide;
 import com.example.mmmmeeting.Info.PostInfo;
-import com.example.mmmmeeting.view.ContentsItemView;
 import com.example.mmmmeeting.R;
+import com.example.mmmmeeting.view.ContentsItemView;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
@@ -56,6 +57,7 @@ public class MakePostActivity extends BasicActivity {
     private EditText titleEditText;
     private PostInfo postInfo;
     private int pathCount, successCount;
+    private String meetingName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,6 +76,7 @@ public class MakePostActivity extends BasicActivity {
         findViewById(R.id.imageModify).setOnClickListener(onClickListener);
         findViewById(R.id.delete).setOnClickListener(onClickListener);
 
+
         buttonsBackgroundLayout.setOnClickListener(onClickListener);
         contentsEditText.setOnFocusChangeListener(onFocusChangeListener);
         titleEditText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
@@ -88,7 +91,24 @@ public class MakePostActivity extends BasicActivity {
         FirebaseStorage storage = FirebaseStorage.getInstance();
         storageRef = storage.getReference();
 
-        postInfo = (PostInfo) getIntent().getSerializableExtra("postInfo");
+        Bundle bundle = getIntent().getExtras();
+
+        // 새로 작성한 경우 FragBoard에서 bundle로 미팅 이름 받아옴
+        if (bundle != null && meetingName != null) {
+            meetingName = bundle.getString("Name");
+            Log.d("update Test2", meetingName);
+
+            // 수정하는 경우 ContentBoardAct에서 수정할 Post의 미팅 이름 받아옴
+        }else if (getIntent().getSerializableExtra("postInfo")!=null) {
+            postInfo = (PostInfo) getIntent().getSerializableExtra("postInfo");
+            if (postInfo.getMeetingID() != null) {
+                meetingName = postInfo.getMeetingID();
+            }
+        }else{
+            // 글 작성 후에는 외부에서 받아온 미팅 이름이 없어져서 MakePost 자체에서 다시 미팅 이름 전달한거 받음
+            // storeUpload->onSuccess
+            meetingName = getIntent().getExtras().getString("Name");
+        }
         postInit();
     }
 
@@ -193,6 +213,7 @@ public class MakePostActivity extends BasicActivity {
         }
     };
 
+    // 글 ID 찾기, PostInfo 정보 생성, 글 업로드
     private void storageUpload() {
         final String title = ((EditText) findViewById(R.id.titleEditText)).getText().toString();
         if (title.length() > 0) {
@@ -204,6 +225,8 @@ public class MakePostActivity extends BasicActivity {
             FirebaseStorage storage = FirebaseStorage.getInstance();
             StorageReference storageRef = storage.getReference();
             FirebaseFirestore firebaseFirestore = FirebaseFirestore.getInstance();
+            // 만약 새로 작성한 글이면 postInfo == null -> posts 밑에 새 ID로 문서 생성
+            // 기존 글을 수정하는거면 postInfo != null -> postInfo ID 찾아서 해당 글 문서에 다시 업로드
             final DocumentReference documentReference = postInfo == null ? firebaseFirestore.collection("posts").document() : firebaseFirestore.collection("posts").document(postInfo.getId());
             final Date date = postInfo == null ? new Date() : postInfo.getCreatedAt();
             for (int i = 0; i < parent.getChildCount(); i++) {
@@ -226,6 +249,7 @@ public class MakePostActivity extends BasicActivity {
                             formatList.add("text");
                         }
                         String[] pathArray = path.split("\\.");
+                        // posts 테이블의 문서 ID 받아서 해당 문서에 정보 업로드
                         final StorageReference mountainImagesRef = storageRef.child("posts/" + documentReference.getId() + "/" + pathCount + "." + pathArray[pathArray.length - 1]);
                         try {
                             InputStream stream = new FileInputStream(new File(pathList.get(pathCount)));
@@ -245,7 +269,7 @@ public class MakePostActivity extends BasicActivity {
                                             successCount--;
                                             contentsList.set(index, uri.toString());
                                             if (successCount == 0) {
-                                                PostInfo postInfo = new PostInfo(title, contentsList, formatList, user.getUid(), date);
+                                                PostInfo postInfo = new PostInfo(title, meetingName, contentsList, formatList, user.getUid(), date);
                                                 storeUpload(documentReference, postInfo);
                                             }
                                         }
@@ -260,13 +284,14 @@ public class MakePostActivity extends BasicActivity {
                 }
             }
             if (successCount == 0) {
-                storeUpload(documentReference, new PostInfo(title, contentsList, formatList, user.getUid(), date));
+                storeUpload(documentReference, new PostInfo(title, meetingName, contentsList, formatList, user.getUid(), date));
             }
         } else {
             showToast(MakePostActivity.this, "제목을 입력해주세요.");
         }
     }
 
+    // db에 등록 성공했는지 검사, 다시 FragBoard로 돌아옴
     private void storeUpload(DocumentReference documentReference, final PostInfo postInfo) {
         documentReference.set(postInfo.getPostInfo())
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
@@ -276,6 +301,8 @@ public class MakePostActivity extends BasicActivity {
                         loaderLayout.setVisibility(View.GONE);
                         Intent resultIntent = new Intent();
                         resultIntent.putExtra("postinfo", postInfo);
+                        // 글 작성 후 다시 MakePost로 돌아오면 meetingName이 사라져서 다시 전달함
+                        resultIntent.putExtra("Name",meetingName);
                         setResult(RESULT_OK, resultIntent);
                         finish();
                     }
@@ -289,6 +316,7 @@ public class MakePostActivity extends BasicActivity {
                 });
     }
 
+    // 작성한 글이 보이게 함
     private void postInit() {
         if (postInfo != null) {
             titleEditText.setText(postInfo.getTitle());

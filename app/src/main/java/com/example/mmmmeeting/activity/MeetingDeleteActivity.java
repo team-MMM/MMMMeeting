@@ -19,6 +19,7 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
@@ -30,6 +31,7 @@ public class MeetingDeleteActivity extends AppCompatActivity {
 
     Button delete;
     FirebaseFirestore db = FirebaseFirestore.getInstance();
+    private String foundCode;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -127,6 +129,11 @@ public class MeetingDeleteActivity extends AppCompatActivity {
 
                     if (document.get("userID").toString().length()==2) {
                         // 모임에 있는 약속, 게시판 내용도 전부 삭제해야..
+
+                        // 스케쥴, 게시판 DB에서 모임 이름으로 찾아서 삭제
+                        scheduleDelete(document.get("name").toString());
+                        boardDelete(document.get("name").toString());
+
                         meetingdel.delete();
                     }
                 } else {
@@ -134,6 +141,59 @@ public class MeetingDeleteActivity extends AppCompatActivity {
                 }
             }
         });
+    }
+
+
+    private void scheduleDelete(String name){
+        CollectionReference scheduleDel = db.collection("schedule");
+        scheduleDel.get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            //모든 document 확인
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                // 문서가 참조하는 이름이 삭제 해야하는 모임 이름과 같으면 일정 삭제
+                                if(document.getData().get("meetingID").toString().equals(name)){
+                                    Log.d("일정 삭제",document.getData().get("title").toString());
+                                    scheduleDel.document(document.getId()).delete();
+                                    break;
+                                } else {
+                                    Log.d("Document Snapshot", "No Document");
+                                }
+                            }
+                        } else {
+                            Log.d("Document Read", "Error getting documents: ", task.getException());
+                        }
+                    }
+                });
+
+    }
+
+    private void boardDelete(String name){
+        CollectionReference boardDel = db.collection("posts");
+        boardDel.get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            //모든 document 확인
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                // 문서가 참조하는 이름이 삭제 해야하는 모임 이름과 같으면 게시글 삭제
+                                if(document.getData().get("meetingID").toString().equals(name)){
+                                    Log.d("일정 삭제",document.getData().get("title").toString());
+                                    boardDel.document(document.getId()).delete();
+                                    break;
+                                } else {
+                                    Log.d("Document Snapshot", "No Document");
+                                }
+                            }
+                        } else {
+                            Log.d("Document Read", "Error getting documents: ", task.getException());
+                        }
+                    }
+                });
+
     }
 
     private void startToast(String msg) {

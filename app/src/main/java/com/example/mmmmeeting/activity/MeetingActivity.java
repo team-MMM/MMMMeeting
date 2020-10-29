@@ -28,6 +28,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 public class MeetingActivity extends BasicActivity {
 
     private BottomNavigationView bottomNavigationView;
+    private Bundle bundle = new Bundle();
     TextView name, description;
     Button invite;
 
@@ -42,14 +43,12 @@ public class MeetingActivity extends BasicActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.frag_default);
-
         setToolbarTitle(getIntent().getExtras().getString("Name"));
 
         FragHome fragHome = new FragHome();
-
-        Bundle bundle = new Bundle();
         bundle.putString("Name", getIntent().getExtras().getString("Name"));
         fragHome.setArguments(bundle);
+
 
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.main_frame,fragHome)
@@ -65,8 +64,6 @@ public class MeetingActivity extends BasicActivity {
                     // 홈 화면(약속 목록)으로 이동
                     case R.id.menu_home:
                         FragHome fragHome = new FragHome();
-
-                        Bundle bundle = new Bundle();
                         bundle.putString("Name", getIntent().getExtras().getString("Name"));
                         fragHome.setArguments(bundle);
 
@@ -77,12 +74,16 @@ public class MeetingActivity extends BasicActivity {
                         return true;
                     case R.id.menu_chat:
                         FragChat fragChat = new FragChat();
+                        bundle.putString("Name", getIntent().getExtras().getString("Name"));
+                        fragChat.setArguments(bundle);
                         getSupportFragmentManager().beginTransaction()
                                 .replace(R.id.main_frame, fragChat)
                                 .commit();
                         return true;
                     case R.id.menu_board:
                         FragBoard fragBoard = new FragBoard();
+                        bundle.putString("Name", getIntent().getExtras().getString("Name"));
+                        fragBoard.setArguments(bundle);
                         getSupportFragmentManager().beginTransaction()
                                 .replace(R.id.main_frame, fragBoard)
                                 .commit();
