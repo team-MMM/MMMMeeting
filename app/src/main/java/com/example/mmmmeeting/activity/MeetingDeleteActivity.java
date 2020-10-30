@@ -19,6 +19,8 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -129,10 +131,11 @@ public class MeetingDeleteActivity extends AppCompatActivity {
 
                     if (document.get("userID").toString().length()==2) {
                         // 모임에 있는 약속, 게시판 내용도 전부 삭제해야..
-
+                        String meetingName = document.get("name").toString();
                         // 스케쥴, 게시판 DB에서 모임 이름으로 찾아서 삭제
-                        scheduleDelete(document.get("name").toString());
-                        boardDelete(document.get("name").toString());
+                        scheduleDelete(meetingName);
+                        boardDelete(meetingName);
+                        chatDelete(meetingName);
 
                         meetingdel.delete();
                     }
@@ -194,6 +197,12 @@ public class MeetingDeleteActivity extends AppCompatActivity {
                     }
                 });
 
+    }
+
+    private void chatDelete(String name){
+        FirebaseDatabase firebaseDatabase= FirebaseDatabase.getInstance();
+        DatabaseReference chatRef= firebaseDatabase.getReference("chat").child(name);
+        chatRef.removeValue();
     }
 
     private void startToast(String msg) {

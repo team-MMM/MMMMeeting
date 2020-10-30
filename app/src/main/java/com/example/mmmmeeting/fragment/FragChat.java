@@ -49,6 +49,7 @@ public class FragChat extends Fragment {
 
     private ArrayList<ChatItem> messageItems=new ArrayList<>();
     private ChatAdapter adapter;
+    private String meetingName;
 
     public FragChat(){}
 
@@ -61,11 +62,16 @@ public class FragChat extends Fragment {
 
         et=view.findViewById(R.id.et);
         listView=view.findViewById(R.id.listview);
-        adapter=new ChatAdapter(messageItems,getLayoutInflater());
-        listView.setAdapter(adapter);
 
+        Bundle bundle = this.getArguments();
+        if(bundle != null) {
+            bundle = getArguments();
+            meetingName = bundle.getString("Name");
+        }
+
+        // meetingName 기준으로 분리함
         firebaseDatabase= FirebaseDatabase.getInstance();
-        chatRef= firebaseDatabase.getReference("chat").child("meetingID");
+        chatRef= firebaseDatabase.getReference("chat").child(meetingName);
 
 
         //RealtimeDB에서 채팅 메세지들 실시간 읽어오기..
@@ -106,6 +112,9 @@ public class FragChat extends Fragment {
 
             }
         });
+
+        adapter=new ChatAdapter(messageItems,getLayoutInflater());
+        listView.setAdapter(adapter);
 
         Button button = (Button) view.findViewById(R.id.msgBtn);
         button.setOnClickListener(new View.OnClickListener()
