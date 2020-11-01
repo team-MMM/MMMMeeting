@@ -39,7 +39,7 @@ public class AccountResultActivity extends AppCompatActivity {
         pay = intent.getIntArrayExtra("pay");
         user_name = intent.getStringArrayExtra("user_name");
         total =intent.getExtras().getInt("total");
-        user_num = user_name.length;
+        user_num = intent.getExtras().getInt("user_num");
 
         calculate_main = (LinearLayout)findViewById(R.id.calculate_main);
 
@@ -98,7 +98,7 @@ public class AccountResultActivity extends AppCompatActivity {
 
             //TextView 생성(정산 결과)
             TextView tv = new TextView(this);
-            int m = total/5-pay[i];
+            int m = total/user_num-pay[i];
             System.out.println("m값은 :"+m);
             //SpannableString s;
             if(m>0){

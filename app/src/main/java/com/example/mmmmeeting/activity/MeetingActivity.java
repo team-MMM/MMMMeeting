@@ -96,6 +96,9 @@ public class MeetingActivity extends BasicActivity {
                         return true;
                     case R.id.menu_account:
                         FragAccount fragAccount = new FragAccount();
+                        bundle.putString("Name", getIntent().getExtras().getString("Name"));
+                        fragAccount.setArguments(bundle);
+
                         getSupportFragmentManager().beginTransaction()
                                 .replace(R.id.main_frame,fragAccount)
                                 .commit();
