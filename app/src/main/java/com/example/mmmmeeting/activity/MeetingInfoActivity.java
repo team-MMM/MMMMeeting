@@ -7,6 +7,7 @@ import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -14,6 +15,7 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.mmmmeeting.CategorySelect;
 import com.example.mmmmeeting.Info.GridItems;
 import com.example.mmmmeeting.R;
 import com.example.mmmmeeting.view.ContentsItemView;
@@ -40,6 +42,14 @@ public class MeetingInfoActivity extends AppCompatActivity {
         Intent intent = getIntent();
         String meetingname = intent.getExtras().getString("Name");
         String meetingdescription = intent.getExtras().getString("Description");
+
+
+        // category Test
+        CategorySelect category  = new CategorySelect(meetingname);
+        category.select();
+//        Log.d("category Test",category.category);
+        // category Test
+
 
         name = findViewById(R.id.meetingName);
         description = findViewById(R.id.meetingDescription);
