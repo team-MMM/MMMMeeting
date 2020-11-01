@@ -1,4 +1,28 @@
-<모임+지도 합친 최종 버전>
+<h1>*모임 분리 방법!!</h1>
+특정 액티비티 or 프래그먼트에서 미팅 이름 전달 -> 전달 받음 -> db에서 미팅 이름을 포함하고 있는 데이터 가져옴 <br><br>
+
+* (intent사용!!) <참고: FragHome- myStartActivity 함수> <br>
+액티비티->액티비티 or 프래그먼트->액티비티 <br>
+Intent intent = new Intent(getActivity(), 클래스이름.class); <br>
+intent.putExtra("Name",meetingName); <br>
+데이터 받는건 getIntent().getExtras().getString("Name")<br><br>
+
+* (bundle사용!!) <참고: MeetingActivity- case R.id.menu_home 부분> <br>
+액티비티->프래그먼트 or 프래그먼트->프래그먼트 <br>
+bundle.putString("Name", getIntent().getExtras().getString("Name")); <br>
+프래그먼트이름.setArguments(bundle); <br>
+데이터 받는건 Bundle bundle = this.getArguments(); if(bundle != null) { bundle = getArguments(); meetingName = bundle.getString("Name"); } <br><br>
+
+* DB에서 데이터 가져오기 <참고: FragHome- postsUpdate 함수> <br>
+// 스케쥴 테이블 접근 <br>
+CollectionReference collectionReference = firebaseFirestore.collection("schedule"); <br>
+// 스케쥴 테이블의 문서 접근 <br>
+for (QueryDocumentSnapshot document : task.getResult()) <br> 
+// 문서에 미팅ID가 미팅 이름과 같으면 동작! <br>
+if(document.getData().get("meetingID").toString().equals(meetingName)){ <br>
+    //예시- 문서의 스케쥴 제목 가져오고 싶을 때 <br>
+    String title = document.getData.get("title").toString() -> 문서의 타이틀 이름을 string으로 가져옴 <br>
+} <br><br>
 
 //2020.10.29 변경 사항
 <br>
