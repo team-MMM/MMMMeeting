@@ -1,5 +1,6 @@
 <h1>*모임 분리 방법!!</h1>
 특정 액티비티 or 프래그먼트에서 미팅 이름 전달 -> 전달 받음 -> db에서 미팅 이름을 포함하고 있는 데이터 가져옴 <br><br>
+
 * (intent사용!!) <참고: FragHome- myStartActivity 함수> <br>
 액티비티->액티비티 or 프래그먼트->액티비티 <br>
 Intent intent = new Intent(getActivity(), 클래스이름.class); <br>
