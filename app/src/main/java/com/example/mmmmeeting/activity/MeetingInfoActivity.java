@@ -28,6 +28,7 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.Arrays;
+import java.util.concurrent.ExecutionException;
 
 public class MeetingInfoActivity extends AppCompatActivity {
 
@@ -47,7 +48,6 @@ public class MeetingInfoActivity extends AppCompatActivity {
         // category Test
         CategorySelect category  = new CategorySelect(meetingname);
         category.select();
-//        Log.d("category Test",category.category);
         // category Test
 
 

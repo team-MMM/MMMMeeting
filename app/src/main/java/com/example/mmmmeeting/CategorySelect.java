@@ -1,15 +1,17 @@
 package com.example.mmmmeeting;
 
 
-import android.content.Context;
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
-import android.widget.Toast;
 
+
+import com.example.mmmmeeting.Info.MeetingInfo;
 import com.example.mmmmeeting.Info.MemberInfo;
+import com.example.mmmmeeting.activity.MeetingActivity;
 import com.example.mmmmeeting.activity.MeetingInfoActivity;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -23,7 +25,7 @@ import com.google.firebase.firestore.QuerySnapshot;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Locale;
+
 import java.util.Map;
 
 import androidx.annotation.NonNull;
@@ -32,7 +34,7 @@ public class CategorySelect {
 
     private String Tag = "category Test";
     String name;
-    String category;
+    String category="";
     ArrayList<Float[]> userRatings =new ArrayList<>();
     FirebaseFirestore db = FirebaseFirestore.getInstance();
 
@@ -40,20 +42,44 @@ public class CategorySelect {
         this.name = name;
     }
 
+    Handler mHandler = new Handler(){
+        public void handleMessage(android.os.Message msg)
+        {
+            Bundle bd = msg.getData( ) ;            /// 전달 받은 메세지에서 번들을 받음
+            String str = bd.getString( "arg" ) ;    /// 번들에 들어있는 값 꺼냄
+            sendCategory(str) ;
+            Log.d(Tag,"Send is "+ str);
+        } ;
+    } ;
 
     public void select(){
         //1. DB에서 별점 읽어오기 (meeting 에서 -> ui목록 접근 -> ui의 별점 읽기)
         meetingFind();
         // 다음 동작- 가중치
-        Handler mHandler = new Handler();
-        mHandler.postDelayed(new Runnable()  {
+        Runnable r = new Runnable() {
+            @Override
             public void run() {
                 addWeight();
                 getHighest(calAvg());
                 Log.d(Tag, category);
+
+                Bundle bd = new Bundle();      /// 번들 생성
+                bd.putString("arg", category);    /// 번들에 값 넣기
+                Message msg = mHandler.obtainMessage();   /// 핸들에 전달할 메세지 구조체 받기
+                msg.setData(bd);                     /// 메세지에 번들 넣기
+                mHandler.sendMessage(msg);
             }
-        }, 600); // 0.6초후
+        };
+
+        mHandler.postDelayed(r, 600); // 0.6초후
     }
+
+    private String sendCategory(String str) {
+ // 액티비티에 추가..
+//        Intent intent = new Intent(this, MeetingInfoActivity.class);
+        return str;
+    }
+
 
     // 1-1. 미팅 이름으로 사용자 테이블 접근
     private void meetingFind() {
