@@ -50,11 +50,6 @@ public class MiddlePlaceActivity extends AppCompatActivity implements OnMapReady
 
     private int countTry;
 
-    // 좌표 설정
-    double[] xs = {37.58410374069874, 37.82172487893991, 37.50839652592737, 37.55768857834483, 37.50209960522367}; // 위도 : latitude
-    double[] ys = {127.0587985551473, 127.13050335515426, 126.91826738212885, 126.92444543977771, 127.02698624767761}; // 경도 : longitude
-
-
     JSONArray routesArray;
     JSONArray legsArray;
 
