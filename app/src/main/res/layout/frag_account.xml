@@ -9,13 +9,26 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
-    <TextView
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/toolbar"
-        android:text="모임비 정산 화면입니다."
-        android:textSize="20sp">
-    </TextView>
+        android:layout_centerInParent="true"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:id="@+id/layout_input_money"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="vertical"></LinearLayout>
+        <Button
+            android:id="@+id/btn_calculate"
+            android:layout_width="100dp"
+            android:layout_height="50dp"
+            android:layout_marginBottom="50dp"
+            android:layout_gravity="center_horizontal"
+            android:text="정산!"/>
+    </LinearLayout>
 
 
 </RelativeLayout>
