@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -44,6 +45,7 @@ public class FragAccount extends Fragment {
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT);
 
+        //db에서 모임원들 이름 가져오기
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         db.collection("users").get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
@@ -94,8 +96,17 @@ public class FragAccount extends Fragment {
                                 LinearLayout.LayoutParams etlp = new LinearLayout.LayoutParams(300,120);
                                 etlp.setMargins(30,30,30,30);
                                 et.setLayoutParams(etlp);
-                                //et.setId(i);
-                                //texts.add(i,et);
+                                //엔터키 막기(엔터 누르면 입력한 값이 사라지는 것을 막기 위함)
+                                et.setOnKeyListener(new View.OnKeyListener(){
+
+                                    @Override
+                                    public boolean onKey(View view, int KeyCode, KeyEvent keyEvent) {
+                                        if(KeyCode== keyEvent.KEYCODE_ENTER)
+                                            return true;
+                                        return false;
+                                    }
+                                });
+                                //EditText저장
                                 texts[j] = et;
                                 ly.addView(et);
 
@@ -103,15 +114,13 @@ public class FragAccount extends Fragment {
                                 TextView tv = new TextView(getContext());
                                 tv.setText("원");
                                 LinearLayout.LayoutParams tvlp = params;
-                                //tvlp.setMargins(30,30,30,30);
                                 tv.setLayoutParams(tvlp);
                                 ly.addView(tv);
                                 ly.setPadding(0,5,0,0);
                                 layout_input_money.addView(ly);
-
-                                System.out.println("동적 뷰 생성 완료");
                             }
 
+                            //버튼 클릭이벤트 : 정산결과로 넘어감
                             btn_calculate.setOnClickListener(new Button.OnClickListener(){
 
                                 @Override
@@ -119,15 +128,16 @@ public class FragAccount extends Fragment {
                                     money = new int[5];
 
                                     for(int i=0;i<5;i++){
+                                        //EditText에 작성된 금액을 가져온다.
                                         money[i] = Integer.parseInt(texts[i].getText().toString());
                                         sum+=money[i];
                                     }
 
+                                    //정산결과를 보여주는 화면으로 넘어감
                                     Intent intent = new Intent(getContext(), AccountResultActivity.class);
                                     intent.putExtra("pay",money);
                                     intent.putExtra("total",sum);
                                     intent.putExtra("user_name",user_name);
-                                    intent.putExtra("user_num",user_name.length);
                                     startActivity(intent);
                                 }
                             });
