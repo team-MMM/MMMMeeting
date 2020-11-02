@@ -32,12 +32,6 @@ import androidx.annotation.NonNull;
 
 public class CategorySelect {
 
-//    // category Test
-//    Category category  = new Category(meetingname);
-//        category.select();
-//    // category Test
-
-
     private String Tag = "category Test";
     String name;
     String category="";
@@ -66,7 +60,7 @@ public class CategorySelect {
             @Override
             public void run() {
                 addWeight();
-                getHighest(calAvg());
+                getHighest();
                 Log.d(Tag, category);
 
                 Bundle bd = new Bundle();      /// 번들 생성
@@ -77,12 +71,11 @@ public class CategorySelect {
             }
         };
 
-        mHandler.postDelayed(r, 600); // 0.6초후
+        mHandler.postDelayed(r, 1000); // 0.6초후
     }
 
     private String sendCategory(String str) {
- // 액티비티에 추가..
-//        Intent intent = new Intent(this, MeetingInfoActivity.class);
+ // 카테고리 얻은 다음 동작 기술
         return str;
     }
 
@@ -123,8 +116,8 @@ public class CategorySelect {
                         DocumentSnapshot document = task.getResult();
                         if (document.exists()) {
                             MemberInfo user = document.toObject(MemberInfo.class);
-//                            Log.d(Tag,document.getId() + "> get rating: "+ rating);
-//                            MapToArray(rating);
+                            Log.d(Tag,document.getId() + "> get rating: "+ user.getRating());
+//                            MapToArray(user.getRating());
                         }
                     } else {
                         Log.d(Tag, "Task Fail : " + task.getException());
@@ -192,46 +185,33 @@ public class CategorySelect {
 
     // 2-2. 가중치 설정
     private Float[] ratingUpdate(Float[] rating) {
-        float high = rating[0];
-        float low = rating[0];
-        int indexH = 0;
-        int indexL = 0;
 
         for (int i = 0; i < rating.length; i++) {
-            if (high < rating[i]) {
-                high = rating[i];
-                indexH = i;
-            }
-            if (low > rating[i]) {
-                low = rating[i];
-                indexL = i;
+            if (rating[i]>2.5) {
+                rating[i] = rating[i] * 1.5f;
+            }else{
+                rating[i] = rating[i] * 0.5f;
             }
         }
         // 가장 좋아하는 카테고리 점수에 가산점, 싫어하는건 감점
-        rating[indexH] = rating[indexH] * 1.2f;
-        rating[indexL] = rating[indexL] * 0.8f;
-
         Log.d(Tag, "After update rating is " + Arrays.toString(rating));
 
         return rating;
     }
 
-    // 3-1 평균
-    private Float[] calAvg() {
+
+    // 3-2 최고값
+    private void getHighest() {
         Float[] avgRating = new Float[userRatings.get(0).length];
         for(int i=0; i<userRatings.get(0).length; i++){ // 카테고리마다
             Float sum=0f;
             for(int j=0; j<userRatings.size(); j++){ // 사용자 평가 합
                 sum +=userRatings.get(j)[i];
             }
-            avgRating[i]=sum/avgRating.length;
+            avgRating[i]=sum/userRatings.size();
         }
         Log.d(Tag, Arrays.toString(avgRating));
-        return avgRating;
-    }
 
-    // 3-2 최고값
-    private void getHighest(Float[] avgRating) {
         float high = avgRating[0];
         int index=0;
         for (int i = 0; i < avgRating.length; i++) {

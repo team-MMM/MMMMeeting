@@ -7,7 +7,6 @@ import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -16,19 +15,14 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.mmmmeeting.CategorySelect;
-import com.example.mmmmeeting.Info.GridItems;
 import com.example.mmmmeeting.R;
-import com.example.mmmmeeting.view.ContentsItemView;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.Arrays;
-import java.util.concurrent.ExecutionException;
 
 public class MeetingInfoActivity extends AppCompatActivity {
 
@@ -52,6 +46,11 @@ public class MeetingInfoActivity extends AppCompatActivity {
 
         name.setText(meetingname);
         description.setText(meetingdescription);
+
+    // category Test
+        CategorySelect category  = new CategorySelect(meetingname);
+        category.select();
+    // category Test
 
         // 초대 버튼 클릭시 -> inviteActivity 넘어가서 초대문자 보내기
         invite.setOnClickListener(new View.OnClickListener() {
