@@ -216,8 +216,7 @@ public class CalendarActivity extends AppCompatActivity {
                     @Override
                     public void onClick(View view) { //저장 버튼 클릭
                         str=contextEditText.getText().toString(); // EditText 내용을 str에 저장
-
-                        scInfo.setCalendarText(calendarMap);
+       
                         calendarMap.put(shot_Day, str);
                         db.collection("schedule").document(scID).update("calendarText", calendarMap); // calendarText에 새메모 업데이트
 
