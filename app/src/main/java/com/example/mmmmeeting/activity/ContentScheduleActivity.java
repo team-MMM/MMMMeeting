@@ -61,7 +61,7 @@ public class ContentScheduleActivity extends BasicActivity implements View.OnCli
                 break;
 
             case R.id.placeBtn:
-                myStartActivity(PlaceChoiceActivity.class);
+                myStartActivity(PlaceChoiceActivity.class, postInfo);
                 break;
         }
     }

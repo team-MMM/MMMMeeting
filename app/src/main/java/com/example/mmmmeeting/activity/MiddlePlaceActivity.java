@@ -3,7 +3,8 @@
 package com.example.mmmmeeting.activity;
 
 
-import android.graphics.Color;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.location.Address;
 import android.location.Geocoder;
 import android.os.AsyncTask;
@@ -13,15 +14,19 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.mmmmeeting.Info.ScheduleInfo;
 import com.example.mmmmeeting.R;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolygonOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -39,21 +44,22 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.ExecutionException;
 import com.google.maps.android.PolyUtil;
 
+
 public class MiddlePlaceActivity extends AppCompatActivity implements OnMapReadyCallback {
+
+    private ScheduleInfo postInfo;
+    private String meetingname;
 
     //private ArrayList<LatLng> position;
     private int[] userTime;
     private LatLng midP;
 
     private int countTry;
-
-    // 좌표 설정
-    double[] xs = {37.58410374069874, 37.82172487893991, 37.50839652592737, 37.55768857834483, 37.50209960522367}; // 위도 : latitude
-    double[] ys = {127.0587985551473, 127.13050335515426, 126.91826738212885, 126.92444543977771, 127.02698624767761}; // 경도 : longitude
-
 
     JSONArray routesArray;
     JSONArray legsArray;
@@ -68,7 +74,7 @@ public class MiddlePlaceActivity extends AppCompatActivity implements OnMapReady
 
     private GoogleMap mMap;
 
-    int size = 0;
+    int i = 0;
     int j = 0;
     Point center = new Point(0, 0);
 
@@ -95,47 +101,88 @@ public class MiddlePlaceActivity extends AppCompatActivity implements OnMapReady
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(SEOUL, 8));
         mMap.clear();
         FirebaseFirestore db = FirebaseFirestore.getInstance();
+        postInfo = (ScheduleInfo) getIntent().getSerializableExtra("scheduleInfo");
+        meetingname = postInfo.getMeetingID();
 
-        // Main_showmeeting
-        // meeting collection의 모든 문서 읽기
-        // db.collection(“name”).whereEqualTo(“field”, “value”).get() => 조건에 맞는 문서만 가져오기 가능
 
-        db.collection("users").get()
+
+        // meetings collection에 모임 이름인 문서 읽기
+
+        db.collection("meetings").whereEqualTo("name", meetingname).get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
                     public void onComplete(@NonNull com.google.android.gms.tasks.Task<QuerySnapshot> task) {
                         if (task.isSuccessful()) {
-                            //모든 document 확인 = QuerySnapshot
-                            int i = 0;
-                            String[] addr = new String[task.getResult().size()];
                             for (QueryDocumentSnapshot document : task.getResult()) {
                                 // document에서 이름이 userID인 필드의 데이터 얻어옴
-                                addr[i++] = document.getData().get("address").toString();
-                                document.getId(); // document 이름(id)
-                                document.getData(); // document의 모든 데이터
-                            }
-                            size = addr.length;
-                            Point[] points = new Point[size];
-                            for (String str : addr) {
-                                getPointFromGeoCoder(str, points);
-                            }
-                            Point[] hull = GrahamScan.convexHull(points);
-                            for (int k = 0; k < hull.length; k++) {
-                                mMap.addMarker(new MarkerOptions().position(new LatLng(hull[k].getX(), hull[k].getY())).title(k + "번째 지점"));
-                            }
+                                List users = (List) document.getData().get("userID");
+                                String[] addr = new String[users.size()];
+                                String[] name = new String[users.size()];
+                                // userID가 동일한 user 문서에서 이름, 주소 읽어오기
+                                for (int m = 0; m < users.size(); m++) {
+                                    DocumentReference docRef = db.collection("users").document(users.get(m).toString());
 
-                            countTry = 0;
-                            PolygonCenter(hull);
-                            curPoint = new LatLng(center.x, center.y);
-                            //중간지점 찾기 (사용자 위치들과 무게중심 좌표 넘겨주기)
-                            findMidPoint(hull, curPoint);
-                            //중간지점 지도 위에 표시
-                            mMap.addMarker(new MarkerOptions().position(midP).title("중간지점 찾음!"));
+                                    docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                        @Override
+                                        public void onComplete(@NonNull com.google.android.gms.tasks.Task<DocumentSnapshot> task) {
+                                            if (task.isSuccessful()) {
+                                                DocumentSnapshot document = task.getResult();
+                                                if (document.exists()) {
+                                                    addr[i] = document.getData().get("address").toString();
+                                                    name[i++] = document.getData().get("name").toString();
+                                                } else {
+                                                    // 존재하지 않는 문서
+                                                    Log.d("Attend", "No Document");
+                                                }
+                                                if (i==users.size())
+                                                    gStart(addr,name); // 중간지점 찾기 시작
+                                            } else {
+                                                Log.d("Attend", "Task Fail : " + task.getException());
+                                            }
+                                        }
+                                    });
+                                }
+                            }
                         } else {
                             Log.d("Document Read", "Error getting documents: ", task.getException());
                         }
                     }
                 });
+
+    }
+
+    // 중간 지점 찾기 시작!
+    private void gStart(String[] addr, String[] name){
+       /*
+        for (String str : addr) {
+            System.out.println(str);
+        }
+        */
+        BitmapDrawable bitmapdraw1 = (BitmapDrawable) getResources().getDrawable(R.drawable.user);
+        Bitmap b = bitmapdraw1.getBitmap();
+        Bitmap UserMarker = Bitmap.createScaledBitmap(b, 100, 100, false);
+
+        BitmapDrawable bitmapdraw2 = (BitmapDrawable) getResources().getDrawable(R.drawable.middleplace);
+        Bitmap c = bitmapdraw2.getBitmap();
+        Bitmap MiddleMarker = Bitmap.createScaledBitmap(c, 100, 100, false);
+
+        Point[] points = new Point[addr.length];
+        for (String str : addr) {
+            getPointFromGeoCoder(str, points);
+        }
+        for (int k = 0; k < points.length; k++) {
+            mMap.addMarker(new MarkerOptions().position(new LatLng(points[k].getX(), points[k].getY())).title(name[k]).icon(BitmapDescriptorFactory.fromBitmap(UserMarker)));
+        }
+        Point[] hull = GrahamScan.convexHull(points);
+
+        countTry = 0;
+        PolygonCenter(hull);
+        curPoint = new LatLng(center.x, center.y);
+        //중간지점 찾기 (사용자 위치들과 무게중심 좌표 넘겨주기)
+        findMidPoint(hull, curPoint);
+        //중간지점 지도 위에 표시
+        mMap.addMarker(new MarkerOptions().position(midP).title("중간지점 찾음!").icon(BitmapDescriptorFactory.fromBitmap(MiddleMarker)));
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(midP, 10));
     }
 
     // 지오코딩(주소->좌표)
@@ -384,7 +431,7 @@ public class MiddlePlaceActivity extends AppCompatActivity implements OnMapReady
         }
 
         Log.d("TEST CHECK", polygonList.toString());
-        mMap.addPolygon(makePolygon(polygonList).strokeColor(Color.RED));
+        //mMap.addPolygon(makePolygon(polygonList).strokeColor(Color.RED));
         return polygonList;
     }
 
@@ -462,3 +509,4 @@ public class MiddlePlaceActivity extends AppCompatActivity implements OnMapReady
         return resultText;
     }
 }
+
