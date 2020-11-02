@@ -27,6 +27,12 @@ import java.util.Map;
 
 import androidx.annotation.NonNull;
 
+
+//// category Test
+//        CategorySelect category  = new CategorySelect(meetingname);
+//                category.select();
+//// category Test
+
 public class CategorySelect {
 
     private String Tag = "category Test";

@@ -47,11 +47,6 @@ public class MeetingInfoActivity extends AppCompatActivity {
         name.setText(meetingname);
         description.setText(meetingdescription);
 
-    // category Test
-        CategorySelect category  = new CategorySelect(meetingname);
-        category.select();
-    // category Test
-
         // 초대 버튼 클릭시 -> inviteActivity 넘어가서 초대문자 보내기
         invite.setOnClickListener(new View.OnClickListener() {
             @Override
