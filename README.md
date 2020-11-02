@@ -22,17 +22,17 @@
 
 
 <h1>* 모임 분리 방법!!</h1>
-특정 액티비티 or 프래그먼트에서 미팅 이름 전달 -> 전달 받음 -> DB에서 미팅 이름을 포함하고 있는 데이터 가져옴
+특정 액티비티 or 프래그먼트에서 미팅 이름 전달 -> 전달 받음 -> DB에서 미팅 이름을 포함하고 있는 데이터 가져옴 <br><br>
 
-* <intent사용!!> <참고: FragHome- myStartActivity 함수>
+* <intent사용!!> <참고: FragHome- myStartActivity 함수> <br>
 액티비티->액티비티 or 프래그먼트->액티비티 <br>
-Intent intent = new Intent(getActivity(), 클래스이름.class);
-intent.putExtra("Name",meetingName); <br>
+Intent intent = new Intent(getActivity(), 클래스이름.class); <br>
+intent.putExtra("Name",meetingName); <br><br>
 
-* <bundle사용!!> <참고: MeetingActivity- case R.id.menu_home 부분>
+* <bundle사용!!> <참고: MeetingActivity- case R.id.menu_home 부분> <br>
 액티비티->프래그먼트 or 프래그먼트->프래그먼트 <br>
-bundle.putString("Name", getIntent().getExtras().getString("Name"));
-프래그먼트이름.setArguments(bundle); <br>
+bundle.putString("Name", getIntent().getExtras().getString("Name")); <br>
+프래그먼트이름.setArguments(bundle); <br><br>
 
 * DB에서 데이터 가져오기 <참고: FragHome- postsUpdate 함수> <br>
 // 스케쥴 테이블 접근 <br>
