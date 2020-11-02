@@ -8,14 +8,18 @@ import android.widget.Button;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.mmmmeeting.Info.ScheduleInfo;
 import com.example.mmmmeeting.R;
 
 public class PlaceChoiceActivity extends AppCompatActivity implements View.OnClickListener {
     Button btn_middle, btn_search;
+    private ScheduleInfo postInfo;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_place_choice);
+
+        postInfo = (ScheduleInfo) getIntent().getSerializableExtra("scheduleInfo");
 
         btn_middle = findViewById(R.id.middleBtn);
         btn_search = findViewById(R.id.searchBtn);
@@ -30,7 +34,7 @@ public class PlaceChoiceActivity extends AppCompatActivity implements View.OnCli
         switch (v.getId()){
             // 중간 지점 찾기
             case (R.id.middleBtn):
-                myStartActivity(MiddlePlaceActivity.class);
+                myStartActivity(MiddlePlaceActivity.class, postInfo);
                 finish();
                 break;
             // 장소 검색
@@ -47,5 +51,11 @@ public class PlaceChoiceActivity extends AppCompatActivity implements View.OnCli
         Intent intent = new Intent(this,c);
         intent.addFlags(intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(intent);
+    }
+
+    private void myStartActivity(Class c, ScheduleInfo postInfo) {
+        Intent intent = new Intent(this, c);
+        intent.putExtra("scheduleInfo", postInfo);
+        startActivityForResult(intent, 0);
     }
 }
