@@ -133,10 +133,10 @@ public class MemberInitActivity extends BasicActivity implements View.OnClickLis
 
             // 멤버 정보 객체 생성 -> db저장
             MemberInfo memberInfo = new MemberInfo(name, address);
-            memberInfo.setRating(restaurant.getRating());
-            memberInfo.setRating(cafe.getRating());
-            memberInfo.setRating(subway.getRating());
-            memberInfo.setRating(shopping.getRating());
+            memberInfo.setRating("restaurant",restaurant.getRating());
+            memberInfo.setRating("cafe",cafe.getRating());
+            memberInfo.setRating("subway",subway.getRating());
+            memberInfo.setRating("shopping",shopping.getRating());
 
             Log.d("Rating Change", memberInfo.getRating().toString());
 

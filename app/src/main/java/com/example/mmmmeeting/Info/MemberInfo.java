@@ -9,7 +9,7 @@ public class MemberInfo {
     private String name;
     private String address;
 
-    private ArrayList<Float> rating = new ArrayList();
+    private HashMap<String, Float> rating = new  HashMap<>();
 
     public MemberInfo(){}
 
@@ -34,11 +34,15 @@ public class MemberInfo {
         this.address = address;
     }
 
-    public void setRating(Float rating) {
-        this.rating.add(rating);
+    public Map<String, Float> getRating() {
+        return rating;
     }
 
-    public ArrayList<Float> getRating() {
-        return rating;
+    public Float getRateValue(String key) {
+        return rating.get(key);
+    }
+
+    public void setRating(String key, Float rating){
+        this.rating.put(key,rating);
     }
 }
