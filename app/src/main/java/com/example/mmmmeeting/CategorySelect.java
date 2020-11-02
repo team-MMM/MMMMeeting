@@ -50,7 +50,8 @@ public class CategorySelect {
         {
             Bundle bd = msg.getData( ) ;            /// 전달 받은 메세지에서 번들을 받음
             ArrayList<String> categoryList = bd.getStringArrayList("arg");    /// 번들에 들어있는 값 꺼냄
-            sendCategory(categoryList) ;
+            // Category 찾은 다음에 쓸 함수
+            sendCategory(categoryList);
             Log.d(Tag,"Send is "+ categoryList.toString());
         } ;
     } ;
