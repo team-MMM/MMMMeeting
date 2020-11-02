@@ -58,7 +58,7 @@ public class MemberInitActivity extends BasicActivity implements View.OnClickLis
     }
 
     private void beforeInfo() {
-        // 이전 저장 값 보여주기 -> 창 띄울 때 이름 자동으로 띄워져 있게
+        // 이전 저장 값 보여주기 -> 창 띄울 때 자동으로 띄워져 있게
         sp = getSharedPreferences("sp", MODE_PRIVATE);
         String name = sp.getString("name", "");
         String address = sp.getString("address","");
@@ -109,9 +109,17 @@ public class MemberInitActivity extends BasicActivity implements View.OnClickLis
         switch (v.getId()){
             // 저장 버튼 -> 유저 정보 db 저장
             case R.id.checkButton:
-                profileUpdate();
-                break;
-
+                if(((TextView)findViewById(R.id.addressText)).getText().toString().length()==0){
+                    Toast.makeText(this, "주소를 입력하세요.", Toast.LENGTH_SHORT).show();
+                    break;
+                }
+                else if(((EditText)findViewById(R.id.nameEditText)).getText().toString().length()==0){
+                    Toast.makeText(this, "이름을 입력하세요.", Toast.LENGTH_SHORT).show();
+                    break;
+                } else {
+                    profileUpdate();
+                    break;
+                }
             // 주소 찾기
             case R.id.addressSearchBtn:
                 myStartActivity(SearchAddressActivity.class);
@@ -126,40 +134,38 @@ public class MemberInitActivity extends BasicActivity implements View.OnClickLis
         String address = ((TextView)findViewById(R.id.addressText)).getText().toString();
         String name = ((EditText)findViewById(R.id.nameEditText)).getText().toString();
 
-        // 이름은 필수 입력 항목
-        if(name.length()>0) {
-            FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-            FirebaseFirestore db = FirebaseFirestore.getInstance();
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-            // 멤버 정보 객체 생성 -> db저장
-            MemberInfo memberInfo = new MemberInfo(name, address);
-            memberInfo.setRating("restaurant",restaurant.getRating());
-            memberInfo.setRating("cafe",cafe.getRating());
-            memberInfo.setRating("subway",subway.getRating());
-            memberInfo.setRating("shopping",shopping.getRating());
+        // 멤버 정보 객체 생성 -> db저장
+        MemberInfo memberInfo = new MemberInfo(name, address);
+        memberInfo.setRating("restaurant", restaurant.getRating());
+        memberInfo.setRating("cafe", cafe.getRating());
+        memberInfo.setRating("subway", subway.getRating());
+        memberInfo.setRating("shopping", shopping.getRating());
 
-            Log.d("Rating Change", memberInfo.getRating().toString());
+        Log.d("Rating Change", memberInfo.getRating().toString());
 
-            if (user != null) {
-                db.collection("users").document(user.getUid()).set(memberInfo)
-                        .addOnSuccessListener(new OnSuccessListener<Void>() {
-                            @Override
-                            public void onSuccess(Void aVoid) {
-                                startToast("회원정보 등록에 성공하였습니다.");
-                                myStartActivity(MainActivity.class);
-                                finish();
-                            }
-                        })
-                        .addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception e) {
-                                startToast("회원정보 등록에 실패하였습니다.");
-                            }
-                        });
-            } else {
-                startToast("회원정보를 입력해주세요.");
-            }
+        if (user != null) {
+            db.collection("users").document(user.getUid()).set(memberInfo)
+                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid) {
+                            startToast("회원정보 등록에 성공하였습니다.");
+                            myStartActivity(MainActivity.class);
+                            finish();
+                        }
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            startToast("회원정보 등록에 실패하였습니다.");
+                        }
+                    });
+        } else {
+            startToast("회원정보를 입력해주세요.");
         }
+
     }
 
     private void startToast(String msg){
