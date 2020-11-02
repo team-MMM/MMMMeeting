@@ -20,13 +20,14 @@ public class EventDecorator implements DayViewDecorator {
     private final Drawable drawable;
     private int color;
     private HashSet<CalendarDay> dates;
+    private int check;
 
-    public EventDecorator(int color, Collection<CalendarDay> dates, Activity context) {
+    public EventDecorator(int color, Collection<CalendarDay> dates, Activity context, int check) {
         drawable = context.getResources().getDrawable(R.drawable.more);
         this.color = color;
         this.dates = new HashSet<>(dates);
+        this.check = check;
     }
-
 
     @Override
     public boolean shouldDecorate(CalendarDay day) {
@@ -35,7 +36,11 @@ public class EventDecorator implements DayViewDecorator {
 
     @Override
     public void decorate(DayViewFacade view) {
-    //    view.setSelectionDrawable(drawable); // 날짜 테두리 그리기
-        view.addSpan(new DotSpan(5, color)); // 날짜 밑에 점
+        if(check==0){
+            view.setSelectionDrawable(drawable); // 날짜 테두리 그리기
+        }
+        else if(check==1) {
+            view.addSpan(new DotSpan(5, color)); // 날짜 밑에 점
+        }
     }
 }
