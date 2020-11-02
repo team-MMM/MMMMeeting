@@ -57,7 +57,7 @@ public class ContentScheduleActivity extends BasicActivity implements View.OnCli
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.calendarBtn:
-                myStartActivity(CalendarActivity.class);
+                myStartActivity(CalendarActivity.class, postInfo);
                 break;
 
             case R.id.placeBtn:
