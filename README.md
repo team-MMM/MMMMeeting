@@ -34,16 +34,16 @@ intent.putExtra("Name",meetingName); <br>
 bundle.putString("Name", getIntent().getExtras().getString("Name"));
 프래그먼트이름.setArguments(bundle); <br>
 
-* DB에서 데이터 가져오기 <참고: FragHome- postsUpdate 함수>
-// 스케쥴 테이블 접근
-CollectionReference collectionReference = firebaseFirestore.collection("schedule");
-// 스케쥴 테이블의 문서 접근
-for (QueryDocumentSnapshot document : task.getResult())
-// 문서에 미팅ID가 미팅 이름과 같으면 동작!
-if(document.getData().get("meetingID").toString().equals(meetingName)){
-    //예시- 문서의 스케쥴 제목 가져오고 싶을 때
-    String title = document.getData.get("title").toString() -> 문서의 타이틀 이름을 string으로 가져옴
-}
+* DB에서 데이터 가져오기 <참고: FragHome- postsUpdate 함수> <br>
+// 스케쥴 테이블 접근 <br>
+CollectionReference collectionReference = firebaseFirestore.collection("schedule"); <br>
+// 스케쥴 테이블의 문서 접근 <br>
+for (QueryDocumentSnapshot document : task.getResult()) <br>
+// 문서에 미팅ID가 미팅 이름과 같으면 동작! <br>
+if(document.getData().get("meetingID").toString().equals(meetingName)){ <br>
+    //예시- 문서의 스케쥴 제목 가져오고 싶을 때 <br>
+    String title = document.getData.get("title").toString() -> 문서의 타이틀 이름을 string으로 가져옴 <br>
+} <br>
 
 
 //2020.10.29 변경 사항
