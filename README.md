@@ -24,17 +24,17 @@
 <h1>* 모임 분리 방법!!</h1>
 특정 액티비티 or 프래그먼트에서 미팅 이름 전달 -> 전달 받음 -> DB에서 미팅 이름을 포함하고 있는 데이터 가져옴
 
-*<intent사용!!> <참고: FragHome- myStartActivity 함수>
+* <intent사용!!> <참고: FragHome- myStartActivity 함수>
 액티비티->액티비티 or 프래그먼트->액티비티 <br>
 Intent intent = new Intent(getActivity(), 클래스이름.class);
 intent.putExtra("Name",meetingName); <br>
 
-*<bundle사용!!> <참고: MeetingActivity- case R.id.menu_home 부분>
+* <bundle사용!!> <참고: MeetingActivity- case R.id.menu_home 부분>
 액티비티->프래그먼트 or 프래그먼트->프래그먼트 <br>
 bundle.putString("Name", getIntent().getExtras().getString("Name"));
 프래그먼트이름.setArguments(bundle); <br>
 
-*DB에서 데이터 가져오기 <참고: FragHome- postsUpdate 함수>
+* DB에서 데이터 가져오기 <참고: FragHome- postsUpdate 함수>
 // 스케쥴 테이블 접근
 CollectionReference collectionReference = firebaseFirestore.collection("schedule");
 // 스케쥴 테이블의 문서 접근
