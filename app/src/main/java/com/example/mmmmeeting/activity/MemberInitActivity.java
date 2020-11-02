@@ -21,6 +21,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.util.ArrayList;
 import java.util.Objects;
 
 public class MemberInitActivity extends BasicActivity implements View.OnClickListener, RatingBar.OnRatingBarChangeListener {
@@ -132,10 +133,12 @@ public class MemberInitActivity extends BasicActivity implements View.OnClickLis
 
             // 멤버 정보 객체 생성 -> db저장
             MemberInfo memberInfo = new MemberInfo(name, address);
-            memberInfo.setRating("restaurant", restaurant.getRating());
-            memberInfo.setRating("cafe", cafe.getRating());
-            memberInfo.setRating("shopping", shopping.getRating());
-            memberInfo.setRating("subway", subway.getRating());
+            memberInfo.setRating(restaurant.getRating());
+            memberInfo.setRating(cafe.getRating());
+            memberInfo.setRating(subway.getRating());
+            memberInfo.setRating(shopping.getRating());
+
+            Log.d("Rating Change", memberInfo.getRating().toString());
 
             if (user != null) {
                 db.collection("users").document(user.getUid()).set(memberInfo)

@@ -1,5 +1,6 @@
 package com.example.mmmmeeting.Info;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -8,7 +9,7 @@ public class MemberInfo {
     private String name;
     private String address;
 
-    private Map<String, Float> rating = new HashMap<>();
+    private ArrayList<Float> rating = new ArrayList();
 
     public MemberInfo(){}
 
@@ -33,16 +34,11 @@ public class MemberInfo {
         this.address = address;
     }
 
-    public void setRating(String category, Float rate) {
-        this.rating.put(category,rate);
+    public void setRating(Float rating) {
+        this.rating.add(rating);
     }
 
-    public Map<String, Float> getRating() {
+    public ArrayList<Float> getRating() {
         return rating;
     }
-
-    public Float getRate(String category) {
-        return rating.get(category);
-    }
-
 }

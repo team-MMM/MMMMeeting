@@ -32,6 +32,12 @@ import androidx.annotation.NonNull;
 
 public class CategorySelect {
 
+//    // category Test
+//    Category category  = new Category(meetingname);
+//        category.select();
+//    // category Test
+
+
     private String Tag = "category Test";
     String name;
     String category="";
@@ -117,9 +123,8 @@ public class CategorySelect {
                         DocumentSnapshot document = task.getResult();
                         if (document.exists()) {
                             MemberInfo user = document.toObject(MemberInfo.class);
-                            Map<String, Float> rating = user.getRating();
 //                            Log.d(Tag,document.getId() + "> get rating: "+ rating);
-                            MapToArray(rating);
+//                            MapToArray(rating);
                         }
                     } else {
                         Log.d(Tag, "Task Fail : " + task.getException());

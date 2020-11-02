@@ -44,13 +44,6 @@ public class MeetingInfoActivity extends AppCompatActivity {
         String meetingname = intent.getExtras().getString("Name");
         String meetingdescription = intent.getExtras().getString("Description");
 
-
-        // category Test
-        CategorySelect category  = new CategorySelect(meetingname);
-        category.select();
-        // category Test
-
-
         name = findViewById(R.id.meetingName);
         description = findViewById(R.id.meetingDescription);
         code = findViewById(R.id.meetingCode);
