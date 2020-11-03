@@ -23,7 +23,13 @@ import com.example.mmmmeeting.fragment.FragCalendar;
 import com.example.mmmmeeting.fragment.FragChat;
 import com.example.mmmmeeting.fragment.FragHome;
 import com.example.mmmmeeting.fragment.FragChat;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
 public class MeetingActivity extends BasicActivity {
 
@@ -38,15 +44,17 @@ public class MeetingActivity extends BasicActivity {
     private FragChat fragChat;
     private FragAlarm fragAlarm;
     private FragAccount fragAccount;
+    String getName;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.frag_default);
-        setToolbarTitle(getIntent().getExtras().getString("Name"));
+        getName = getIntent().getExtras().getString("Name");
+        setToolbarTitle(getName);
 
         FragHome fragHome = new FragHome();
-        bundle.putString("Name", getIntent().getExtras().getString("Name"));
+        bundle.putString("Name", getName);
         fragHome.setArguments(bundle);
 
 
@@ -122,17 +130,53 @@ public class MeetingActivity extends BasicActivity {
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()){
             case R.id.meetingInfo:
-                // 미팅 정보 아이콘 클릭시 미팅 정보 출력하는 액티비티로 이동
-                Intent intent = new Intent(MeetingActivity.this, MeetingInfoActivity.class);
-                intent.addFlags(intent.FLAG_ACTIVITY_CLEAR_TOP);
-                intent.putExtra("Name",getIntent().getExtras().getString("Name"));
-                intent.putExtra("Description",getIntent().getExtras().getString("Description"));
-                startActivity(intent);
+                // 리더인지 확인
+                checkReader(getName);
                 return true;
         }
 
         return super.onOptionsItemSelected(item);
     }
-    //
+
+    private void checkReader(String getName) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        FirebaseAuth mAuth=FirebaseAuth.getInstance();
+        db.collection("meetings").get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            boolean check=false;
+                            //모든 document 출력 (dou id + data arr { : , ... ,  })
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                // 모임 이름이 같은 경우 해당 모임의 리더 확인
+                                if (document.get("name").toString().equals(getName)&&document.get("reader").toString().equals(mAuth.getUid())) {
+                                    check=true;
+                                    Log.d("Document Read", document.getId() + " => " + document.getData());
+                                    break;
+                                } else {
+                                    Log.d("Document Snapshot", "No Document");
+                                }
+                            }
+                            if(check){
+                                Intent intent = new Intent(MeetingActivity.this, MeetingInfoReaderActivity.class);
+                                intent.addFlags(intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                intent.putExtra("Name",getIntent().getExtras().getString("Name"));
+                                intent.putExtra("Description",getIntent().getExtras().getString("Description"));
+                                startActivity(intent);
+                            }
+                            else{
+                                Intent intent = new Intent(MeetingActivity.this, MeetingInfoActivity.class);
+                                intent.addFlags(intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                intent.putExtra("Name",getIntent().getExtras().getString("Name"));
+                                intent.putExtra("Description",getIntent().getExtras().getString("Description"));
+                                startActivity(intent);
+                            }
+                        } else {
+                            Log.d("Document Read", "Error getting documents: ", task.getException());
+                        }
+                    }
+                });
+    }
 
 }
