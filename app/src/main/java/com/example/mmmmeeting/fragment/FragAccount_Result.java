@@ -1,4 +1,4 @@
-package com.example.mmmmeeting.activity;
+package com.example.mmmmeeting.fragment;
 
 import android.content.Intent;
 import android.graphics.Color;
@@ -7,47 +7,55 @@ import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.RelativeSizeSpan;
 import android.view.Gravity;
+import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import androidx.appcompat.app.AppCompatActivity;
-
+import androidx.fragment.app.Fragment;
 
 import com.example.mmmmeeting.R;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public class AccountResultActivity extends AppCompatActivity {
+public class FragAccount_Result extends Fragment {
+    private View view;
+
     private int[] pay;
     private String[] user_name;
     private int total;
     private int user_num;
     LinearLayout calculate_main;
 
+    public static FragAccount_Result newInstance() {
+        return new FragAccount_Result();
+    }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.frag_account_result);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        view = inflater.inflate(R.layout.frag_account_result, container, false);
 
 
         //FragAccount.java에서 정보를 받아온다.
-        Intent intent = getIntent();
-        pay = intent.getIntArrayExtra("pay");
-        user_name = intent.getStringArrayExtra("user_name");
-        total =intent.getExtras().getInt("total");
-        user_num = intent.getExtras().getInt("user_num");
+        Bundle args = getArguments();
+        if(args!=null){
+            System.out.println("번들로 받아오자!");
+            pay = args.getIntArray("pay");
+            user_name = args.getStringArray("user_name");
+            total = args.getInt("total");
+            user_num = args.getInt("user_num");
+        }
 
-        calculate_main = (LinearLayout)findViewById(R.id.calculate_main);
+        calculate_main = (LinearLayout)view.findViewById(R.id.calculate_main);
 
         Date d = new Date(System.currentTimeMillis());
         SimpleDateFormat fm = new SimpleDateFormat("yyyy/MM/dd");
         String today = fm.format(d);
 
-        TextView cal_title = findViewById(R.id.cal_title);
+        TextView cal_title = view.findViewById(R.id.cal_title);
         //cal_title.setText(today+"정산결과");
         SpannableString s;
         s= new SpannableString(today+"  정산결과");
@@ -56,10 +64,9 @@ public class AccountResultActivity extends AppCompatActivity {
         cal_title.setText(s);
 
 
-        TextView cal_total = findViewById(R.id.cal_total);
+        TextView cal_total = view.findViewById(R.id.cal_total);
         cal_total.setText("총 금액 : "+total);
         cal_total.setTextSize(15);
-
 
         //LinearLayout 정의
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
@@ -69,18 +76,18 @@ public class AccountResultActivity extends AppCompatActivity {
         //여기서는 모임원의 수만큼 반복문을 돌면서 정산 결과를 동적 뷰로 생성한다.
         for(int i=0;i<user_num;i++){
             //LinearLayout 생성
-            LinearLayout ly = new LinearLayout(this);
+            LinearLayout ly = new LinearLayout(getContext());
             LinearLayout.LayoutParams lyparams = params;
-            lyparams.gravity=Gravity.LEFT;
+            lyparams.gravity= Gravity.LEFT;
             ly.setOrientation(LinearLayout.HORIZONTAL);
 
             //(아이콘 + 모임원이름)이 들어갈 layout
-            LinearLayout ivly = new LinearLayout(this);
+            LinearLayout ivly = new LinearLayout(getContext());
             ivly.setOrientation(LinearLayout.VERTICAL);
             ivly.setLayoutParams(params);
 
             //ImageView 생성(프로필 아이콘)
-            ImageView siv = new ImageView(this);
+            ImageView siv = new ImageView(getContext());
             siv.setImageResource(R.drawable.user);
             LinearLayout.LayoutParams sivlp = new LinearLayout.LayoutParams(120,100);
             sivlp.gravity= Gravity.CENTER_VERTICAL|Gravity.CENTER_HORIZONTAL;
@@ -88,7 +95,7 @@ public class AccountResultActivity extends AppCompatActivity {
             ivly.addView(siv);
 
             //TextView (모임원 이름)
-            TextView stiv = new TextView(this);
+            TextView stiv = new TextView(getContext());
             stiv.setGravity(Gravity.CENTER_VERTICAL|Gravity.CENTER_HORIZONTAL);
             stiv.setText(user_name[i]);
             ivly.addView(stiv);
@@ -97,7 +104,7 @@ public class AccountResultActivity extends AppCompatActivity {
             ly.addView(ivly);
 
             //TextView 생성(정산 결과)
-            TextView tv = new TextView(this);
+            TextView tv = new TextView(getContext());
             int m = total/user_num-pay[i];
             System.out.println("m값은 :"+m);
             //SpannableString s;
@@ -120,8 +127,11 @@ public class AccountResultActivity extends AppCompatActivity {
             tv.setPadding(10,30,30,30);
             tv.setLayoutParams(params);
             ly.addView(tv);
+
             calculate_main.addView(ly);
         }
-
+        return view;
     }
+
+
 }

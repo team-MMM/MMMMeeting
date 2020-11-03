@@ -10,6 +10,12 @@ import android.location.Geocoder;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -31,6 +37,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
+import org.apmem.tools.layouts.FlowLayout;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -44,6 +51,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ExecutionException;
@@ -74,6 +82,8 @@ public class MiddlePlaceActivity extends AppCompatActivity implements OnMapReady
 
     private GoogleMap mMap;
 
+    private LinearLayout midpoint_info;
+
     int i = 0;
     int j = 0;
     Point center = new Point(0, 0);
@@ -83,6 +93,7 @@ public class MiddlePlaceActivity extends AppCompatActivity implements OnMapReady
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_place_middle);
 
+        midpoint_info=(LinearLayout)findViewById(R.id.midpoint_info);
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
@@ -179,10 +190,58 @@ public class MiddlePlaceActivity extends AppCompatActivity implements OnMapReady
         PolygonCenter(hull);
         curPoint = new LatLng(center.x, center.y);
         //중간지점 찾기 (사용자 위치들과 무게중심 좌표 넘겨주기)
-        findMidPoint(hull, curPoint);
+        midP=curPoint;
+        //findMidPoint(hull, curPoint);
+        String midAdr = getCurrentAddress(midP);
+
+        TextView tv_mid = new TextView(this);
+        tv_mid.setText("중간지점 주소 : "+midAdr);
+        LinearLayout.LayoutParams param = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT);
+        tv_mid.setLayoutParams(param);
+        midpoint_info.addView(tv_mid);
+        midpoint_info.setVisibility(View.VISIBLE);
+
         //중간지점 지도 위에 표시
         mMap.addMarker(new MarkerOptions().position(midP).title("중간지점 찾음!").icon(BitmapDescriptorFactory.fromBitmap(MiddleMarker)));
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(midP, 10));
+
+    }
+
+    //지오코딩(좌표->주소)
+    public String getCurrentAddress(LatLng latlng) {
+
+        //지오코더... GPS를 주소로 변환
+        Geocoder geocoder = new Geocoder(this, Locale.forLanguageTag("ko"));
+
+        List<Address> addresses;
+
+        try {
+
+            addresses = geocoder.getFromLocation(
+                    latlng.latitude,
+                    latlng.longitude,
+                    1);
+        } catch (IOException ioException) {
+            //네트워크 문제
+            Toast.makeText(this, "지오코더 서비스 사용불가", Toast.LENGTH_LONG).show();
+            return "지오코더 서비스 사용불가";
+        } catch (IllegalArgumentException illegalArgumentException) {
+            Toast.makeText(this, "잘못된 GPS 좌표", Toast.LENGTH_LONG).show();
+            return "잘못된 GPS 좌표";
+
+        }
+
+
+        if (addresses == null || addresses.size() == 0) {
+            Toast.makeText(this, "주소 미발견", Toast.LENGTH_LONG).show();
+            return "주소 미발견";
+
+        } else {
+            Address address = addresses.get(0);
+            return address.getAddressLine(0).toString();
+        }
+
     }
 
     // 지오코딩(주소->좌표)
@@ -294,7 +353,7 @@ public class MiddlePlaceActivity extends AppCompatActivity implements OnMapReady
                 isOptimized = true;
         }
 
-//        최적이라면 => 중간지점 출력(midPoint)
+        //최적이라면 => 중간지점 출력(midPoint)
 //        if(isOptimized==true){
 //            midP = m;
 //        }

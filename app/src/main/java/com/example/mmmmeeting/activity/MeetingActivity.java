@@ -12,11 +12,13 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.example.mmmmeeting.R;
 import com.example.mmmmeeting.fragment.FragAccount;
+import com.example.mmmmeeting.fragment.FragAccount_Result;
 import com.example.mmmmeeting.fragment.FragAlarm;
 import com.example.mmmmeeting.fragment.FragBoard;
 import com.example.mmmmeeting.fragment.FragCalendar;
@@ -38,6 +40,10 @@ public class MeetingActivity extends BasicActivity {
     private FragChat fragChat;
     private FragAlarm fragAlarm;
     private FragAccount fragAccount;
+    private FragAccount_Result fragAccount_result;
+    private Fragment fragment_ac;
+
+    private boolean fr_check=false;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -49,10 +55,10 @@ public class MeetingActivity extends BasicActivity {
         bundle.putString("Name", getIntent().getExtras().getString("Name"));
         fragHome.setArguments(bundle);
 
-
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.main_frame,fragHome)
                 .commit();
+        fragment_ac = new Fragment();
 
         bottomNavigationView = findViewById(R.id.bottomNavi);
         // 메뉴 바 아이콘을 눌렀을 때의 화면 동작
@@ -70,7 +76,6 @@ public class MeetingActivity extends BasicActivity {
                         getSupportFragmentManager().beginTransaction()
                                 .replace(R.id.main_frame,fragHome)
                                 .commit();
-
                         return true;
                     case R.id.menu_chat:
                         FragChat fragChat = new FragChat();
@@ -87,6 +92,7 @@ public class MeetingActivity extends BasicActivity {
                         getSupportFragmentManager().beginTransaction()
                                 .replace(R.id.main_frame, fragBoard)
                                 .commit();
+
                         return true;
                     case R.id.menu_alarm:
                         FragAlarm fragAlarm = new FragAlarm();
@@ -95,13 +101,20 @@ public class MeetingActivity extends BasicActivity {
                                 .commit();
                         return true;
                     case R.id.menu_account:
-                        FragAccount fragAccount = new FragAccount();
+                        fragAccount = new FragAccount();
                         bundle.putString("Name", getIntent().getExtras().getString("Name"));
                         fragAccount.setArguments(bundle);
 
-                        getSupportFragmentManager().beginTransaction()
-                                .replace(R.id.main_frame,fragAccount)
-                                .commit();
+                        if(fr_check==false) {
+                            getSupportFragmentManager().beginTransaction()
+                                    .replace(R.id.main_frame, fragAccount)
+                                    .commit();
+                        }
+                        if(fr_check){
+                            getSupportFragmentManager().beginTransaction().hide(fragAccount).commit();
+                            //fragAccount_result = new FragAccount_Result();
+                            getSupportFragmentManager().beginTransaction().replace(R.id.main_frame,fragment_ac).commit();
+                        }
                         return true;
                 }
                 return false;
@@ -109,6 +122,15 @@ public class MeetingActivity extends BasicActivity {
         });
 
 
+    }
+
+    public void replaceFragment(Fragment fragment) {
+        fragment_ac = fragment;
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.replace(R.id.main_frame, fragment).commit();      // Fragment로 사용할 MainActivity내의 layout공간을 선택합니다.
+        fr_check=true;
+        //fragmentManager.beginTransaction().hide(fragAccount).commit();
     }
 
     //메뉴바 코드

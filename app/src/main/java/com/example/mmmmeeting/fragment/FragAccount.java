@@ -17,21 +17,17 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
-import com.example.mmmmeeting.Info.ScheduleInfo;
 import com.example.mmmmeeting.R;
-import com.example.mmmmeeting.activity.AccountResultActivity;
+import com.example.mmmmeeting.activity.MeetingActivity;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.snackbar.Snackbar;
-import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
-
-import java.util.ArrayList;
-import java.util.Date;
 
 public class FragAccount extends Fragment {
     private View view;
@@ -45,6 +41,11 @@ public class FragAccount extends Fragment {
     private String meetingName;
     private boolean check_group=false;
     private RelativeLayout layout_account;
+    FragmentManager fragmentManager;
+
+    public static FragAccount newInstance() {
+        return new FragAccount();
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -56,7 +57,9 @@ public class FragAccount extends Fragment {
         layout_input_money = (LinearLayout)view.findViewById(R.id.layout_input_money);
         btn_calculate = view.findViewById(R.id.btn_calculate);
 
+
         Bundle bundle = this.getArguments();
+
         if(bundle != null) {
             bundle = getArguments();
             meetingName = bundle.getString("Name");
@@ -197,13 +200,20 @@ public class FragAccount extends Fragment {
                                         snackbar.show();
                                     }else {
 
-                                        //정산결과를 보여주는 화면으로 넘어감
-                                        Intent intent = new Intent(getContext(), AccountResultActivity.class);
-                                        intent.putExtra("pay", money);
-                                        intent.putExtra("total", sum);
-                                        intent.putExtra("user_name", user_name);
-                                        intent.putExtra("user_num", user_num);
-                                        startActivity(intent);
+                                        FragAccount_Result fr = new FragAccount_Result();
+                                        //FragmentManager fm = getFragmentManager();
+                                        //FragmentTransaction fmt = fm.beginTransaction();
+                                        Bundle bundle = new Bundle();
+                                        bundle.putIntArray("pay",money);
+                                        bundle.putInt("total",sum);
+                                        bundle.putStringArray("user_name",user_name);
+                                        bundle.putInt("user_num",user_num);
+                                        fr.setArguments(bundle);
+
+                                        //((MeetingActivity)getActivity()).replaceFragment(fr.newInstance());
+                                        ((MeetingActivity)getActivity()).replaceFragment(fr);
+
+
                                     }
                                 }
                             });
