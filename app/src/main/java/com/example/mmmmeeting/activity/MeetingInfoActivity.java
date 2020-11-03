@@ -106,6 +106,7 @@ public class MeetingInfoActivity extends AppCompatActivity {
                                         newReader(document.getData().get("userID"),document.getId());
                                     }
                                     else {readerFind(document.getData().get("reader").toString());}
+
                                     Log.d("Document Read", document.getId() + " => " + document.getData());
                                     break;
                                 } else {
