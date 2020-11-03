@@ -5,14 +5,15 @@
 
     <application
         android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@mipmap/ic_launcher_new"
         android:label="우리 지금 만나"
         android:requestLegacyExternalStorage="true"
         android:usesCleartextTraffic="true"
-        android:roundIcon="@mipmap/ic_launcher_round"
+        android:roundIcon="@mipmap/ic_launcher_new_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:replace="android:allowBackup,android:label">
+
         <activity android:name=".activity.inviteActivity"></activity>
 
         <activity android:name=".activity.MeetingDeleteActivity" />

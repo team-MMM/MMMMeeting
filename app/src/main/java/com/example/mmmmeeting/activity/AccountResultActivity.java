@@ -82,7 +82,7 @@ public class AccountResultActivity extends AppCompatActivity {
             //ImageView 생성(프로필 아이콘)
             ImageView siv = new ImageView(this);
             siv.setImageResource(R.drawable.user);
-            LinearLayout.LayoutParams sivlp = new LinearLayout.LayoutParams(100,100);
+            LinearLayout.LayoutParams sivlp = new LinearLayout.LayoutParams(120,100);
             sivlp.gravity= Gravity.CENTER_VERTICAL|Gravity.CENTER_HORIZONTAL;
             siv.setLayoutParams(sivlp);
             ivly.addView(siv);

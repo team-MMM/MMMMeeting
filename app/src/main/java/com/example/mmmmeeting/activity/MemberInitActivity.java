@@ -109,6 +109,7 @@ public class MemberInitActivity extends BasicActivity implements View.OnClickLis
         switch (v.getId()){
             // 저장 버튼 -> 유저 정보 db 저장
             case R.id.checkButton:
+                // 주소, 이름 필수 입력
                 if(((TextView)findViewById(R.id.addressText)).getText().toString().length()==0){
                     Toast.makeText(this, "주소를 입력하세요.", Toast.LENGTH_SHORT).show();
                     break;

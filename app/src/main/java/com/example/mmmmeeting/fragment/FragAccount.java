@@ -120,7 +120,7 @@ public class FragAccount extends Fragment {
 
                                 ImageView iv = new ImageView(getContext());
                                 iv.setImageResource(R.drawable.user);
-                                LinearLayout.LayoutParams ivlp = new LinearLayout.LayoutParams(100, 100);
+                                LinearLayout.LayoutParams ivlp = new LinearLayout.LayoutParams(120, 100);
                                 ivlp.gravity = Gravity.CENTER_VERTICAL | Gravity.CENTER_HORIZONTAL;
                                 iv.setLayoutParams(ivlp);
                                 ivly.addView(iv);
@@ -149,7 +149,7 @@ public class FragAccount extends Fragment {
                                     }
                                 });
 
-                                if(et.getText()==null||et.getText().toString()==""){
+                                if(et.getText()==null||et.getText().toString().length()==0){
                                     et.setText("0");
                                 }
 
@@ -176,7 +176,7 @@ public class FragAccount extends Fragment {
 
                                     for (int i = 0; i < user_num; i++) {
                                         //EditText에 작성된 금액을 가져온다.
-                                        if(texts[i].getText()==null||texts[i].getText().toString()==""){
+                                        if(texts[i].getText()==null||texts[i].getText().toString().length()==0){
                                             texts[i].setText("0");
                                             money[i] = Integer.parseInt(texts[i].getText().toString());
                                         } else{
