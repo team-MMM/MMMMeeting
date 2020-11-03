@@ -83,14 +83,15 @@ public class MakeMeetingActivity extends BasicActivity {
         String name = ((EditText)findViewById(R.id.makeMeetingText)).getText().toString();
         String description = ((EditText)findViewById(R.id.meetingDesc)).getText().toString();
 
-        // 모임 이름의 길이가 0보다 큰경우 = 모임의 이름이 입력된 경우
-        if(name.length()>0) {
+        // 모임 이름의 길이가 0이 아닌 경우 = 모임의 이름이 입력된 경우
+        if(name.length()!=0) {
             final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
             FirebaseFirestore db = FirebaseFirestore.getInstance();
 
             // db에 저장할 모임 정보 객체 생성
             MeetingInfo info = new MeetingInfo(name,description);
             info.setUserID(user.getUid());
+            info.setReader(user.getUid());
 
             if (user != null) {
                 // meeting table에 미팅 정보 저장

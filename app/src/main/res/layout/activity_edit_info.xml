@@ -139,11 +139,11 @@
         android:textSize="20sp"
         android:layout_alignParentLeft="true"
         android:layout_centerInParent="true"
-        android:text="지하철"
+        android:text="공원"
         />
 
     <RatingBar
-        android:id="@+id/subwayRate"
+        android:id="@+id/parkRate"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="10sp"
@@ -185,6 +185,46 @@
         android:max = "5"
         style="@style/Widget.AppCompat.RatingBar.Indicator"
         />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        >
+        <TextView
+            android:id="@+id/actName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@android:color/black"
+            android:layout_marginLeft="5sp"
+            android:textSize="20sp"
+            android:layout_alignParentLeft="true"
+            android:layout_centerInParent="true"
+            android:text="액티비티"
+            />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@+id/actName"
+            android:textSize="12sp"
+            android:layout_centerInParent="true"
+            android:text="=> 영화관, 박물관..."
+            />
+
+        <RatingBar
+            android:id="@+id/actRate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="10sp"
+            android:layout_alignParentRight="true"
+            android:isIndicator="false"
+            android:numStars="5"
+            android:rating="0"
+            android:stepSize="0.5"
+            android:max = "5"
+            style="@style/Widget.AppCompat.RatingBar.Indicator"
+            />
     </RelativeLayout>
 
     <Button
