@@ -111,7 +111,7 @@ public class MeetingActivity extends BasicActivity {
                                     .commit();
                         }
                         if(fr_check){
-                            getSupportFragmentManager().beginTransaction().hide(fragAccount).commit();
+                            //getSupportFragmentManager().beginTransaction().hide(fragAccount).commit();
                             //fragAccount_result = new FragAccount_Result();
                             getSupportFragmentManager().beginTransaction().replace(R.id.main_frame,fragment_ac).commit();
                         }
@@ -124,12 +124,19 @@ public class MeetingActivity extends BasicActivity {
 
     }
 
-    public void replaceFragment(Fragment fragment) {
-        fragment_ac = fragment;
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        fragmentTransaction.replace(R.id.main_frame, fragment).commit();      // Fragment로 사용할 MainActivity내의 layout공간을 선택합니다.
-        fr_check=true;
+    //Fragment fragment,
+    public void replaceFragment(Fragment fragment,boolean check) {
+        if(check){
+            fragment_ac = fragment;
+            getSupportFragmentManager().beginTransaction().replace(R.id.main_frame,fragment_ac).commit();
+        }
+        if(check==false){
+            fragAccount = new FragAccount();
+            bundle.putString("Name", getIntent().getExtras().getString("Name"));
+            fragAccount.setArguments(bundle);
+            getSupportFragmentManager().beginTransaction().replace(R.id.main_frame,fragAccount).commit();
+        }
+        fr_check=check;
         //fragmentManager.beginTransaction().hide(fragAccount).commit();
     }
 

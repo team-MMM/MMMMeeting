@@ -50,17 +50,22 @@ public class FragAccount extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.frag_account,container,false);
-
         db = FirebaseFirestore.getInstance();
 
-        layout_account = (RelativeLayout)view.findViewById(R.id.layout_account);
+        //layout_account = (RelativeLayout)view.findViewById(R.id.layout_account);
         layout_input_money = (LinearLayout)view.findViewById(R.id.layout_input_money);
         btn_calculate = view.findViewById(R.id.btn_calculate);
 
+        if(view!=null){
+            ViewGroup parentvg = (ViewGroup)view.getParent();
+            if(null!=parentvg){
+                parentvg.removeView(view);
+            }
+        }
 
         Bundle bundle = this.getArguments();
 
-        if(bundle != null) {
+        if (bundle != null) {
             bundle = getArguments();
             meetingName = bundle.getString("Name");
         }
@@ -80,6 +85,7 @@ public class FragAccount extends Fragment {
                         }
                     }
                 });
+
 
         return view;
     }
@@ -210,8 +216,8 @@ public class FragAccount extends Fragment {
                                         bundle.putInt("user_num",user_num);
                                         fr.setArguments(bundle);
 
-                                        //((MeetingActivity)getActivity()).replaceFragment(fr.newInstance());
-                                        ((MeetingActivity)getActivity()).replaceFragment(fr);
+                                        //((MeetingActivity)getActivity()).replaceFragment(fr,true);
+                                        ((MeetingActivity)getActivity()).replaceFragment(fr,true);
 
 
                                     }

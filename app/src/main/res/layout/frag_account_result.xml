@@ -31,6 +31,16 @@
         android:gravity="center"
         android:layout_centerInParent="true"
         android:orientation="vertical">
+
     </LinearLayout>
+
+    <Button
+        android:id="@+id/btn_calculate_modify"
+        android:layout_width="wrap_content"
+        android:layout_height="50dp"
+        android:layout_marginBottom="50dp"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:text="수정하기"/>
 
 </RelativeLayout>

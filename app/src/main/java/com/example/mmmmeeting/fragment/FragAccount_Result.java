@@ -10,6 +10,7 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -17,6 +18,7 @@ import android.widget.TextView;
 import androidx.fragment.app.Fragment;
 
 import com.example.mmmmeeting.R;
+import com.example.mmmmeeting.activity.MeetingActivity;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -29,6 +31,7 @@ public class FragAccount_Result extends Fragment {
     private int total;
     private int user_num;
     LinearLayout calculate_main;
+    Button btn_calculate_modify ;
 
     public static FragAccount_Result newInstance() {
         return new FragAccount_Result();
@@ -50,6 +53,7 @@ public class FragAccount_Result extends Fragment {
         }
 
         calculate_main = (LinearLayout)view.findViewById(R.id.calculate_main);
+        btn_calculate_modify = view.findViewById(R.id.btn_calculate_modify);
 
         Date d = new Date(System.currentTimeMillis());
         SimpleDateFormat fm = new SimpleDateFormat("yyyy/MM/dd");
@@ -130,6 +134,16 @@ public class FragAccount_Result extends Fragment {
 
             calculate_main.addView(ly);
         }
+
+        btn_calculate_modify.setOnClickListener(new Button.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                FragAccount fa = new FragAccount();
+                //((MeetingActivity)getActivity()).replaceFragment(fa.newInstance(),false);
+                ((MeetingActivity)getActivity()).replaceFragment(fa,false);
+            }
+        });
         return view;
     }
 
