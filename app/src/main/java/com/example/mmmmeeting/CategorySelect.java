@@ -28,6 +28,11 @@ import java.util.Map;
 import androidx.annotation.NonNull;
 
 
+//// category Test
+//        CategorySelect category  = new CategorySelect(meetingname);
+//                category.select();
+//// category Test
+
 public class CategorySelect {
 
     private String Tag = "category Test";
@@ -219,22 +224,25 @@ public class CategorySelect {
         }
         Log.d(Tag, Arrays.toString(avgRating));
 
-        float high = avgRating[0];
         ArrayList<Integer> index= new ArrayList<>();
 
         for(int i=0; i<3;i++ ){ // 가장 높은 3개 항목
-            int j = 0;
-            for ( int tempIndex = 0; j < avgRating.length; j++) {
+            int tempIndex = 0;
+            float high = avgRating[0];
+
+            for (int j= 0; j < avgRating.length; j++) {
                 if (high <= avgRating[j]) {
                     high = avgRating[j];
                     tempIndex = j;
                 }
             }
-            index.add(j);
-        }
 
-        // 0 = 식당 , 1 = 카페, 2 = 공원, 3 = 쇼핑몰, 4=액티비티
+            avgRating[tempIndex]=0f;
+            index.add(tempIndex);
+        }
+        // 0=식당 , 1=카페, 2=공원, 3=쇼핑몰, 4=액티비티
         this.category.clear();
+
         for (int i =0 ; i< index.size(); i++) {
             switch (index.get(i)) {
                 case 0: this.category.add("restaurant"); break;
