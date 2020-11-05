@@ -40,7 +40,6 @@ public class MeetingActivity extends BasicActivity {
     private FragChat fragChat;
     private FragAlarm fragAlarm;
     private FragAccount fragAccount;
-    private FragAccount_Result fragAccount_result;
     private Fragment fragment_ac;
 
     private boolean fr_check=false;

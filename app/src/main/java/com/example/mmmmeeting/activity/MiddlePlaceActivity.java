@@ -3,6 +3,7 @@
 package com.example.mmmmeeting.activity;
 
 
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.location.Address;
@@ -10,6 +11,12 @@ import android.location.Geocoder;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -71,6 +78,9 @@ public class MiddlePlaceActivity extends AppCompatActivity implements OnMapReady
     private LatLng midP;
 
     private int countTry;
+    private LinearLayout midpoint_select;
+
+
 
     JSONArray routesArray;
     JSONArray legsArray;
@@ -97,6 +107,7 @@ public class MiddlePlaceActivity extends AppCompatActivity implements OnMapReady
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_place_middle);
 
+        midpoint_select=(LinearLayout)findViewById(R.id.midpoint_select);
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
@@ -185,6 +196,54 @@ public class MiddlePlaceActivity extends AppCompatActivity implements OnMapReady
         curPoint = new LatLng(center.x, center.y);
         //중간지점 찾기 (사용자 위치들과 무게중심 좌표 넘겨주기)
         findMidPoint(hull, curPoint);
+
+        String midAdr = getCurrentAddress(midP);
+
+        //LinearLayout 정의
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT);
+        //LinearLayout 정의
+        RelativeLayout.LayoutParams rl_params = new RelativeLayout.LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT);
+
+        //LinearLayout 생성
+        RelativeLayout ly = new RelativeLayout(this);
+        ly.setLayoutParams(rl_params);
+        //ly.setOrientation(LinearLayout.HORIZONTAL);
+
+        TextView tv_mid = new TextView(this);
+        int id =1;
+        tv_mid.setId(id);
+        tv_mid.setText("중간지점 주소 : "+midAdr);
+        tv_mid.setLayoutParams(rl_params);
+        ly.addView(tv_mid);
+
+        Button btn_mid = new Button(this);
+        btn_mid.setText("선택");
+        RelativeLayout.LayoutParams btn_params = new RelativeLayout.LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT);
+        btn_params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT|RelativeLayout.ALIGN_PARENT_BOTTOM,RelativeLayout.TRUE);
+        btn_params.addRule(RelativeLayout.BELOW,tv_mid.getId());
+        btn_mid.setLayoutParams(btn_params);
+        ly.addView(btn_mid);
+
+
+        midpoint_select.addView(ly);
+        midpoint_select.setVisibility(View.VISIBLE);
+
+        btn_mid.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent i = new Intent(MiddlePlaceActivity.this, PlaceListActivity.class);
+
+                Bundle bundle = new Bundle();
+                bundle.putParcelable("midpoint",midP);
+                i.putExtras(bundle);
+                //i.putExtra("midpoint",midP);
+                startActivity(i);
+            }
+        });
+
         //중간지점 지도 위에 표시
         //mMap.addMarker(new MarkerOptions().position(midP).title("중간지점 찾음!").icon(BitmapDescriptorFactory.fromBitmap(MiddleMarker)));
         //mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(midP, 10));

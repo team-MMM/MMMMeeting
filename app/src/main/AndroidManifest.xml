@@ -43,6 +43,8 @@
         <activity android:name=".activity.CalendarActivity"/>
         <activity android:name=".activity.PlaceChoiceActivity"/>
         <activity android:name=".activity.DirectionActivity"/>
+        <activity android:name=".activity.PlaceListActivity"/>
+
 
 
         <meta-data
