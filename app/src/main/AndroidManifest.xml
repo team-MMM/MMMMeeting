@@ -8,15 +8,16 @@
         android:icon="@mipmap/ic_launcher_new"
         android:label="우리 지금 만나"
         android:requestLegacyExternalStorage="true"
+        android:usesCleartextTraffic="true"
         android:roundIcon="@mipmap/ic_launcher_new_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
-        android:usesCleartextTraffic="true"
         tools:replace="android:allowBackup,android:label">
         <activity android:name=".activity.newReaderActivity"></activity>
         <activity android:name=".activity.MeetingInfoReaderActivity" />
         <activity android:name=".activity.inviteActivity" />
         <activity android:name=".activity.MeetingDeleteActivity" />
+
         <activity android:name=".activity.MeetingAttendActivity" />
         <activity android:name=".activity.SignActivity">
             <intent-filter>
@@ -33,28 +34,29 @@
         <activity android:name=".activity.MakePostActivity" />
         <activity android:name=".activity.MemberInitActivity" />
         <activity android:name=".activity.ContentBoardActivity" />
-        <activity android:name=".activity.MakeScheduleActivity" />
-        <activity android:name=".activity.ContentScheduleActivity" />
-        <activity android:name=".activity.MiddlePlaceActivity" />
-        <activity android:name=".activity.MeetingInfoActivity" />
-        <activity android:name=".activity.SearchPlaceActivity" />
-        <activity android:name=".activity.SearchAddressActivity" />
-        <activity android:name=".activity.CalendarActivity" />
-        <activity android:name=".activity.PlaceChoiceActivity" />
-        <activity android:name=".activity.DirectionActivity" />
+        <activity android:name=".activity.MakeScheduleActivity"/>
+        <activity android:name=".activity.ContentScheduleActivity"/>
+        <activity android:name=".activity.MiddlePlaceActivity"/>
+        <activity android:name=".activity.MeetingInfoActivity"/>
+        <activity android:name=".activity.SearchPlaceActivity"/>
+        <activity android:name=".activity.SearchAddressActivity"/>
+        <activity android:name=".activity.CalendarActivity"/>
+        <activity android:name=".activity.PlaceChoiceActivity"/>
+        <activity android:name=".activity.DirectionActivity"/>
         <activity android:name=".activity.DistancePointActivity" />
+        <activity android:name=".activity.PlaceListActivity"/>
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyAMjzNcvmVwExmuyfw82V-G-DXmhVAUymY" />
     </application>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.SEND_SMS" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
 
-    <uses-permission android:name="android.permission.SEND_SMS" />
+    <uses-permission android:name="android.permission.INTERNET" />
 
 </manifest>

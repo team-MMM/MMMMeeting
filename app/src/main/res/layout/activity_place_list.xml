@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".activity.PlaceListActivity">
+
+    <fragment
+        android:id="@+id/place_map"
+        android:layout_width="match_parent"
+        android:layout_height="300dp"
+        tools:context=".DirectionActivity"
+        android:name="com.google.android.gms.maps.SupportMapFragment"/>
+
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="20dp"
+        android:background="@color/gray"
+        android:layout_below="@id/place_map">
+
+        <LinearLayout
+            android:id="@+id/place_list_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@color/gray"
+            android:visibility="gone">
+
+        </LinearLayout>
+
+    </ScrollView>
+
+
+
+</RelativeLayout>
