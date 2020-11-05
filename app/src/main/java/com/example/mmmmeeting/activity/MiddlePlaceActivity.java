@@ -10,11 +10,6 @@ import android.location.Geocoder;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -28,6 +23,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolygonOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -37,7 +33,6 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
-import org.apmem.tools.layouts.FlowLayout;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -50,15 +45,23 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ExecutionException;
 import com.google.maps.android.PolyUtil;
+import com.google.maps.android.SphericalUtil;
+
+import noman.googleplaces.NRPlaces;
+import noman.googleplaces.Place;
+import noman.googleplaces.PlaceType;
+import noman.googleplaces.PlacesException;
+import noman.googleplaces.PlacesListener;
 
 
-public class MiddlePlaceActivity extends AppCompatActivity implements OnMapReadyCallback {
+public class MiddlePlaceActivity extends AppCompatActivity implements OnMapReadyCallback, PlacesListener {
 
     private ScheduleInfo postInfo;
     private String meetingname;
@@ -82,18 +85,18 @@ public class MiddlePlaceActivity extends AppCompatActivity implements OnMapReady
 
     private GoogleMap mMap;
 
-    private LinearLayout midpoint_info;
-
     int i = 0;
     int j = 0;
     Point center = new Point(0, 0);
+
+    List<Marker> previous_marker = null;
+    int radius = 500;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_place_middle);
 
-        midpoint_info=(LinearLayout)findViewById(R.id.midpoint_info);
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
@@ -164,18 +167,9 @@ public class MiddlePlaceActivity extends AppCompatActivity implements OnMapReady
 
     // 중간 지점 찾기 시작!
     private void gStart(String[] addr, String[] name){
-       /*
-        for (String str : addr) {
-            System.out.println(str);
-        }
-        */
         BitmapDrawable bitmapdraw1 = (BitmapDrawable) getResources().getDrawable(R.drawable.user);
         Bitmap b = bitmapdraw1.getBitmap();
         Bitmap UserMarker = Bitmap.createScaledBitmap(b, 100, 100, false);
-
-        BitmapDrawable bitmapdraw2 = (BitmapDrawable) getResources().getDrawable(R.drawable.middleplace);
-        Bitmap c = bitmapdraw2.getBitmap();
-        Bitmap MiddleMarker = Bitmap.createScaledBitmap(c, 100, 100, false);
 
         Point[] points = new Point[addr.length];
         for (String str : addr) {
@@ -190,58 +184,11 @@ public class MiddlePlaceActivity extends AppCompatActivity implements OnMapReady
         PolygonCenter(hull);
         curPoint = new LatLng(center.x, center.y);
         //중간지점 찾기 (사용자 위치들과 무게중심 좌표 넘겨주기)
-        midP=curPoint;
-        //findMidPoint(hull, curPoint);
-        String midAdr = getCurrentAddress(midP);
-
-        TextView tv_mid = new TextView(this);
-        tv_mid.setText("중간지점 주소 : "+midAdr);
-        LinearLayout.LayoutParams param = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT);
-        tv_mid.setLayoutParams(param);
-        midpoint_info.addView(tv_mid);
-        midpoint_info.setVisibility(View.VISIBLE);
-
+        findMidPoint(hull, curPoint);
         //중간지점 지도 위에 표시
-        mMap.addMarker(new MarkerOptions().position(midP).title("중간지점 찾음!").icon(BitmapDescriptorFactory.fromBitmap(MiddleMarker)));
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(midP, 10));
-
-    }
-
-    //지오코딩(좌표->주소)
-    public String getCurrentAddress(LatLng latlng) {
-
-        //지오코더... GPS를 주소로 변환
-        Geocoder geocoder = new Geocoder(this, Locale.forLanguageTag("ko"));
-
-        List<Address> addresses;
-
-        try {
-
-            addresses = geocoder.getFromLocation(
-                    latlng.latitude,
-                    latlng.longitude,
-                    1);
-        } catch (IOException ioException) {
-            //네트워크 문제
-            Toast.makeText(this, "지오코더 서비스 사용불가", Toast.LENGTH_LONG).show();
-            return "지오코더 서비스 사용불가";
-        } catch (IllegalArgumentException illegalArgumentException) {
-            Toast.makeText(this, "잘못된 GPS 좌표", Toast.LENGTH_LONG).show();
-            return "잘못된 GPS 좌표";
-
-        }
-
-
-        if (addresses == null || addresses.size() == 0) {
-            Toast.makeText(this, "주소 미발견", Toast.LENGTH_LONG).show();
-            return "주소 미발견";
-
-        } else {
-            Address address = addresses.get(0);
-            return address.getAddressLine(0).toString();
-        }
-
+        //mMap.addMarker(new MarkerOptions().position(midP).title("중간지점 찾음!").icon(BitmapDescriptorFactory.fromBitmap(MiddleMarker)));
+        //mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(midP, 10));
+        findSub(midP);
     }
 
     // 지오코딩(주소->좌표)
@@ -353,7 +300,7 @@ public class MiddlePlaceActivity extends AppCompatActivity implements OnMapReady
                 isOptimized = true;
         }
 
-        //최적이라면 => 중간지점 출력(midPoint)
+//        최적이라면 => 중간지점 출력(midPoint)
 //        if(isOptimized==true){
 //            midP = m;
 //        }
@@ -379,10 +326,7 @@ public class MiddlePlaceActivity extends AppCompatActivity implements OnMapReady
             }
             //findMidPoint(hull,midP);
         }
-
-
         System.out.println("update Check : " + check);
-
 
         // 1. 중간지점이 범위 내에 있다면 다시 midpoint가 맞는지 탐색하고
         // 2. 범위 내에 없다면 범위 내의 임의의 지점을 설정해줘서 다시 탐색하는 방식으로? 수정해야할듯
@@ -505,6 +449,127 @@ public class MiddlePlaceActivity extends AppCompatActivity implements OnMapReady
         return inside;
     }
 
+    // 중간지점 근처 역 찾기
+    private void findSub(LatLng midP){
+        String apiKey = getString(R.string.api_key);
+        previous_marker = new ArrayList<Marker>();
+
+        if (previous_marker != null)
+            previous_marker.clear();//지역정보 마커 클리어
+
+            new NRPlaces.Builder()
+                .listener(MiddlePlaceActivity.this)
+                .key(apiKey)
+                .latlng(midP.latitude, midP.longitude)//중간지점 위치
+                .radius(radius) //500 미터 내에서 검색
+                .type(PlaceType.SUBWAY_STATION) //지하철
+                .language("ko", "KR")
+                .build()
+                .execute();
+    }
+    // 500 미터 내에 없을 경우 찾을 때 까지 500 미터 늘려서 다시 계산
+    @Override
+    public void onPlacesFailure(PlacesException e) {
+        String apiKey = getString(R.string.api_key);
+        radius += 500;
+        new NRPlaces.Builder()
+                .listener(MiddlePlaceActivity.this)
+                .key(apiKey)
+                .latlng(midP.latitude, midP.longitude)//현재 위치
+                .radius(radius) //500 미터 내에서 검색
+                .type(PlaceType.SUBWAY_STATION) //지하철
+                .language("ko", "KR")
+                .build()
+                .execute();
+    }
+
+    @Override
+    public void onPlacesStart() {
+
+    }
+
+    @Override
+    public void onPlacesSuccess(final List<noman.googleplaces.Place> places) {
+        BitmapDrawable bitmapdraw2 = (BitmapDrawable) getResources().getDrawable(R.drawable.middleplace);
+        Bitmap c = bitmapdraw2.getBitmap();
+        Bitmap MiddleMarker = Bitmap.createScaledBitmap(c, 100, 100, false);
+        // 중간지점과 가장 가까운 역 표시
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                double distance = (double)radius;
+                double temp = 0.0;
+                LatLng latlng = new LatLng(0,0);
+                int i=1;
+                int size = places.size();
+                String name = null;
+                for (noman.googleplaces.Place place : places) {
+                    LatLng latLng
+                            = new LatLng(place.getLatitude(), place.getLongitude());
+                    temp = distance;
+                    distance = SphericalUtil.computeDistanceBetween(midP, latLng);
+                    System.out.println(place.getName()+ " 거리 : "+ distance);
+                    if(distance < temp) {
+                        latlng = latLng;
+                        name = place.getName();
+                    }
+                    if(i==size) {
+                        String markerSnippet = getCurrentAddress(latlng);
+
+                        MarkerOptions markerOptions = new MarkerOptions();
+                        markerOptions.position(latlng);
+                        markerOptions.title(name+"역");
+                        markerOptions.snippet(markerSnippet).icon(BitmapDescriptorFactory.fromBitmap(MiddleMarker));
+                        Marker item = mMap.addMarker(markerOptions);
+                        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latlng, 10));
+                        previous_marker.add(item);
+                    }
+                    i++;
+                }
+                //중복 마커 제거
+                HashSet<Marker> hashSet = new HashSet<Marker>();
+                hashSet.addAll(previous_marker);
+                previous_marker.clear();
+                previous_marker.addAll(hashSet);
+
+            }
+        });
+    }
+
+    @Override
+    public void onPlacesFinished() {
+
+    }
+
+    public String getCurrentAddress(LatLng latlng) {
+        //지오코더... GPS를 주소로 변환
+        Geocoder geocoder = new Geocoder(this, Locale.getDefault());
+
+        List<Address> addresses;
+
+        try {
+            addresses = geocoder.getFromLocation(
+                    latlng.latitude,
+                    latlng.longitude,
+                    1);
+        } catch (IOException ioException) {
+            //네트워크 문제
+            Toast.makeText(this, "지오코더 서비스 사용불가", Toast.LENGTH_LONG).show();
+            return "지오코더 서비스 사용불가";
+        } catch (IllegalArgumentException illegalArgumentException) {
+            Toast.makeText(this, "잘못된 GPS 좌표", Toast.LENGTH_LONG).show();
+            return "잘못된 GPS 좌표";
+        }
+
+        if (addresses == null || addresses.size() == 0) {
+            Toast.makeText(this, "주소 미발견", Toast.LENGTH_LONG).show();
+            return "주소 미발견";
+        } else {
+            Address address = addresses.get(0);
+            return address.getAddressLine(0).toString();
+        }
+
+    }
 
     ////////////////////////
     //URL연결, JSON 받아오기///
