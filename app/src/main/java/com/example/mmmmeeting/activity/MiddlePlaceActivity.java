@@ -260,6 +260,7 @@ public class MiddlePlaceActivity extends AppCompatActivity implements OnMapReady
                                     }).setNegativeButton("YES", new DialogInterface.OnClickListener() {
                                         @Override
                                         public void onClick(DialogInterface dialogInterface, int i) {
+
                                             //장소리스트 화면으로 넘어감
                                             Intent intent = new Intent(MiddlePlaceActivity.this, PlaceListActivity.class);
 

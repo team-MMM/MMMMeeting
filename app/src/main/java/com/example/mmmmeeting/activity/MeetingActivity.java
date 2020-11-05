@@ -44,6 +44,7 @@ public class MeetingActivity extends BasicActivity {
 
     private boolean fr_check=false;
 
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
