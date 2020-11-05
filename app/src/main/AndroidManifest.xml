@@ -45,7 +45,6 @@
         <activity android:name=".activity.DirectionActivity"/>
         <activity android:name=".activity.DistancePointActivity" />
         <activity android:name=".activity.PlaceListActivity"/>
-        <activity android:name=".activity.DistancePointActivity" />
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
