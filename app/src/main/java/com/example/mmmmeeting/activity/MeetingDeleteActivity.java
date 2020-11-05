@@ -91,13 +91,16 @@ public class MeetingDeleteActivity extends AppCompatActivity {
 
                     if (document.getData().get("userID").toString().contains(user.getUid())) {
                         // db에서 현재 유저 uid 삭제
+                        if(document.get("reader").equals(user.getUid())){
+                            userdel.update("reader", "");
+                        }
                         userdel.update("userID", FieldValue.arrayRemove(user.getUid()));
                         startToast("모임에서 탈퇴했습니다.");
                         Log.d("Delete2", document.getId() + " => " + document.getData());
 
                         meetingMemberCheck(code); //모임의 모임원이 아무도 없는지 확인 후 없으면 모임 제거거
 
-                       myStartActivity(MainActivity.class);
+                        myStartActivity(MainActivity.class);
                         finish();
                     } else {
                         Log.d("Delete", "No Document");

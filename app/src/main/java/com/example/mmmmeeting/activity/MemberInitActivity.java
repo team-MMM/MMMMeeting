@@ -28,7 +28,7 @@ public class MemberInitActivity extends BasicActivity implements View.OnClickLis
 
     Button checkButton,addressSearch;
     TextView addressTv, nameTv;
-    RatingBar restaurant, cafe, shopping, subway;
+    RatingBar restaurant, cafe, shopping, park, act;
     SharedPreferences sp;
 
     @Override
@@ -44,17 +44,20 @@ public class MemberInitActivity extends BasicActivity implements View.OnClickLis
         restaurant = findViewById(R.id.restaurantRate);
         cafe = findViewById(R.id.cafetRate);
         shopping = findViewById(R.id.shoppingRate);
-        subway = findViewById(R.id.subwayRate);
+        park = findViewById(R.id.parkRate);
+        act = findViewById(R.id.actRate);
 
         beforeInfo();
-        
+
         checkButton.setOnClickListener(this);
         addressSearch.setOnClickListener(this);
 
         restaurant.setOnRatingBarChangeListener(this);
         cafe.setOnRatingBarChangeListener(this);
         shopping.setOnRatingBarChangeListener(this);
-        subway.setOnRatingBarChangeListener(this);
+        park.setOnRatingBarChangeListener(this);
+        act.setOnRatingBarChangeListener(this);
+
     }
 
     private void beforeInfo() {
@@ -65,7 +68,8 @@ public class MemberInitActivity extends BasicActivity implements View.OnClickLis
         float restaurantBar = sp.getFloat("restaurant",0);
         float cafeBar = sp.getFloat("cafe",0);
         float shoppingBar = sp.getFloat("shopping",0);
-        float subwayBar = sp.getFloat("subway",0);
+        float parkBar = sp.getFloat("park",0);
+        float actBar = sp.getFloat("act",0);
 
         // 뷰에 반영
         nameTv.setText(name);
@@ -73,7 +77,9 @@ public class MemberInitActivity extends BasicActivity implements View.OnClickLis
         restaurant.setRating(restaurantBar);
         cafe.setRating(cafeBar);
         shopping.setRating(shoppingBar);
-        subway.setRating(subwayBar);
+        park.setRating(parkBar);
+        act.setRating(actBar);
+
     }
 
     @Override protected void onStop() {
@@ -88,7 +94,9 @@ public class MemberInitActivity extends BasicActivity implements View.OnClickLis
         editor.putFloat("restaurant", restaurant.getRating());
         editor.putFloat("cafe", cafe.getRating());
         editor.putFloat("shopping", shopping.getRating());
-        editor.putFloat("subway", subway.getRating());
+        editor.putFloat("park", park.getRating());
+        editor.putFloat("act", act.getRating());
+
         editor.commit(); // 저장 반영
     }
 
@@ -121,7 +129,7 @@ public class MemberInitActivity extends BasicActivity implements View.OnClickLis
                     profileUpdate();
                     break;
                 }
-            // 주소 찾기
+                // 주소 찾기
             case R.id.addressSearchBtn:
                 myStartActivity(SearchAddressActivity.class);
                 finish();
@@ -142,8 +150,9 @@ public class MemberInitActivity extends BasicActivity implements View.OnClickLis
         MemberInfo memberInfo = new MemberInfo(name, address);
         memberInfo.setRating("restaurant", restaurant.getRating());
         memberInfo.setRating("cafe", cafe.getRating());
-        memberInfo.setRating("subway", subway.getRating());
+        memberInfo.setRating("park", park.getRating());
         memberInfo.setRating("shopping", shopping.getRating());
+        memberInfo.setRating("act", act.getRating());
 
         Log.d("Rating Change", memberInfo.getRating().toString());
 
@@ -191,8 +200,11 @@ public class MemberInitActivity extends BasicActivity implements View.OnClickLis
             case R.id.shoppingRate:
                 Log.d("Rate Test", "shopping change"+shopping.getRating());
                 break;
-            case R.id.subwayRate:
-                Log.d("Rate Test", "subway change"+ subway.getRating());
+            case R.id.parkRate:
+                Log.d("Rate Test", "subway change"+ park.getRating());
+                break;
+            case R.id.actRate:
+                Log.d("Rate Test", "subway change"+ act.getRating());
                 break;
         }
     }

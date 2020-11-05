@@ -104,6 +104,16 @@
             android:text="초대하기"
             android:textSize="15sp"/>
 
+        <Button
+            android:id="@+id/newReader"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="10sp"
+            android:layout_margin="10sp"
+            android:background="@drawable/button_shape"
+            android:text="양도하기"
+            android:textSize="15sp"/>
+
     </LinearLayout>
 
 

@@ -103,7 +103,7 @@ public class CategorySelect {
                             for (int i = 0; i < users.size(); i++) {
                                 userRating(users.get(i));
                             }
-                            break;
+                            return;
                         }
                     }
                 } else {
