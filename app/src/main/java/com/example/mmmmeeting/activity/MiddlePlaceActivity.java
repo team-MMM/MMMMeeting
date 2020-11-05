@@ -250,27 +250,27 @@ public class MiddlePlaceActivity extends AppCompatActivity implements OnMapReady
                 s.setSpan(new RelativeSizeSpan(0.5f),22,22+midAdr.length(),0);
                 s.setSpan(new ForegroundColorSpan(Color.parseColor("#62ABD9")),22,22+midAdr.length(),0);
                 alertDialogBuilder.setMessage(s)
-                                    .setCancelable(false)
-                                    .setPositiveButton("NO", new DialogInterface.OnClickListener() {
-                                        @Override
-                                        public void onClick(DialogInterface dialogInterface, int i) {
-                                            //프로그램 종료
-                                            MiddlePlaceActivity.this.finish();
-                                        }
-                                    }).setNegativeButton("YES", new DialogInterface.OnClickListener() {
-                                        @Override
-                                        public void onClick(DialogInterface dialogInterface, int i) {
+                        .setCancelable(false)
+                        .setPositiveButton("NO", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                //프로그램 종료
+                                MiddlePlaceActivity.this.finish();
+                            }
+                        }).setNegativeButton("YES", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
 
-                                            //장소리스트 화면으로 넘어감
-                                            Intent intent = new Intent(MiddlePlaceActivity.this, PlaceListActivity.class);
+                        //장소리스트 화면으로 넘어감
+                        Intent intent = new Intent(MiddlePlaceActivity.this, PlaceListActivity.class);
 
-                                            Bundle bundle = new Bundle();
-                                            bundle.putParcelable("midpoint",midP);
-                                            intent.putExtras(bundle);
-                                            //i.putExtra("midpoint",midP);
-                                            startActivity(intent);
-                                        }
-                                    });
+                        Bundle bundle = new Bundle();
+                        bundle.putParcelable("midpoint",midP);
+                        intent.putExtras(bundle);
+                        //i.putExtra("midpoint",midP);
+                        startActivity(intent);
+                    }
+                });
 
                 //다이얼로그 생성
                 AlertDialog alertDialog = alertDialogBuilder.create();
@@ -553,7 +553,7 @@ public class MiddlePlaceActivity extends AppCompatActivity implements OnMapReady
         if (previous_marker != null)
             previous_marker.clear();//지역정보 마커 클리어
 
-            new NRPlaces.Builder()
+        new NRPlaces.Builder()
                 .listener(MiddlePlaceActivity.this)
                 .key(apiKey)
                 .latlng(midP.latitude, midP.longitude)//중간지점 위치
@@ -729,4 +729,3 @@ public class MiddlePlaceActivity extends AppCompatActivity implements OnMapReady
         return resultText;
     }
 }
-
