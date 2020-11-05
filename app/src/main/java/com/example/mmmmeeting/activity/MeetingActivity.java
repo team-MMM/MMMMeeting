@@ -147,7 +147,7 @@ public class MeetingActivity extends BasicActivity {
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         if (task.isSuccessful()) {
                             boolean check=false;
-                            //모든 document 출력 (dou id + data arr { : , ... ,  })
+                            //모든 document 확인
                             for (QueryDocumentSnapshot document : task.getResult()) {
                                 // 모임 이름이 같은 경우 해당 모임의 리더 확인
                                 if (document.get("name").toString().equals(getName)&&document.get("reader").toString().equals(mAuth.getUid())) {
