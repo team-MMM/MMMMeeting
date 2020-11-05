@@ -163,9 +163,7 @@ public class MeetingDeleteActivity extends AppCompatActivity {
                                 if(document.getData().get("meetingID").toString().equals(name)){
                                     Log.d("일정 삭제",document.getData().get("title").toString());
                                     scheduleDel.document(document.getId()).delete();
-                                    break;
-                                } else {
-                                    Log.d("Document Snapshot", "No Document");
+                                    return;
                                 }
                             }
                         } else {
@@ -189,7 +187,7 @@ public class MeetingDeleteActivity extends AppCompatActivity {
                                 if(document.getData().get("meetingID").toString().equals(name)){
                                     Log.d("일정 삭제",document.getData().get("title").toString());
                                     boardDel.document(document.getId()).delete();
-                                    break;
+                                    return;
                                 } else {
                                     Log.d("Document Snapshot", "No Document");
                                 }

@@ -115,7 +115,7 @@ public class MeetingInfoReaderActivity extends AppCompatActivity {
                                     // 모임장 확인
                                     readerFind(document.getData().get("reader").toString());
                                     Log.d("Document Read", document.getId() + " => " + document.getData());
-                                    break;
+                                    return;
                                 } else {
                                     Log.d("Document Snapshot", "No Document");
                                 }

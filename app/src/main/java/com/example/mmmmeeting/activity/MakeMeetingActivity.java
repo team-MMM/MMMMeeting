@@ -46,8 +46,8 @@ public class MakeMeetingActivity extends BasicActivity {
 
     private void checkMeetingName() {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
-        String name = ((EditText)findViewById(R.id.makeMeetingText)).getText().toString();
-        check =false;
+        String name = ((EditText) findViewById(R.id.makeMeetingText)).getText().toString();
+        check = false;
         db.collection("meetings").get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
@@ -55,23 +55,16 @@ public class MakeMeetingActivity extends BasicActivity {
                         if (task.isSuccessful()) {
                             //모든 document 확인
                             for (QueryDocumentSnapshot document : task.getResult()) {
-                                if(document.getData().get("name").toString().equals(name)){
+                                if (document.getData().get("name").toString().equals(name)) {
                                     // 입력한 이름이 이미 존재하는 경우
                                     Toast.makeText(MakeMeetingActivity.this, "이미 존재하는 모임 이름입니다.", Toast.LENGTH_SHORT).show();
-                                    ((EditText)findViewById(R.id.makeMeetingText)).setText(null);
+                                    ((EditText) findViewById(R.id.makeMeetingText)).setText(null);
                                     Log.d("Document Read", name);
-                                    check =true;
-                                    Log.d("checkName", "result 1: "+check);
-                                    break;
-                                } else {
-                                    Log.d("Document Snapshot", "No Document");
+                                    return;
                                 }
                             }
                             //문서 확인 결과 중복이름이 없으면
-                            Log.d("checkName", "result 2: " + check);
-                            if(!check) {
-                                meetingUpdate();
-                            }
+                            meetingUpdate();
                         } else {
                             Log.d("Document Read", "Error getting documents: ", task.getException());
                         }
@@ -79,17 +72,17 @@ public class MakeMeetingActivity extends BasicActivity {
                 });
     }
 
-    private void meetingUpdate(){
-        String name = ((EditText)findViewById(R.id.makeMeetingText)).getText().toString();
-        String description = ((EditText)findViewById(R.id.meetingDesc)).getText().toString();
+    private void meetingUpdate() {
+        String name = ((EditText) findViewById(R.id.makeMeetingText)).getText().toString();
+        String description = ((EditText) findViewById(R.id.meetingDesc)).getText().toString();
 
         // 모임 이름의 길이가 0이 아닌 경우 = 모임의 이름이 입력된 경우
-        if(name.length()!=0) {
+        if (name.length() != 0) {
             final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
             FirebaseFirestore db = FirebaseFirestore.getInstance();
 
             // db에 저장할 모임 정보 객체 생성
-            MeetingInfo info = new MeetingInfo(name,description);
+            MeetingInfo info = new MeetingInfo(name, description);
             info.setUserID(user.getUid());
             info.setReader(user.getUid());
 
@@ -117,12 +110,12 @@ public class MakeMeetingActivity extends BasicActivity {
         }
     }
 
-    private void startToast(String msg){
-        Toast.makeText(this,msg,Toast.LENGTH_SHORT).show();
+    private void startToast(String msg) {
+        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
     }
 
-    private void myStartActivity(Class c){
-        Intent intent = new Intent(this,c);
+    private void myStartActivity(Class c) {
+        Intent intent = new Intent(this, c);
         intent.addFlags(intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(intent);
     }

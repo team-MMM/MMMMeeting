@@ -108,7 +108,7 @@ public class MeetingInfoActivity extends AppCompatActivity {
                                     else {readerFind(document.getData().get("reader").toString());}
 
                                     Log.d("Document Read", document.getId() + " => " + document.getData());
-                                    break;
+                                    return;
                                 } else {
                                     Log.d("Document Snapshot", "No Document");
                                 }
@@ -155,7 +155,7 @@ public class MeetingInfoActivity extends AppCompatActivity {
                                     db.collection("meetings").document(code).update("reader",document.getId());
                                     readerFind(document.getId());
                                     Log.d("Document Read", document.getId() + " => " + document.getData());
-                                    break;
+                                    return;
                                 } else {
                                     Log.d("Document Snapshot", "No Document");
                                 }
