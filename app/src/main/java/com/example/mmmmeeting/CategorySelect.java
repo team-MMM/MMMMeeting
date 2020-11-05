@@ -3,13 +3,21 @@ package com.example.mmmmeeting;
 
 
 
+import android.location.Address;
+import android.location.Geocoder;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
+import android.widget.Toast;
 
 
 import com.example.mmmmeeting.Info.MemberInfo;
+import com.example.mmmmeeting.activity.SearchPlaceActivity;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentReference;
@@ -19,13 +27,20 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 
+import java.util.Locale;
 import java.util.Map;
 
 import androidx.annotation.NonNull;
+import noman.googleplaces.NRPlaces;
+import noman.googleplaces.Place;
+import noman.googleplaces.PlacesException;
+import noman.googleplaces.PlacesListener;
 
 
 //// category Test
@@ -33,8 +48,14 @@ import androidx.annotation.NonNull;
 //                category.select();
 //// category Test
 
-public class CategorySelect {
+public class CategorySelect implements PlacesListener {
 
+
+    //
+    GoogleMap mMap;
+    List<Marker> previous_marker = null;
+
+    //
     private String Tag = "category Test";
     String name;
     ArrayList<String> category=new ArrayList<>();
@@ -43,6 +64,8 @@ public class CategorySelect {
 
     public CategorySelect(String name){
         this.name = name;
+        previous_marker = new ArrayList<Marker>();
+
     }
 
     Handler mHandler = new Handler(){
@@ -246,5 +269,110 @@ public class CategorySelect {
                 case 3: this.category.add("쇼핑몰"); break;
             }
         }
+    }
+
+    private  void showPlaceInformation(LatLng location, String type)
+    {
+        mMap.clear();//지도 클리어
+        String apiKey = "AIzaSyAMjzNcvmVwExmuyfw82V-G-DXmhVAUymY";
+//        String apiKey = getString(R.string.api_key);
+
+        if (previous_marker != null)
+            previous_marker.clear();//지역정보 마커 클리어
+
+        new NRPlaces.Builder()
+                .listener(CategorySelect.this)
+                .key(apiKey)
+                .latlng(location.latitude, location.longitude)//현재 위치
+                .radius(500) //500 미터 내에서 검색
+                .type(type) //음식점
+                .build()
+                .execute();
+
+    }
+
+    @Override
+    public void onPlacesFailure(PlacesException e) {
+
+    }
+
+    @Override
+    public void onPlacesStart() {
+
+    }
+
+    @Override
+    public void onPlacesSuccess(List<Place> places) {
+
+        // 액티비티가 아니라 UI가 안되나볻,
+//        runOnUiThread(new Runnable() {
+//            @Override
+//            public void run() {
+//                for (Place place : places) {
+//
+//                    LatLng latLng
+//                            = new LatLng(place.getLatitude()
+//                            , place.getLongitude());
+//
+//                    //주소
+//                    String markerSnippet = getCurrentAddress(latLng);
+//
+//                    MarkerOptions markerOptions = new MarkerOptions();
+//                    markerOptions.position(latLng);
+//                    markerOptions.title(place.getName());
+//                    markerOptions.snippet(markerSnippet);
+//                    Marker item = mMap.addMarker(markerOptions);
+//                    previous_marker.add(item);
+//
+//                }
+////
+////                //중복 마커 제거
+////                HashSet<Marker> hashSet = new HashSet<Marker>();
+////                hashSet.addAll(previous_marker);
+////                previous_marker.clear();
+////                previous_marker.addAll(hashSet);
+//
+//            }
+//        });
+    }
+
+//    public String getCurrentAddress(LatLng latlng) {
+//
+//        //지오코더... GPS를 주소로 변환
+//        Geocoder geocoder = new Geocoder(this, Locale.getDefault());
+//
+//        List<Address> addresses;
+//
+//        try {
+//
+//            addresses = geocoder.getFromLocation(
+//                    latlng.latitude,
+//                    latlng.longitude,
+//                    1);
+//        } catch (IOException ioException) {
+//            //네트워크 문제
+////            Toast.makeText(this, "지오코더 서비스 사용불가", Toast.LENGTH_LONG).show();
+//            return "지오코더 서비스 사용불가";
+//        } catch (IllegalArgumentException illegalArgumentException) {
+////            Toast.makeText(this, "잘못된 GPS 좌표", Toast.LENGTH_LONG).show();
+//            return "잘못된 GPS 좌표";
+//
+//        }
+//
+//
+//        if (addresses == null || addresses.size() == 0) {
+////            Toast.makeText(this, "주소 미발견", Toast.LENGTH_LONG).show();
+//            return "주소 미발견";
+//
+//        } else {
+//            Address address = addresses.get(0);
+//            return address.getAddressLine(0).toString();
+//        }
+//
+//    }
+
+    @Override
+    public void onPlacesFinished() {
+
     }
 }
