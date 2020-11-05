@@ -3,13 +3,18 @@
 package com.example.mmmmeeting.activity;
 
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.location.Address;
 import android.location.Geocoder;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.text.SpannableString;
+import android.text.style.ForegroundColorSpan;
+import android.text.style.RelativeSizeSpan;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,6 +25,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.mmmmeeting.Info.ScheduleInfo;
@@ -234,13 +240,43 @@ public class MiddlePlaceActivity extends AppCompatActivity implements OnMapReady
         btn_mid.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent i = new Intent(MiddlePlaceActivity.this, PlaceListActivity.class);
 
-                Bundle bundle = new Bundle();
-                bundle.putParcelable("midpoint",midP);
-                i.putExtras(bundle);
-                //i.putExtra("midpoint",midP);
-                startActivity(i);
+                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(MiddlePlaceActivity.this);
+                //제목
+                alertDialogBuilder.setTitle("중간지점 선택");
+
+                //AlertDialog 세팅
+                SpannableString s = new SpannableString("이 곳을 중간지점으로 선택하시겠습니까?\n"+midAdr);
+                s.setSpan(new RelativeSizeSpan(0.5f),22,22+midAdr.length(),0);
+                s.setSpan(new ForegroundColorSpan(Color.parseColor("#62ABD9")),22,22+midAdr.length(),0);
+                alertDialogBuilder.setMessage(s)
+                                    .setCancelable(false)
+                                    .setPositiveButton("NO", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialogInterface, int i) {
+                                            //프로그램 종료
+                                            MiddlePlaceActivity.this.finish();
+                                        }
+                                    }).setNegativeButton("YES", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialogInterface, int i) {
+                                            //장소리스트 화면으로 넘어감
+                                            Intent intent = new Intent(MiddlePlaceActivity.this, PlaceListActivity.class);
+
+                                            Bundle bundle = new Bundle();
+                                            bundle.putParcelable("midpoint",midP);
+                                            intent.putExtras(bundle);
+                                            //i.putExtra("midpoint",midP);
+                                            startActivity(intent);
+                                        }
+                                    });
+
+                //다이얼로그 생성
+                AlertDialog alertDialog = alertDialogBuilder.create();
+
+                //다이얼로그 보여주기
+                alertDialog.show();
+
             }
         });
 

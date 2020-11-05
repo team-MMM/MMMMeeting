@@ -79,8 +79,8 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
                 WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         //이전 엑티비티에서 중간지점 받아오기(일단 주석처리)
-//        Intent i = getIntent();
-//        midpoint = i.getParcelableExtra("midpoint");
+        Intent i = getIntent();
+        midpoint = i.getParcelableExtra("midpoint");
 
         setContentView(R.layout.activity_place_list);
 
