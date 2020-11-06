@@ -266,6 +266,7 @@ public class MiddlePlaceActivity extends AppCompatActivity implements OnMapReady
 
                         Bundle bundle = new Bundle();
                         bundle.putParcelable("midpoint",midP);
+                        bundle.putString("name", meetingname);
                         intent.putExtras(bundle);
                         //i.putExtra("midpoint",midP);
                         startActivity(intent);
@@ -619,6 +620,7 @@ public class MiddlePlaceActivity extends AppCompatActivity implements OnMapReady
                         Marker item = mMap.addMarker(markerOptions);
                         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latlng, 10));
                         previous_marker.add(item);
+                        midP= latlng;
                     }
                     i++;
                 }

@@ -69,7 +69,7 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
 
     private String str_url = null;
     private String placeInfo;
-
+    String name;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -81,6 +81,8 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
         //이전 엑티비티에서 중간지점 받아오기(일단 주석처리)
         Intent i = getIntent();
         midpoint = i.getParcelableExtra("midpoint");
+        name = i.getStringExtra("name");
+        Log.d("name Test", name);
 
         setContentView(R.layout.activity_place_list);
 
