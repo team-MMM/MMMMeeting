@@ -14,7 +14,6 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.mmmmeeting.CategorySelect;
 import com.example.mmmmeeting.Info.MeetingInfo;
 import com.example.mmmmeeting.R;
 import com.google.android.gms.tasks.OnCompleteListener;

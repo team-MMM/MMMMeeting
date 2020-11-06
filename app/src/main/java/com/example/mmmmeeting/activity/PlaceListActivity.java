@@ -13,6 +13,7 @@ import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.RelativeSizeSpan;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
@@ -79,7 +80,6 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
     //임의지정
     LatLng midpoint = new LatLng(37.584114826538716, 127.05876976018965);
 
-
     LinearLayout fl_place_list,place_list_view;
 
     List<Marker> previous_marker=null;
@@ -93,11 +93,9 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
     ArrayList<Float[]> userRatings =new ArrayList<>();
     FirebaseFirestore db = FirebaseFirestore.getInstance();
 
+    boolean fail;
     Spinner spinner;
     ArrayAdapter<String> arrayAdapter;
-
-    int start = 0;
-    int len = 0;
 
     Handler mHandler = new Handler(){
         public void handleMessage(android.os.Message msg)
@@ -114,7 +112,6 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
         arrayAdapter = new ArrayAdapter<>(this,
                 android.R.layout.simple_spinner_dropdown_item, categoryList);
 
-        spinner.setPrompt("추천 카테고리");
         spinner.setAdapter(arrayAdapter);
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener(){
 
@@ -126,19 +123,30 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
                 switch (categoryList.get(position)) {
                     case "shopping":
                         //shopping_mall + department_store
+                        Log.d(Tag, "Shopping");
                         showPlaceInformation("shopping_mall");
                         showPlaceInformation("department_store");
                         break;
                     case "activity":
                         // amusement_park + aquarium +art_gallery +stadium +zoo
+                        Log.d(Tag, "Activity");
                         showPlaceInformation("amusement_park");
                         showPlaceInformation("aquarium");
                         showPlaceInformation("art_gallery");
                         showPlaceInformation("stadium");
                         showPlaceInformation("zoo");
                         break;
-                    default:
-                        showPlaceInformation(category.get(start));
+                    case "cafe":
+                        Log.d(Tag, "Cafe");
+                        showPlaceInformation("cafe");
+                        break;
+                    case "restaurant":
+                        Log.d(Tag, "restaurant");
+                        showPlaceInformation("restaurant");
+                        break;
+                    case "park":
+                        Log.d(Tag, "park");
+                        showPlaceInformation("park");
                         break;
                 }
             }
@@ -152,9 +160,15 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
     }
 
     private void layoutclear() {
+        mMap.clear();
         place_list_view.removeAllViews();
-        if (previous_marker != null)
-            previous_marker.clear();//지역정보 마커 클리어
+
+        MarkerOptions marker = new MarkerOptions();
+        marker.position(midpoint).title("중간지점")
+                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
+        mMap.addMarker(marker);
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(midpoint, 15));
+        Log.d(Tag, "Clear");
     }
 
     @Override
@@ -174,7 +188,7 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
 
         String apiKey = getString(R.string.api_key);
 
-        previous_marker = new ArrayList<Marker>();
+//        previous_marker = new ArrayList<Marker>();
 
         place_list_view = findViewById(R.id.place_list_view);
         spinner = findViewById(R.id.categoryList);
@@ -184,8 +198,6 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
         mapFragment.getMapAsync(this);
 
         select();
-//        showPlaceInformation("restaurant");
-
         place_list_view.setVisibility(View.VISIBLE);
     }
 
@@ -207,10 +219,6 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
                 msg.setData(bd);                     /// 메세지에 번들 넣기
                 mHandler.sendMessage(msg);
 
-                Log.d(Tag, "length is " + len);
-//                while (len==0){
-//                    printPlace(++start);
-//                }
             }
         };
 
@@ -221,9 +229,6 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
     {
         //mMap.clear();//지도 클리어
         String apiKey = getString(R.string.api_key);
-
-//        if (previous_marker != null)
-//            previous_marker.clear();//지역정보 마커 클리어
 
         new NRPlaces.Builder()
                 .listener(PlaceListActivity.this)
@@ -238,6 +243,31 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
 
     @Override
     public void onPlacesFailure(PlacesException e) {
+        if(fail==false){
+        runOnUiThread(new Runnable(){
+            @Override
+            public void run() {
+                fail = true;
+                TextView view1 = new TextView(PlaceListActivity.this);
+                view1.setText("근처에 해당 카테고리에 속하는 장소가 존재하지 않습니다.");
+                view1.setTextSize(30f);
+                view1.setTextColor(Color.BLACK);
+                view1.setBackgroundColor(Color.WHITE);
+                view1.setPadding(20,20,20,20);
+
+                //layout_width, layout_height, gravity 설정
+                LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                lp.gravity = Gravity.CENTER;
+                view1.setLayoutParams(lp);
+
+                //부모 뷰에 추가
+                place_list_view.setBackgroundColor(Color.WHITE);
+                place_list_view.addView(view1);
+
+                Log.d(Tag, "on Failure");
+            }
+        });
+        }
     }
 
     @Override
@@ -246,10 +276,7 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
 
     @Override
     public void onPlacesSuccess(final List<Place> places) {
-        len=places.size();
-
-        Log.d(Tag, "places size is " + len);
-
+        fail=false;
         runOnUiThread(new Runnable() {
             @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
             @Override
@@ -388,8 +415,11 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
                         markerOptions.position(latLng);
                         markerOptions.title(place.getName());
                         markerOptions.snippet(placeAddress);
-                        Marker item = mMap.addMarker(markerOptions);
-                        previous_marker.add(item);
+                        mMap.addMarker(markerOptions);
+
+//                        Marker item = mMap.addMarker(markerOptions);
+//                        previous_marker.add(item);
+
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
@@ -424,7 +454,6 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
         List<Address> addresses;
 
         try {
-
             addresses = geocoder.getFromLocation(
                     latlng.latitude,
                     latlng.longitude,
