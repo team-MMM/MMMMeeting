@@ -40,7 +40,7 @@ public class DistancePointActivity extends AppCompatActivity{
     2. 선호도 기반으로 한 장소 주소 array 생성
     3. 장소랑 중간지점과의 이동시간 계산
      */
-
+/*
     // 임시로 시립대 후문을 중간 지점으로 함
     private LatLng midP = new LatLng(37.585007,127.059992);
 
@@ -238,5 +238,5 @@ public class DistancePointActivity extends AppCompatActivity{
             return receiveMsg;
         }
     }
-
+*/
 }
