@@ -119,7 +119,7 @@ public class NoticeActivity extends AppCompatActivity {
 
                     Date currentDateTime = calendar.getTime();
                     String date_text = new SimpleDateFormat("yyyy년 MM월 dd일 EE요일 a hh시 mm분 ", Locale.getDefault()).format(currentDateTime);
-                    Toast.makeText(getApplicationContext(),date_text + "으로 알람이 설정되었습니다!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(),date_text + "으로 약속이 설정되었습니다!", Toast.LENGTH_SHORT).show();
 
                     //  Preference에 설정한 값 저장
                     calendar.set(Calendar.HOUR_OF_DAY, hour_24-1);
