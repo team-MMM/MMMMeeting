@@ -46,7 +46,19 @@
         <activity android:name=".activity.DistancePointActivity" />
         <activity android:name=".activity.PlaceListActivity"/>
         <activity android:name=".activity.CheckLateActivity"/>
+        <activity android:name=".activity.NoticeActivity"/>
+        <activity android:name=".activity.AlarmReceiver"/>
+        <activity android:name=".activity.DeviceBootReceiver"/>
 
+        <receiver android:name=".DeviceBootReceiver"
+            android:enabled="false">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+
+        <receiver android:name=".AlarmReceiver" />
+    
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyAMjzNcvmVwExmuyfw82V-G-DXmhVAUymY" />
@@ -57,7 +69,8 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
-
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />   
     <uses-permission android:name="android.permission.INTERNET" />
 
 </manifest>
