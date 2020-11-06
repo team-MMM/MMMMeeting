@@ -213,7 +213,7 @@ public class CheckLateActivity extends AppCompatActivity implements View.OnClick
         }
         thread.stopThread();
         String date_text = new SimpleDateFormat(
-                "hh시 mm분 ").format(calDate);
+                "hh시 mm분").format(calDate);
         System.out.println(date_text);
         Toast.makeText(getApplicationContext(),"약속 시간 " + date_text+"을 잘 지키셨군요!", Toast.LENGTH_SHORT).show();
 
