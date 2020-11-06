@@ -3,21 +3,13 @@ package com.example.mmmmeeting;
 
 
 
-import android.location.Address;
-import android.location.Geocoder;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
-import android.widget.Toast;
 
 
 import com.example.mmmmeeting.Info.MemberInfo;
-import com.example.mmmmeeting.activity.SearchPlaceActivity;
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentReference;
@@ -27,20 +19,13 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
 
-import java.util.Locale;
 import java.util.Map;
 
 import androidx.annotation.NonNull;
-import noman.googleplaces.NRPlaces;
-import noman.googleplaces.Place;
-import noman.googleplaces.PlacesException;
-import noman.googleplaces.PlacesListener;
 
 
 //// category Test
@@ -48,14 +33,8 @@ import noman.googleplaces.PlacesListener;
 //                category.select();
 //// category Test
 
-public class CategorySelect implements PlacesListener {
+public class CategorySelect {
 
-
-    //
-    GoogleMap mMap;
-    List<Marker> previous_marker = null;
-
-    //
     private String Tag = "category Test";
     String name;
     ArrayList<String> category=new ArrayList<>();
@@ -64,8 +43,6 @@ public class CategorySelect implements PlacesListener {
 
     public CategorySelect(String name){
         this.name = name;
-        previous_marker = new ArrayList<Marker>();
-
     }
 
     Handler mHandler = new Handler(){
@@ -126,7 +103,7 @@ public class CategorySelect implements PlacesListener {
                             for (int i = 0; i < users.size(); i++) {
                                 userRating(users.get(i));
                             }
-                            return;
+                            break;
                         }
                     }
                 } else {
@@ -167,11 +144,14 @@ public class CategorySelect implements PlacesListener {
                 case "cafe":
                     temp[1]=rating.get(key);
                     break;
-                case "subway":
+                case "park":
                     temp[2]=rating.get(key);
                     break;
                 case "shopping":
                     temp[3]=rating.get(key);
+                    break;
+                case "act":
+                    temp[4]=rating.get(key);
                     break;
             }
         }
@@ -244,135 +224,39 @@ public class CategorySelect implements PlacesListener {
         }
         Log.d(Tag, Arrays.toString(avgRating));
 
-        float high = avgRating[0];
         ArrayList<Integer> index= new ArrayList<>();
-        for (int i = 0; i < avgRating.length; i++) {
-            if (high <= avgRating[i]) {
-                high = avgRating[i];
-            }
-        }
 
-        // 중복 최대값 확인
-        for (int i=0; i<avgRating.length;i++){
-            if(high == avgRating[i]){
-                index.add(i);
-            }
-        }
+        for(int i=0; i<3;i++ ){ // 가장 높은 3개 항목
+            int tempIndex = 0;
+            float high = avgRating[0];
 
-        // 0 = 식당 , 1 = 카페, 2 = 지하철, 3 = 쇼핑몰
+            for (int j= 0; j < avgRating.length; j++) {
+                if (high <= avgRating[j]) {
+                    high = avgRating[j];
+                    tempIndex = j;
+                }
+            }
+
+            avgRating[tempIndex]=0f;
+            index.add(tempIndex);
+        }
+        // 0=식당 , 1=카페, 2=공원, 3=쇼핑몰, 4=액티비티
         this.category.clear();
+
         for (int i =0 ; i< index.size(); i++) {
             switch (index.get(i)) {
-                case 0: this.category.add("식당"); break;
-                case 1: this.category.add("카페"); break;
-                case 2: this.category.add("지하철"); break;
-                case 3: this.category.add("쇼핑몰"); break;
+                case 0: this.category.add("restaurant"); break;
+                case 1: this.category.add("cafe"); break;
+                case 2: this.category.add("park"); break;
+                case 3: this.category.add("shopping_mall"); this.category.add("department_store"); break;
+                case 4:
+                    this.category.add("amusement_park");
+                    this.category.add("aquarium");
+                    this.category.add("art_gallery");
+                    this.category.add("stadium");
+                    this.category.add("zoo");
+                    break;
             }
         }
-    }
-
-    private  void showPlaceInformation(LatLng location, String type)
-    {
-        mMap.clear();//지도 클리어
-        String apiKey = "AIzaSyAMjzNcvmVwExmuyfw82V-G-DXmhVAUymY";
-//        String apiKey = getString(R.string.api_key);
-
-        if (previous_marker != null)
-            previous_marker.clear();//지역정보 마커 클리어
-
-        new NRPlaces.Builder()
-                .listener(CategorySelect.this)
-                .key(apiKey)
-                .latlng(location.latitude, location.longitude)//현재 위치
-                .radius(500) //500 미터 내에서 검색
-                .type(type) //음식점
-                .build()
-                .execute();
-
-    }
-
-    @Override
-    public void onPlacesFailure(PlacesException e) {
-
-    }
-
-    @Override
-    public void onPlacesStart() {
-
-    }
-
-    @Override
-    public void onPlacesSuccess(List<Place> places) {
-
-        // 액티비티가 아니라 UI가 안되나볻,
-//        runOnUiThread(new Runnable() {
-//            @Override
-//            public void run() {
-//                for (Place place : places) {
-//
-//                    LatLng latLng
-//                            = new LatLng(place.getLatitude()
-//                            , place.getLongitude());
-//
-//                    //주소
-//                    String markerSnippet = getCurrentAddress(latLng);
-//
-//                    MarkerOptions markerOptions = new MarkerOptions();
-//                    markerOptions.position(latLng);
-//                    markerOptions.title(place.getName());
-//                    markerOptions.snippet(markerSnippet);
-//                    Marker item = mMap.addMarker(markerOptions);
-//                    previous_marker.add(item);
-//
-//                }
-////
-////                //중복 마커 제거
-////                HashSet<Marker> hashSet = new HashSet<Marker>();
-////                hashSet.addAll(previous_marker);
-////                previous_marker.clear();
-////                previous_marker.addAll(hashSet);
-//
-//            }
-//        });
-    }
-
-//    public String getCurrentAddress(LatLng latlng) {
-//
-//        //지오코더... GPS를 주소로 변환
-//        Geocoder geocoder = new Geocoder(this, Locale.getDefault());
-//
-//        List<Address> addresses;
-//
-//        try {
-//
-//            addresses = geocoder.getFromLocation(
-//                    latlng.latitude,
-//                    latlng.longitude,
-//                    1);
-//        } catch (IOException ioException) {
-//            //네트워크 문제
-////            Toast.makeText(this, "지오코더 서비스 사용불가", Toast.LENGTH_LONG).show();
-//            return "지오코더 서비스 사용불가";
-//        } catch (IllegalArgumentException illegalArgumentException) {
-////            Toast.makeText(this, "잘못된 GPS 좌표", Toast.LENGTH_LONG).show();
-//            return "잘못된 GPS 좌표";
-//
-//        }
-//
-//
-//        if (addresses == null || addresses.size() == 0) {
-////            Toast.makeText(this, "주소 미발견", Toast.LENGTH_LONG).show();
-//            return "주소 미발견";
-//
-//        } else {
-//            Address address = addresses.get(0);
-//            return address.getAddressLine(0).toString();
-//        }
-//
-//    }
-
-    @Override
-    public void onPlacesFinished() {
-
     }
 }
