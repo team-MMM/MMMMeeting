@@ -5,26 +5,22 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.example.mmmmeeting.R;
 import com.example.mmmmeeting.fragment.FragAccount;
-import com.example.mmmmeeting.fragment.FragAccount_Result;
 import com.example.mmmmeeting.fragment.FragAlarm;
 import com.example.mmmmeeting.fragment.FragBoard;
 import com.example.mmmmeeting.fragment.FragCalendar;
 import com.example.mmmmeeting.fragment.FragChat;
 import com.example.mmmmeeting.fragment.FragHome;
-import com.example.mmmmeeting.fragment.FragChat;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -161,7 +157,7 @@ public class MeetingActivity extends BasicActivity {
         switch (item.getItemId()) {
             case R.id.meetingInfo:
                 // 리더인지 확인
-                checkReader(getName);
+                checkLeader(getName);
                 return true;
         }
 
@@ -169,7 +165,7 @@ public class MeetingActivity extends BasicActivity {
     }
     //
 
-    private void checkReader(String getName) {
+    private void checkLeader(String getName) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         FirebaseAuth mAuth = FirebaseAuth.getInstance();
         db.collection("meetings").get()
@@ -180,9 +176,9 @@ public class MeetingActivity extends BasicActivity {
                             //모든 document 확인
                             for (QueryDocumentSnapshot document : task.getResult()) {
                                 // 모임 이름이 같은 경우 해당 모임의 리더 확인
-                                if (document.get("name").toString().equals(getName) && document.get("reader").toString().equals(mAuth.getUid())) {
+                                if (document.get("name").toString().equals(getName) && document.get("leader").toString().equals(mAuth.getUid())) {
                                     Log.d("Document Read", document.getId() + " => " + document.getData());
-                                    Intent intent = new Intent(MeetingActivity.this, MeetingInfoReaderActivity.class);
+                                    Intent intent = new Intent(MeetingActivity.this, MeetingInfoLeaderActivity.class);
                                     intent.addFlags(intent.FLAG_ACTIVITY_CLEAR_TOP);
                                     intent.putExtra("Name", getIntent().getExtras().getString("Name"));
                                     intent.putExtra("Description", getIntent().getExtras().getString("Description"));

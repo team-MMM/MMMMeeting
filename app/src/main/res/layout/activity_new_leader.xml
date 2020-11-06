@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:gravity="center"
     android:orientation="vertical"
-    tools:context=".activity.newReaderActivity">
+    tools:context=".activity.newLeaderActivity">
 
     <TextView
         android:layout_width="match_parent"
@@ -18,7 +18,7 @@
         />
 
     <EditText
-        android:id="@+id/newReaderName"
+        android:id="@+id/newLeaderName"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:ems="10"

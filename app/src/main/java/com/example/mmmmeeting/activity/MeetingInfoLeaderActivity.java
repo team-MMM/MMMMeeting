@@ -1,19 +1,16 @@
 package com.example.mmmmeeting.activity;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.ClipData;
 import android.content.ClipboardManager;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -28,16 +25,16 @@ import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.Arrays;
 
-public class MeetingInfoReaderActivity extends AppCompatActivity {
+public class MeetingInfoLeaderActivity extends AppCompatActivity {
 
-    TextView name, description, code, user, readertv;
-    Button invite, changeReader;
+    TextView name, description, code, user, leadertv;
+    Button invite, changeLeader;
     String meetingname, meetingdescription ;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_meeting_info_reader);
+        setContentView(R.layout.activity_meeting_info_leader);
 
         Intent intent = getIntent();
         meetingname = intent.getExtras().getString("Name");
@@ -48,8 +45,8 @@ public class MeetingInfoReaderActivity extends AppCompatActivity {
         code = findViewById(R.id.meetingCode);
         user = findViewById(R.id.meetingUsers);
         invite = findViewById(R.id.inviteBtn);
-        readertv = findViewById(R.id.meetingReader);
-        changeReader = findViewById(R.id.newReader);
+        leadertv = findViewById(R.id.meetingLeader);
+        changeLeader = findViewById(R.id.newLeader);
 
         name.setText(meetingname);
         description.setText(meetingdescription);
@@ -60,7 +57,7 @@ public class MeetingInfoReaderActivity extends AppCompatActivity {
         invite.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(MeetingInfoReaderActivity.this, inviteActivity.class);
+                Intent intent = new Intent(MeetingInfoLeaderActivity.this, inviteActivity.class);
                 intent.addFlags(intent.FLAG_ACTIVITY_CLEAR_TOP);
                 intent.putExtra("Name", meetingname);
                 intent.putExtra("Code", code.getText().toString());
@@ -68,10 +65,10 @@ public class MeetingInfoReaderActivity extends AppCompatActivity {
             }
         });
 
-        changeReader.setOnClickListener(new View.OnClickListener() {
+        changeLeader.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(MeetingInfoReaderActivity.this, newReaderActivity.class);
+                Intent intent = new Intent(MeetingInfoLeaderActivity.this, newLeaderActivity.class);
                 intent.addFlags(intent.FLAG_ACTIVITY_CLEAR_TOP);
                 intent.putExtra("Code", code.getText().toString());
                 startActivity(intent);
@@ -87,7 +84,7 @@ public class MeetingInfoReaderActivity extends AppCompatActivity {
                     //클립보드 사용 코드
                     ClipboardManager clipboardManager = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
                     ClipData clipData = ClipData.newPlainText("Code",code.getText().toString()); //클립보드에 ID라는 이름표로 id 값을 복사하여 저장
-                    Toast.makeText(MeetingInfoReaderActivity.this, "모임코드가 복사되었습니다.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MeetingInfoLeaderActivity.this, "모임코드가 복사되었습니다.", Toast.LENGTH_SHORT).show();
                     clipboardManager.setPrimaryClip(clipData);
                 }
                 return true;
@@ -113,7 +110,7 @@ public class MeetingInfoReaderActivity extends AppCompatActivity {
                                     // 찾은 모임의 사용자 확인
                                     userFind(document.getData().get("userID"));
                                     // 모임장 확인
-                                    readerFind(document.getData().get("reader").toString());
+                                    leaderFind(document.getData().get("leader").toString());
                                     Log.d("Document Read", document.getId() + " => " + document.getData());
                                     return;
                                 } else {
@@ -127,9 +124,9 @@ public class MeetingInfoReaderActivity extends AppCompatActivity {
                 });
     }
 
-    private void readerFind(String reader) {
+    private void leaderFind(String leader) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
-        DocumentReference docRef = db.collection("users").document(reader);
+        DocumentReference docRef = db.collection("users").document(leader);
 
         docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
@@ -137,7 +134,7 @@ public class MeetingInfoReaderActivity extends AppCompatActivity {
                 if (task.isSuccessful()) {
                     DocumentSnapshot document = task.getResult();
                     if (document.exists()) {
-                        readertv.setText(document.get("name").toString());
+                        leadertv.setText(document.get("name").toString());
                     } else {
                     }
                 } else {

@@ -84,7 +84,7 @@ public class MakeMeetingActivity extends BasicActivity {
             // db에 저장할 모임 정보 객체 생성
             MeetingInfo info = new MeetingInfo(name, description);
             info.setUserID(user.getUid());
-            info.setReader(user.getUid());
+            info.setLeader(user.getUid());
 
             if (user != null) {
                 // meeting table에 미팅 정보 저장

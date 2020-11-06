@@ -31,7 +31,7 @@ import java.util.Arrays;
 
 public class MeetingInfoActivity extends AppCompatActivity {
 
-    TextView name, description, code, user, readertv;
+    TextView name, description, code, user, leadertv;
     Button invite;
     String meetingname;
     @Override
@@ -48,7 +48,7 @@ public class MeetingInfoActivity extends AppCompatActivity {
         code = findViewById(R.id.meetingCode);
         user = findViewById(R.id.meetingUsers);
         invite = findViewById(R.id.inviteBtn);
-        readertv = findViewById(R.id.meetingReader);
+        leadertv = findViewById(R.id.meetingLeader);
 
         name.setText(meetingname);
         description.setText(meetingdescription);
@@ -102,10 +102,10 @@ public class MeetingInfoActivity extends AppCompatActivity {
                                     userFind(document.getData().get("userID"));
 
                                     // 모임장 확인
-                                    if(document.getData().get("reader").toString().length()==0){
-                                        newReader(document.getData().get("userID"),document.getId());
+                                    if(document.getData().get("leader").toString().length()==0){
+                                        newLeader(document.getData().get("userID"),document.getId());
                                     }
-                                    else {readerFind(document.getData().get("reader").toString());}
+                                    else {leaderFind(document.getData().get("leader").toString());}
 
                                     Log.d("Document Read", document.getId() + " => " + document.getData());
                                     return;
@@ -120,9 +120,9 @@ public class MeetingInfoActivity extends AppCompatActivity {
                 });
     }
 
-    private void readerFind(String reader) {
+    private void leaderFind(String leader) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
-        DocumentReference docRef = db.collection("users").document(reader);
+        DocumentReference docRef = db.collection("users").document(leader);
 
         docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
@@ -130,7 +130,7 @@ public class MeetingInfoActivity extends AppCompatActivity {
                 if (task.isSuccessful()) {
                     DocumentSnapshot document = task.getResult();
                     if (document.exists()) {
-                        readertv.setText(document.get("name").toString());
+                        leadertv.setText(document.get("name").toString());
                     } else {
                     }
                 } else {
@@ -140,7 +140,7 @@ public class MeetingInfoActivity extends AppCompatActivity {
         });
     }
 
-    private void newReader(Object userID, String code) {
+    private void newLeader(Object userID, String code) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
         // 모든 유저 정보를 확인 -> 모임에 속한 유저와 같은 uid 발견시 가장 먼저 발견한 유저 리더로
@@ -152,8 +152,8 @@ public class MeetingInfoActivity extends AppCompatActivity {
                             //모든 document 확인
                             for (QueryDocumentSnapshot document : task.getResult()) {
                                 if (userID.toString().contains(document.getId())) {
-                                    db.collection("meetings").document(code).update("reader",document.getId());
-                                    readerFind(document.getId());
+                                    db.collection("meetings").document(code).update("leader",document.getId());
+                                    leaderFind(document.getId());
                                     Log.d("Document Read", document.getId() + " => " + document.getData());
                                     return;
                                 } else {

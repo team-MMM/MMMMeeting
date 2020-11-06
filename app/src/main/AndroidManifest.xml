@@ -13,8 +13,8 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:replace="android:allowBackup,android:label">
-        <activity android:name=".activity.newReaderActivity"></activity>
-        <activity android:name=".activity.MeetingInfoReaderActivity" />
+        <activity android:name=".activity.newLeaderActivity"></activity>
+        <activity android:name=".activity.MeetingInfoLeaderActivity" />
         <activity android:name=".activity.inviteActivity" />
         <activity android:name=".activity.MeetingDeleteActivity" />
 

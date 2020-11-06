@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:gravity="center"
-    tools:context=".activity.MeetingInfoReaderActivity">
+    tools:context=".activity.MeetingInfoLeaderActivity">
 
     <TextView
         android:text="모임 이름"
@@ -64,8 +64,8 @@
         android:layout_height="wrap_content"/>
 
     <TextView
-        android:id="@+id/meetingReader"
-        android:hint="Reader"
+        android:id="@+id/meetingLeader"
+        android:hint="Leader"
         android:textColor="@color/colorPrimaryDark"
         android:textSize="20sp"
         android:layout_margin="10sp"
@@ -105,7 +105,7 @@
             android:textSize="15sp"/>
 
         <Button
-            android:id="@+id/newReader"
+            android:id="@+id/newLeader"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:padding="10sp"

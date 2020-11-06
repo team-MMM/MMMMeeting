@@ -19,31 +19,31 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
-public class newReaderActivity extends AppCompatActivity {
+public class newLeaderActivity extends AppCompatActivity {
 
-    Button changeReader;
-    EditText newReaderName;
+    Button changeLeader;
+    EditText newLeaderName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_new_reader);
-        changeReader = findViewById(R.id.changeBtn);
-        newReaderName = findViewById(R.id.newReaderName);
+        setContentView(R.layout.activity_new_leader);
+        changeLeader = findViewById(R.id.changeBtn);
+        newLeaderName = findViewById(R.id.newLeaderName);
 
-        changeReader.setOnClickListener(new View.OnClickListener() {
+        changeLeader.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = getIntent();
-                String username = newReaderName.getText().toString();
+                String username = newLeaderName.getText().toString();
                 String meetingCode =  intent.getExtras().getString("Code");
-                newReader(username,meetingCode);
+                newLeader(username,meetingCode);
                 finish();
             }
         });
     }
 
-    private void newReader(String user, String code) {
+    private void newLeader(String user, String code) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
         // 모임 사용자 중 같은 이름이 존재
@@ -79,15 +79,15 @@ public class newReaderActivity extends AppCompatActivity {
                             for (QueryDocumentSnapshot document : task.getResult()) {
                                 if (userID.toString().contains(document.getId())) {
                                     if(document.get("name").toString().equals(userName)){
-                                        db.collection("meetings").document(code).update("reader",document.getId());
-                                        Toast.makeText(newReaderActivity.this, "모임장이 변경되었습니다", Toast.LENGTH_SHORT).show();
+                                        db.collection("meetings").document(code).update("leader",document.getId());
+                                        Toast.makeText(newLeaderActivity.this, "모임장이 변경되었습니다", Toast.LENGTH_SHORT).show();
                                         Log.d("Reader Read", document.getId() + " => " + document.getData());
                                         return;
                                     }
                                     Log.d("Document Read", document.getId() + " => " + document.getData());
                                 }
                             }
-                            Toast.makeText(newReaderActivity.this, "이름을 다시 확인하세요.", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(newLeaderActivity.this, "이름을 다시 확인하세요.", Toast.LENGTH_SHORT).show();
                         } else {
                             Log.d("Document Read", "Error getting documents: ", task.getException());
                         }
