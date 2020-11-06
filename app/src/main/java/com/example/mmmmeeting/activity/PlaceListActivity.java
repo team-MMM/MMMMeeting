@@ -89,6 +89,8 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
     ArrayList<Float[]> userRatings =new ArrayList<>();
     FirebaseFirestore db = FirebaseFirestore.getInstance();
 
+    int start = 0;
+    int len = 0;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -121,6 +123,57 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
         place_list_view.setVisibility(View.VISIBLE);
     }
 
+    private void select(){
+        //1. DB에서 별점 읽어오기 (meeting 에서 -> ui목록 접근 -> ui의 별점 읽기)
+        meetingFind();
+        // 다음 동작- 가중치
+        Runnable r = new Runnable() {
+            @Override
+            public void run() {
+                addWeight();
+
+                getHighest();
+                Log.d(Tag, "After Category: "+ category);
+
+                printPlace(start);
+
+                Log.d(Tag, "length is " + len);
+//                while (len==0){
+//                    printPlace(++start);
+//                }
+            }
+        };
+
+        Handler mHandler = new Handler();
+        mHandler.postDelayed(r, 1000); // 1초후
+    }
+
+    private void printPlace(int start){
+        // 가장 좋아하는 카테고리 출력
+        if(start > category.size()-1){
+            len=-1;
+            return;
+        }
+        switch (category.get(start)) {
+            case "shopping_mall":
+                //shopping_mall + department_store
+                showPlaceInformation("shopping_mall");
+                showPlaceInformation("department_store");
+                break;
+            case "amusement_park":
+                // amusement_park + aquarium +art_gallery +stadium +zoo
+                showPlaceInformation("amusement_park");
+                showPlaceInformation("aquarium");
+                showPlaceInformation("art_gallery");
+                showPlaceInformation("stadium");
+                showPlaceInformation("zoo");
+                break;
+            default:
+                showPlaceInformation(category.get(0));
+                break;
+        }
+    }
+
     public void showPlaceInformation(String type)
     {
         //mMap.clear();//지도 클리어
@@ -137,7 +190,6 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
                 .type(type) //음식점
                 .build()
                 .execute();
-
     }
 
 
@@ -153,6 +205,10 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
 
     @Override
     public void onPlacesSuccess(final List<Place> places) {
+        len=places.size();
+
+        Log.d(Tag, "places size is " + len);
+
         runOnUiThread(new Runnable() {
             @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
             @Override
@@ -219,26 +275,26 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
                         pInfo.setLayoutParams(rl_param);
                         pl_name.addView(pInfo);
 
-                        //좋아요버튼
-                        Button favorite = new Button(PlaceListActivity.this);
-                        RelativeLayout.LayoutParams btn_param = new RelativeLayout.LayoutParams(90,90);
-                        btn_param.addRule(RelativeLayout.ALIGN_PARENT_RIGHT,RelativeLayout.TRUE);
-                        favorite.setLayoutParams(btn_param);
-                        favorite.setPadding(0,20,5,0);
-                        favorite.setId(i+1);
-                        favorite.setBackground(ContextCompat.getDrawable(PlaceListActivity.this,R.drawable.heart));
-                        pl_name.addView(favorite);
-
-                        //좋아요 count
-                        TextView favorite_count = new TextView(PlaceListActivity.this);
-                        RelativeLayout.LayoutParams fc_param = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
-                                ViewGroup.LayoutParams.WRAP_CONTENT);
-                        //fc_param.addRule(RelativeLayout.CENTER_HORIZONTAL,RelativeLayout.TRUE);
-                        fc_param.addRule(RelativeLayout.LEFT_OF,favorite.getId());
-                        favorite_count.setLayoutParams(fc_param);
-
-                        favorite_count.setText("0");
-                        pl_name.addView(favorite_count);
+//                        //좋아요버튼
+//                        Button favorite = new Button(PlaceListActivity.this);
+//                        RelativeLayout.LayoutParams btn_param = new RelativeLayout.LayoutParams(90,90);
+//                        btn_param.addRule(RelativeLayout.ALIGN_PARENT_RIGHT,RelativeLayout.TRUE);
+//                        favorite.setLayoutParams(btn_param);
+//                        favorite.setPadding(0,20,5,0);
+//                        favorite.setId(i+1);
+//                        favorite.setBackground(ContextCompat.getDrawable(PlaceListActivity.this,R.drawable.heart));
+//                        pl_name.addView(favorite);
+//
+//                        //좋아요 count
+//                        TextView favorite_count = new TextView(PlaceListActivity.this);
+//                        RelativeLayout.LayoutParams fc_param = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
+//                                ViewGroup.LayoutParams.WRAP_CONTENT);
+//                        //fc_param.addRule(RelativeLayout.CENTER_HORIZONTAL,RelativeLayout.TRUE);
+//                        fc_param.addRule(RelativeLayout.LEFT_OF,favorite.getId());
+//                        favorite_count.setLayoutParams(fc_param);
+//
+//                        favorite_count.setText("0");
+//                        pl_name.addView(favorite_count);
 
                         fl_place_list.addView(pl_name);
 
@@ -261,34 +317,32 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
                         rb.setLayoutParams(param);
                         ly.addView(rb);
 
-
                         fl_place_list.addView(ly);
 
                         place_list_view.addView(fl_place_list);
 
-
-                        favorite.setOnClickListener(new View.OnClickListener(){
-
-                            @Override
-                            public void onClick(View v) {
-                                int selected_count=0;
-
-                                v.setSelected(!v.isSelected());//선택여부 반전
-
-                                if(v.isSelected()){//현재 좋아요 누른 상태
-
-                                    selected_count++;
-                                    favorite_count.setText(String.valueOf(selected_count));
-                                }
-                                else{
-                                    if(selected_count>0)
-                                        selected_count--;
-                                    favorite_count.setText(String.valueOf(selected_count));
-                                }
-
-
-                            }
-                        });
+//                        favorite.setOnClickListener(new View.OnClickListener(){
+//
+//                            @Override
+//                            public void onClick(View v) {
+//                                int selected_count=0;
+//
+//                                v.setSelected(!v.isSelected());//선택여부 반전
+//
+//                                if(v.isSelected()){//현재 좋아요 누른 상태
+//
+//                                    selected_count++;
+//                                    favorite_count.setText(String.valueOf(selected_count));
+//                                }
+//                                else{
+//                                    if(selected_count>0)
+//                                        selected_count--;
+//                                    favorite_count.setText(String.valueOf(selected_count));
+//                                }
+//
+//
+//                            }
+//                        });
 
                         MarkerOptions markerOptions = new MarkerOptions();
                         markerOptions.position(latLng);
@@ -301,13 +355,6 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
                     }
                     i++;
                 }
-
-                //중복 마커 제거
-//                HashSet<Marker> hashSet = new HashSet<Marker>();
-//                hashSet.addAll(previous_marker);
-                //previous_marker.clear();
-                //previous_marker.addAll(hashSet);
-
             }
         });
     }
@@ -362,7 +409,6 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
             return address.getAddressLine(0).toString();
         }
     }
-
 
     ////////////////////////
     //URL연결, JSON 받아오기///
@@ -430,46 +476,6 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
         return resultText;
     }
 
-    private void select(){
-        //1. DB에서 별점 읽어오기 (meeting 에서 -> ui목록 접근 -> ui의 별점 읽기)
-        meetingFind();
-        // 다음 동작- 가중치
-        Runnable r = new Runnable() {
-            @Override
-            public void run() {
-                getHighest();
-                Log.d(Tag, "before Category: "+ category);
-
-                addWeight();
-
-                getHighest();
-                Log.d(Tag, "After Category: "+ category);
-
-                // 가장 좋아하는 카테고리 출력
-                switch (category.get(0)) {
-                    case "shopping_mall":
-                        //shopping_mall + department_store
-                        showPlaceInformation("shopping_mall");
-                        showPlaceInformation("department_store");
-                        break;
-                    case "amusement_park":
-                        // amusement_park + aquarium +art_gallery +stadium +zoo
-                        showPlaceInformation("amusement_park");
-                        showPlaceInformation("aquarium");
-                        showPlaceInformation("art_gallery");
-                        showPlaceInformation("stadium");
-                        showPlaceInformation("zoo");
-                        break;
-                    default:
-                        showPlaceInformation(category.get(0));
-                        break;
-                }
-            }
-        };
-
-        Handler mHandler = new Handler();
-        mHandler.postDelayed(r, 1000); // 1초후
-    }
 
     // 1-1. 미팅 이름으로 사용자 테이블 접근
     private void meetingFind() {
