@@ -31,7 +31,7 @@ public class ContentScheduleActivity extends BasicActivity implements View.OnCli
     private ScheduleDeleter boardDeleter;
     private ReadScheduleView readContentsVIew;
     private LinearLayout contentsLayout;
-    Button btn_calendar, btn_place;
+    Button btn_calendar, btn_place, btn_attendance;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,9 +45,11 @@ public class ContentScheduleActivity extends BasicActivity implements View.OnCli
 
         btn_calendar = findViewById(R.id.calendarBtn);
         btn_place = findViewById(R.id.placeBtn);
+        btn_attendance = findViewById(R.id.attendanceBtn);
 
         btn_calendar.setOnClickListener(this);
         btn_place.setOnClickListener(this);
+        btn_attendance.setOnClickListener(this);
 
         boardDeleter = new ScheduleDeleter(this);
         boardDeleter.setOnPostListener(onPostListener);
@@ -62,6 +64,10 @@ public class ContentScheduleActivity extends BasicActivity implements View.OnCli
 
             case R.id.placeBtn:
                 myStartActivity(PlaceChoiceActivity.class, postInfo);
+                break;
+
+            case R.id.attendanceBtn:
+                myStartActivity(CheckLateActivity.class,postInfo);
                 break;
         }
     }
