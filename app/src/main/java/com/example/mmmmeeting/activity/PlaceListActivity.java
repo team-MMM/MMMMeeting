@@ -149,6 +149,21 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
                         showPlaceInformation("park",1000);
                         break;
                 }
+
+                new Handler().postDelayed(new Runnable(){
+                    @Override
+                    public void run() {
+                        runOnUiThread(new Runnable(){
+                            @Override
+                            public void run() {
+                                Log.d(Tag, "check count " + count);
+                                if(count==0){
+                                view1.setVisibility(View.VISIBLE);
+                                }
+                            }
+                        });
+                    }
+                }, 1000); // 1초후
             }
 
             @Override
@@ -199,7 +214,6 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
         mapFragment.getMapAsync(this);
 
         select();
-        place_list_view.setVisibility(View.VISIBLE);
     }
 
     private void select(){
@@ -293,12 +307,7 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
             @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
             @Override
             public void run() {
-                // 처음 찾는 경우 뷰 초기화
-                if(count==0){
-                    place_list_view.removeAllViews();
-                    count++;
-                }
-
+                count++;
                 int i=0;
                 for (noman.googleplaces.Place place : places) {
 
