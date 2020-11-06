@@ -2,6 +2,7 @@
 
 package com.example.mmmmeeting.activity;
 
+import android.app.Activity;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -56,10 +57,12 @@ import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.DocumentSnapshot;
+
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+
 import com.google.firebase.storage.FirebaseStorage;
 
 
@@ -80,7 +83,7 @@ public class CalendarActivity extends AppCompatActivity {
     MaterialCalendarView materialCalendarView;
     ArrayList<String> result = new ArrayList<>(); //점 표시할 날짜들
     ArrayList<String> selectedDay = new ArrayList<>(); //확정된 날짜
-    SimpleDateFormat transDate = new  SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault());//String을 Date 형식으로 변경
+    SimpleDateFormat transDate = new  SimpleDateFormat("yyyy-MM-dd hh:mm:ss", java.util.Locale.getDefault());//String을 Date 형식으로 변경
     SimpleDateFormat transString = new SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault());
 
 
@@ -118,36 +121,36 @@ public class CalendarActivity extends AppCompatActivity {
 
         DocumentReference docRef = db.collection("schedule").document(scID);
         docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() { //schedule에 저장된 calendarText 받아오기
-                                               @Override
-                                               public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                                                   if (task.isSuccessful()) {
-                                                       DocumentSnapshot document = task.getResult();
-                                                       if (document.exists()) {// 해당 문서가 존재하는 경우
-                                                           if(document.getData().get("calendarText")!=null){ // 저장된 메모가 있을 때
-                                                               calendarMap = (Map<String, String>) document.getData().get("calendarText");
-                                                               Set set = calendarMap.keySet();
-                                                               Iterator iterator = set.iterator();
-                                                               while(iterator.hasNext()){ // 점 표시할 리스트에 메모가 있는 날짜를 넣어준다
-                                                                   String key = (String)iterator.next();
-                                                                   result.add(key);
-                                                               }
-                                                               new ApiSimulator(result).executeOnExecutor(Executors.newSingleThreadExecutor()); // 데코 표시
-                                                           }
-                                                           if(document.getData().get("meetingDate")!=null){ // 확정된 날짜가 있으면
-                                                               Date day = document.getTimestamp("meetingDate").toDate(); // 확정 날짜 받아오기
-                                                               String sel_day = transString.format(day); // String으로 변환
-                                                               selectedDay.add(sel_day);
-                                                               selectDayDeco();
-                                                           }
-                                                           Log.d("Attend", "Data is : " + document.getId());
-                                                       } else {// 존재하지 않는 문서
-                                                           Log.d("Attend", "No Document");
-                                                       }
-                                                   } else {
-                                                       Log.d("Attend", "Task Fail : " + task.getException());
-                                                   }
-                                               }
-                                           });
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    if (document.exists()) {// 해당 문서가 존재하는 경우
+                        if(document.getData().get("calendarText")!=null){ // 저장된 메모가 있을 때
+                            calendarMap = (Map<String, String>) document.getData().get("calendarText");
+                            Set set = calendarMap.keySet();
+                            Iterator iterator = set.iterator();
+                            while(iterator.hasNext()){ // 점 표시할 리스트에 메모가 있는 날짜를 넣어준다
+                                String key = (String)iterator.next();
+                                result.add(key);
+                            }
+                            new ApiSimulator(result).executeOnExecutor(Executors.newSingleThreadExecutor()); // 데코 표시
+                        }
+                        if(document.getData().get("meetingDate")!=null){ // 확정된 날짜가 있으면
+                            Date day = document.getTimestamp("meetingDate").toDate(); // 확정 날짜 받아오기
+                            String sel_day = transString.format(day); // String으로 변환
+                            selectedDay.add(sel_day);
+                            selectDayDeco();
+                        }
+                        Log.d("Attend", "Data is : " + document.getId());
+                    } else {// 존재하지 않는 문서
+                        Log.d("Attend", "No Document");
+                    }
+                } else {
+                    Log.d("Attend", "Task Fail : " + task.getException());
+                }
+            }
+        });
 
         materialCalendarView.setOnDateChangedListener(new OnDateSelectedListener() {
             @Override
@@ -187,20 +190,30 @@ public class CalendarActivity extends AppCompatActivity {
                                 .setPositiveButton("확인", new DialogInterface.OnClickListener(){
                                     // 확인 버튼 클릭시 설정, 오른쪽 버튼입니다.
                                     public void onClick(DialogInterface dialog, int whichButton){//약속 날짜를 확정 //db로 해당 날짜 올리기
+
+                                        int day[] = new int[2]; // 약속 달과 일
+                                        day[0]=Month-1;
+                                        day[1]=Day;
+                                        Intent intent = new Intent(CalendarActivity.this, NoticeActivity.class);
+                                        intent.putExtra("meetingdate", day);
+                                        intent.putExtra("scInfo", scID);
+                                        startActivityForResult(intent, 0); // 시간 받아오기
+
+                                        /*
                                         try {
                                             mdate = transDate.parse(shot_Day); //String을 Date로 변환
                                         }
                                         catch(Exception ex){
                                             ex.printStackTrace();
                                         }
-                                        scInfo.setMeetingDate(mdate);
-                                        db.collection("schedule").document(scID).update("meetingDate", mdate); // 선택한 날짜로 db에 저장
+
+                                         */
 
                                         selectedDay.clear();
                                         selectedDay.add(shot_Day);
                                         removeDeco();
                                        // selectDay(selectedDay); //확정 날짜 이벤트 표시
-                                        Toast.makeText(getApplicationContext(), shot_Day+"가 약속날짜로 설정되었습니다.", Toast.LENGTH_SHORT).show();
+
                                     }
                                 })
                                 .setNegativeButton("취소", new DialogInterface.OnClickListener(){// 취소 버튼 클릭시
@@ -235,6 +248,22 @@ public class CalendarActivity extends AppCompatActivity {
             }
         });
     }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        switch (requestCode) {
+            case 0:
+                if (resultCode == Activity.RESULT_OK) {
+                    mdate = (Date) data.getSerializableExtra("fulldate");
+                    scInfo.setMeetingDate(mdate);
+                    db.collection("schedule").document(scID).update("meetingDate", mdate); // 선택한 날짜로 db에 저장
+                  //  Toast.makeText(getApplicationContext(), mdate+"로 약속날짜가 설정되었습니다.", Toast.LENGTH_SHORT).show();
+                }
+                break;
+        }
+    }
+
     private class ApiSimulator extends AsyncTask<Void, Void, List<CalendarDay>> {
 
         ArrayList<String> Time_Result;
@@ -346,7 +375,7 @@ public class CalendarActivity extends AppCompatActivity {
         }
     }
 
-    public void selectDayDeco() { //학정 날짜 표시
+    public void selectDayDeco() { //확정 날짜 표시
         Calendar calendar = Calendar.getInstance();
         ArrayList<CalendarDay> dates = new ArrayList<>();
         for (int i = 0; i < selectedDay.size(); i++) {
