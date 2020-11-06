@@ -445,8 +445,25 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
                 getHighest();
                 Log.d(Tag, "After Category: "+ category);
 
-
-                showPlaceInformation(category.get(0));
+                // 가장 좋아하는 카테고리 출력
+                switch (category.get(0)) {
+                    case "shopping_mall":
+                        //shopping_mall + department_store
+                        showPlaceInformation("shopping_mall");
+                        showPlaceInformation("department_store");
+                        break;
+                    case "amusement_park":
+                        // amusement_park + aquarium +art_gallery +stadium +zoo
+                        showPlaceInformation("amusement_park");
+                        showPlaceInformation("aquarium");
+                        showPlaceInformation("art_gallery");
+                        showPlaceInformation("stadium");
+                        showPlaceInformation("zoo");
+                        break;
+                    default:
+                        showPlaceInformation(category.get(0));
+                        break;
+                }
             }
         };
 
@@ -576,7 +593,6 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
 
         return rating;
     }
-
 
     // 3-2 최고값
     private void getHighest() {
