@@ -122,7 +122,7 @@ public class NoticeActivity extends AppCompatActivity {
                     Toast.makeText(getApplicationContext(),date_text + "으로 알람이 설정되었습니다!", Toast.LENGTH_SHORT).show();
 
                     //  Preference에 설정한 값 저장
-                    //calendar.set(Calendar.HOUR_OF_DAY, hour_24-1);
+                    calendar.set(Calendar.HOUR_OF_DAY, hour_24-1);
                     SharedPreferences.Editor editor = getSharedPreferences("daily alarm", MODE_PRIVATE).edit();
                     editor.putLong("nextNotifyTime", (long)calendar.getTimeInMillis());
                     editor.apply();
