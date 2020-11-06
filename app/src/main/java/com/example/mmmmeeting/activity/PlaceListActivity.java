@@ -16,10 +16,13 @@ import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.RatingBar;
 import android.widget.RelativeLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -59,6 +62,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -89,8 +93,69 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
     ArrayList<Float[]> userRatings =new ArrayList<>();
     FirebaseFirestore db = FirebaseFirestore.getInstance();
 
+    Spinner spinner;
+    ArrayAdapter<String> arrayAdapter;
+
     int start = 0;
     int len = 0;
+
+    Handler mHandler = new Handler(){
+        public void handleMessage(android.os.Message msg)
+        {
+            Bundle bd = msg.getData( ) ;            /// 전달 받은 메세지에서 번들을 받음
+            ArrayList<String> categoryList = bd.getStringArrayList("arg");    /// 번들에 들어있는 값 꺼냄
+            // Category 찾은 다음에 쓸 함수
+            spinnerAdd(categoryList);
+            Log.d(Tag,"Send is "+ categoryList.toString());
+        } ;
+    } ;
+
+    private void spinnerAdd(ArrayList<String> categoryList) {
+        arrayAdapter = new ArrayAdapter<>(this,
+                android.R.layout.simple_spinner_dropdown_item, categoryList);
+
+        spinner.setPrompt("추천 카테고리");
+        spinner.setAdapter(arrayAdapter);
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener(){
+
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+                layoutclear();
+
+                switch (categoryList.get(position)) {
+                    case "shopping":
+                        //shopping_mall + department_store
+                        showPlaceInformation("shopping_mall");
+                        showPlaceInformation("department_store");
+                        break;
+                    case "activity":
+                        // amusement_park + aquarium +art_gallery +stadium +zoo
+                        showPlaceInformation("amusement_park");
+                        showPlaceInformation("aquarium");
+                        showPlaceInformation("art_gallery");
+                        showPlaceInformation("stadium");
+                        showPlaceInformation("zoo");
+                        break;
+                    default:
+                        showPlaceInformation(category.get(start));
+                        break;
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
+    }
+
+    private void layoutclear() {
+        place_list_view.removeAllViews();
+        if (previous_marker != null)
+            previous_marker.clear();//지역정보 마커 클리어
+    }
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -112,6 +177,7 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
         previous_marker = new ArrayList<Marker>();
 
         place_list_view = findViewById(R.id.place_list_view);
+        spinner = findViewById(R.id.categoryList);
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.place_map);
@@ -135,7 +201,11 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
                 getHighest();
                 Log.d(Tag, "After Category: "+ category);
 
-                printPlace(start);
+                Bundle bd = new Bundle();      /// 번들 생성
+                bd.putStringArrayList("arg", category); // 번들에 값 넣기
+                Message msg = mHandler.obtainMessage();   /// 핸들에 전달할 메세지 구조체 받기
+                msg.setData(bd);                     /// 메세지에 번들 넣기
+                mHandler.sendMessage(msg);
 
                 Log.d(Tag, "length is " + len);
 //                while (len==0){
@@ -144,34 +214,7 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
             }
         };
 
-        Handler mHandler = new Handler();
         mHandler.postDelayed(r, 1000); // 1초후
-    }
-
-    private void printPlace(int start){
-        // 가장 좋아하는 카테고리 출력
-        if(start > category.size()-1){
-            len=-1;
-            return;
-        }
-        switch (category.get(start)) {
-            case "shopping_mall":
-                //shopping_mall + department_store
-                showPlaceInformation("shopping_mall");
-                showPlaceInformation("department_store");
-                break;
-            case "amusement_park":
-                // amusement_park + aquarium +art_gallery +stadium +zoo
-                showPlaceInformation("amusement_park");
-                showPlaceInformation("aquarium");
-                showPlaceInformation("art_gallery");
-                showPlaceInformation("stadium");
-                showPlaceInformation("zoo");
-                break;
-            default:
-                showPlaceInformation(category.get(0));
-                break;
-        }
     }
 
     public void showPlaceInformation(String type)
@@ -179,15 +222,15 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
         //mMap.clear();//지도 클리어
         String apiKey = getString(R.string.api_key);
 
-        if (previous_marker != null)
-            previous_marker.clear();//지역정보 마커 클리어
+//        if (previous_marker != null)
+//            previous_marker.clear();//지역정보 마커 클리어
 
         new NRPlaces.Builder()
                 .listener(PlaceListActivity.this)
                 .key(apiKey)
                 .latlng(midpoint.latitude, midpoint.longitude)//현재 위치
                 .radius(500) //500 미터 내에서 검색
-                .type(type) //음식점
+                .type(type)
                 .build()
                 .execute();
     }
@@ -195,12 +238,10 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
 
     @Override
     public void onPlacesFailure(PlacesException e) {
-
     }
 
     @Override
     public void onPlacesStart() {
-
     }
 
     @Override
@@ -252,7 +293,6 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
 
                         fl_place_list = new LinearLayout(PlaceListActivity.this);
                         fl_place_list.setOrientation(LinearLayout.VERTICAL);
-                        //param.bottomMargin = 100;
                         fl_place_list.setLayoutParams(fl_param);
                         fl_place_list.setBackgroundColor(Color.WHITE);
                         fl_place_list.setPadding(0,10,0,30);
@@ -636,14 +676,15 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
                 case 0: this.category.add("restaurant"); break;
                 case 1: this.category.add("cafe"); break;
                 case 2: this.category.add("park"); break;
-                case 3: this.category.add("shopping_mall"); this.category.add("department_store"); break;
-                case 4:
-                    this.category.add("amusement_park");
-                    this.category.add("aquarium");
-                    this.category.add("art_gallery");
-                    this.category.add("stadium");
-                    this.category.add("zoo");
-                    break;
+                case 3: this.category.add("shopping"); break;
+//                    this.category.add("shopping_mall"); this.category.add("department_store"); break;
+                case 4: this.category.add("activity"); break;
+//                    this.category.add("amusement_park");
+//                    this.category.add("aquarium");
+//                    this.category.add("art_gallery");
+//                    this.category.add("stadium");
+//                    this.category.add("zoo");
+//                    break;
             }
         }
     }
