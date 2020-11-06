@@ -50,7 +50,7 @@
         <activity android:name=".activity.AlarmReceiver"/>
         <activity android:name=".activity.DeviceBootReceiver"/>
 
-        receiver android:name=".DeviceBootReceiver"
+        <receiver android:name=".DeviceBootReceiver"
             android:enabled="false">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
