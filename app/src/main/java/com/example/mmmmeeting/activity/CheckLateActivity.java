@@ -1,11 +1,6 @@
 package com.example.mmmmeeting.activity;
 
-import android.graphics.Bitmap;
-import android.graphics.drawable.BitmapDrawable;
-import android.os.Build;
 import android.os.Bundle;
-import android.os.CountDownTimer;
-import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
@@ -19,14 +14,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.mmmmeeting.Info.ScheduleInfo;
 import com.example.mmmmeeting.R;
-import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
@@ -35,24 +23,23 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Timer;
 
 public class CheckLateActivity extends AppCompatActivity implements View.OnClickListener {
 
     private int hour,minute;
     private Date calDate;
     private String scID;
-    private long meetingTime;
+    private boolean timeFlag;
+    private boolean lateFlag;
     FirebaseUser user;
     FirebaseFirestore db;
 
     Calendar calendar;
+    Calendar tempCal;
     TextView meetingText;
     Button attendanceBtn;
 
@@ -77,6 +64,7 @@ public class CheckLateActivity extends AppCompatActivity implements View.OnClick
         user = FirebaseAuth.getInstance().getCurrentUser();
         calendar = Calendar.getInstance();
         calDate = new Date();
+        tempCal = Calendar.getInstance();
 
         // 해당 일정의 ID를 통해 meetingDate를 찾아냄
         ScheduleInfo scInfo = (ScheduleInfo) getIntent().getSerializableExtra("scheduleInfo");
@@ -134,20 +122,29 @@ public class CheckLateActivity extends AppCompatActivity implements View.OnClick
                 Date now = new Date();
                 String current = sdf.format(now);
 
-                // 아직 약속 시간을 지나지 않았으니까 버튼 보이게 함
-                attendanceBtn.setVisibility(View.VISIBLE);
-                // now > calDate : 현재 시간이 약속 시간을 지났을 때 버튼 안 보이게, 창 종료됨
-                if(now.compareTo(calDate) == 1){
-                    attendanceBtn.setVisibility(View.INVISIBLE);
-                    showToast();
-                    break;
-                }
+                // 약속 시간 5분전인지 알기 위해 시, 분 받아옴
+                tempCal.setTime(now);
+                int nowHour = tempCal.get(Calendar.HOUR_OF_DAY);
+                int nowMinute = tempCal.get(Calendar.MINUTE);
+
                 Log.d("my",current+" "+calDate);
 
+                // now > calDate : 현재 시간이 약속 시간을 지났을 때 약 2초 뒤에 창 종료됨
+                if(now.compareTo(calDate) == 1){
+                    lateFlag = true;
+                    try {
+                        thread.sleep(2000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    showToast();
+                    break;
+                }else if(nowHour == hour && nowMinute >= minute-5 ){
+                    // 약속 시간 5분 전부터 flag true를 줘서 출석체크 버튼을 누를 수 있음
+                    timeFlag = true;
+                }
             }
-
             finish();
-
 
         }
 
@@ -174,19 +171,34 @@ public class CheckLateActivity extends AppCompatActivity implements View.OnClick
 
     private void checkAttend(){
 
-        Toast.makeText(getApplicationContext(),"출석체크 완료!",Toast.LENGTH_SHORT).show();
+        // 약속 시간이 지났을 때
+        if(lateFlag == true){
+            Toast.makeText(getApplicationContext(),"약속 시간이 지나서 출석체크 할 수 없습니다.",Toast.LENGTH_SHORT).show();
+            lateFlag = false;
+            return;
+        }
+        // 약속 시간이 지나지 않았지만 5분 전이 아닐 때
+        if(timeFlag == false){
+            Toast.makeText(getApplicationContext(),"만남 5분 전부터 출석체크 가능합니다.",Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // 약속 시간 5분 전일 때
         // 토스트가 너무 빨리 표시돼서 1초 딜레이
         try {
             thread.sleep(1000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+        Toast.makeText(getApplicationContext(),"출석체크 완료!",Toast.LENGTH_SHORT).show();
+
         thread.stopThread();
         String date_text = new SimpleDateFormat(
                 "hh시 mm분").format(calDate);
         System.out.println(date_text);
         Toast.makeText(getApplicationContext(),"약속 시간 " + date_text+"을 잘 지키셨군요!", Toast.LENGTH_SHORT).show();
-
+        // timeFlag 재설정
+        timeFlag = false;
         // 스케쥴 lateComer에 출첵한 사람 저장 -> 타이틀 변경 예정
         DocumentReference docRef = db.collection("schedule").document(scID);
         docRef.update("lateComer", FieldValue.arrayUnion(user.getUid()));

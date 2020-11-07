@@ -47,8 +47,6 @@
         <activity android:name=".activity.PlaceListActivity"/>
         <activity android:name=".activity.CheckLateActivity"/>
         <activity android:name=".activity.NoticeActivity"/>
-        <activity android:name=".activity.AlarmReceiver"/>
-        <activity android:name=".activity.DeviceBootReceiver"/>
 
         <receiver android:name=".DeviceBootReceiver"
             android:enabled="false">
