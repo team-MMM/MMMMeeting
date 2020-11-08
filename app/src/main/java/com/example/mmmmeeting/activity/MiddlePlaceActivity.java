@@ -78,6 +78,7 @@ public class MiddlePlaceActivity extends AppCompatActivity implements OnMapReady
 
     private ScheduleInfo postInfo;
     private String meetingname;
+    private String scheduleId;
 
     //private ArrayList<LatLng> position;
     private int[] userTime;
@@ -108,7 +109,7 @@ public class MiddlePlaceActivity extends AppCompatActivity implements OnMapReady
     Point center = new Point(0, 0);
 
     List<Marker> previous_marker = null;
-    int radius = 500;
+    int radius = 1000;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -136,7 +137,7 @@ public class MiddlePlaceActivity extends AppCompatActivity implements OnMapReady
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         postInfo = (ScheduleInfo) getIntent().getSerializableExtra("scheduleInfo");
         meetingname = postInfo.getMeetingID();
-
+        scheduleId = postInfo.getId();
 
 
         // meetings collection에 모임 이름인 문서 읽기
@@ -271,6 +272,7 @@ public class MiddlePlaceActivity extends AppCompatActivity implements OnMapReady
                         Bundle bundle = new Bundle();
                         bundle.putParcelable("midpoint",midP);
                         bundle.putString("name", meetingname);
+                        bundle.putString("scheduleId", scheduleId);
                         intent.putExtras(bundle);
                         //i.putExtra("midpoint",midP);
                         startActivity(intent);
@@ -572,16 +574,18 @@ public class MiddlePlaceActivity extends AppCompatActivity implements OnMapReady
     @Override
     public void onPlacesFailure(PlacesException e) {
         String apiKey = getString(R.string.api_key);
-        radius += 500;
-        new NRPlaces.Builder()
-                .listener(MiddlePlaceActivity.this)
-                .key(apiKey)
-                .latlng(midP.latitude, midP.longitude)//현재 위치
-                .radius(radius) //500 미터 내에서 검색
-                .type(PlaceType.SUBWAY_STATION) //지하철
-                .language("ko", "KR")
-                .build()
-                .execute();
+        if(radius < 3000) {
+            radius += 1000;
+            new NRPlaces.Builder()
+                    .listener(MiddlePlaceActivity.this)
+                    .key(apiKey)
+                    .latlng(midP.latitude, midP.longitude)//현재 위치
+                    .radius(radius) //500 미터 내에서 검색
+                    .type(PlaceType.SUBWAY_STATION) //지하철
+                    .language("ko", "KR")
+                    .build()
+                    .execute();
+        }
     }
 
     @Override

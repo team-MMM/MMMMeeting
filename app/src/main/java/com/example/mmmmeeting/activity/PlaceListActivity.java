@@ -35,6 +35,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
 import com.example.mmmmeeting.Info.MemberInfo;
+import com.example.mmmmeeting.Info.VoteInfo;
 import com.example.mmmmeeting.R;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -45,10 +46,14 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.GeoPoint;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
@@ -92,10 +97,13 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
 
     private String Tag = "category Test";
     String name;
+    String scheduleId;
+    String id = null;
     ArrayList<String> category=new ArrayList<>();
     ArrayList<Float[]> userRatings =new ArrayList<>();
     FirebaseFirestore db = FirebaseFirestore.getInstance();
     int count; //success
+    int size;
 
     Spinner spinner;
     ArrayAdapter<String> arrayAdapter;
@@ -201,6 +209,7 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
         Intent i = getIntent();
         midpoint = i.getParcelableExtra("midpoint");
         name = i.getStringExtra("name");
+        scheduleId = i.getStringExtra("scheduleId");
         Log.d("name Test", name);
 
         setContentView(R.layout.activity_place_list);
@@ -217,6 +226,38 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
         mapFragment.getMapAsync(this);
 
         select();
+
+        db.collection("vote").whereEqualTo("scheduleID", scheduleId).get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull com.google.android.gms.tasks.Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                id = document.getId(); // document 이름(id)
+                                System.out.println("list 있음");
+                            }
+                            if(id==null){
+                                VoteInfo info = new VoteInfo(scheduleId);
+                                db.collection("vote").add(info)
+                                        .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                                            @Override
+                                            public void onSuccess(DocumentReference documentReference) {
+                                                id = documentReference.getId();
+                                                Log.d("Document Create", "Creating Success");
+                                            }
+                                        })
+                                        .addOnFailureListener(new OnFailureListener() {
+                                            @Override
+                                            public void onFailure(@NonNull Exception e) {
+                                                Log.d("Document Create", "Error creating documents: ", task.getException());
+                                            }
+                                        });
+                            }
+                        } else {
+                            Log.d("Document Read", "Error getting documents: ", task.getException());
+                        }
+                    }
+                });
     }
 
     private void select(){
@@ -794,19 +835,8 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
                                 favorite.setLayoutParams(btn_param);
                                 favorite.setPadding(0, 20, 5, 0);
                                 favorite.setId(i + 1);
-                                favorite.setBackground(ContextCompat.getDrawable(PlaceListActivity.this, R.drawable.heart));
+                                favorite.setBackground(ContextCompat.getDrawable(PlaceListActivity.this, R.drawable.addvote));
                                 pl_name.addView(favorite);
-
-                                //좋아요 count
-                                TextView favorite_count = new TextView(PlaceListActivity.this);
-                                RelativeLayout.LayoutParams fc_param = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
-                                        ViewGroup.LayoutParams.WRAP_CONTENT);
-                                //fc_param.addRule(RelativeLayout.CENTER_HORIZONTAL,RelativeLayout.TRUE);
-                                fc_param.addRule(RelativeLayout.LEFT_OF, favorite.getId());
-                                favorite_count.setLayoutParams(fc_param);
-
-                                favorite_count.setText("0");
-                                pl_name.addView(favorite_count);
 
                                 fl_place_list.addView(pl_name);
 
@@ -834,24 +864,49 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
                                 place_list_view.addView(fl_place_list);
 
                                 favorite.setOnClickListener(new View.OnClickListener() {
-
                                     @Override
                                     public void onClick(View v) {
-                                        int selected_count = 0;
-
                                         v.setSelected(!v.isSelected());//선택여부 반전
 
-                                        if (v.isSelected()) {//현재 좋아요 누른 상태
+                                        DocumentReference docRef = db.collection("vote").document(id);
 
-                                            selected_count++;
-                                            favorite_count.setText(String.valueOf(selected_count));
-                                        } else {
-                                            if (selected_count > 0)
-                                                selected_count--;
-                                            favorite_count.setText(String.valueOf(selected_count));
+                                        docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                            @Override
+                                            public void onComplete(@NonNull com.google.android.gms.tasks.Task<DocumentSnapshot> task) {
+                                                if (task.isSuccessful()) {
+                                                    DocumentSnapshot document = task.getResult();
+                                                    if (document.exists()) {
+                                                        // 해당 문서가 존재하는 경우
+                                                        List<HashMap<String,Object>> list = (List<HashMap<String, Object>>)document.get("place");
+                                                        size = list.size();
+                                                    } else {
+                                                        // 존재하지 않는 문서
+                                                        Log.d("Attend", "No Document");
+                                                    }
+                                                } else {
+                                                    Log.d("Attend", "Task Fail : " + task.getException());
+                                                }
+                                            }
+                                        });
+
+                                        HashMap<String, Object> map = new HashMap<>();
+                                        GeoPoint location = new GeoPoint(place.getLatitude(), place.getLongitude());
+                                        map.put("latlng", location);
+                                        map.put("vote", 0);
+
+                                        if(v.isSelected()){//현재 add버튼 누른 상태
+                                            System.out.println("size : "+ size);
+                                            if(size >= 5){ // 리스트에 5개 이상 존재할 때
+                                                Toast.makeText(PlaceListActivity.this,"더이상 투표리스트에 추가할 수 없습니다.",Toast.LENGTH_SHORT).show();
+                                            }else {
+                                                db.collection("vote").document(id).update("place", FieldValue.arrayUnion(map));
+                                                Toast.makeText(PlaceListActivity.this, "투표리스트에 추가되었습니다.", Toast.LENGTH_SHORT).show();
+                                            }
                                         }
-
-
+                                        else{
+                                            db.collection("vote").document(id).update("place", FieldValue.arrayRemove(map));
+                                            Toast.makeText(PlaceListActivity.this,"취소되었습니다.",Toast.LENGTH_SHORT).show();
+                                        }
                                     }
                                 });
 
