@@ -101,6 +101,8 @@ public class MeetingActivity extends BasicActivity {
                         return true;
                     case R.id.menu_alarm:
                         FragAlarm fragAlarm = new FragAlarm();
+                        bundle.putString("Name", getIntent().getExtras().getString("Name"));
+                        fragAlarm.setArguments(bundle);
                         getSupportFragmentManager().beginTransaction()
                                 .replace(R.id.main_frame, fragAlarm)
                                 .commit();
