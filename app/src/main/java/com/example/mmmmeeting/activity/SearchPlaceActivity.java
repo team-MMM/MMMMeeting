@@ -7,6 +7,7 @@ package com.example.mmmmeeting.activity;
  */
 
 
+import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.location.Address;
@@ -19,11 +20,13 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 
+import com.example.mmmmeeting.Info.ScheduleInfo;
+import com.example.mmmmeeting.Info.VoteInfo;
 import com.example.mmmmeeting.R;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -33,16 +36,27 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.model.Place;
 import com.google.android.libraries.places.api.net.PlacesClient;
 import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
 import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
 import com.google.android.material.snackbar.Snackbar;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldValue;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.GeoPoint;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -54,7 +68,7 @@ import noman.googleplaces.PlacesListener;
 
 
 public class SearchPlaceActivity extends AppCompatActivity
-        implements View.OnClickListener,OnMapReadyCallback, PlacesListener {
+        implements View.OnClickListener,OnMapReadyCallback {
 
 
     GoogleMap mMap;
@@ -66,7 +80,7 @@ public class SearchPlaceActivity extends AppCompatActivity
     private String address=null;
     private LatLng arrival;
 
-    Button btn_route,btn_category,btn_loading;
+    Button btn_route,btn_vote;
     private View layout_search;
 
     int category; //선택한 카테고리 넘버
@@ -87,6 +101,11 @@ public class SearchPlaceActivity extends AppCompatActivity
             "all","atm","bank","beauty_salon","cafe","church","gas_station","restaurant"
     };
 
+    private ScheduleInfo postInfo;
+    private String scheduleId;
+    FirebaseFirestore db = FirebaseFirestore.getInstance();
+    private String id=null;
+    int size;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState){
@@ -104,11 +123,13 @@ public class SearchPlaceActivity extends AppCompatActivity
 
         layout_search=findViewById(R.id.layout_search);
         btn_route = findViewById(R.id.btn_route);
-        btn_category = findViewById(R.id.btn_category);
+        btn_vote = findViewById(R.id.btn_vote);
 
         btn_route.setOnClickListener(this);
-        btn_category.setOnClickListener(this);
+        btn_vote.setOnClickListener(this);
 
+        postInfo = (ScheduleInfo) getIntent().getSerializableExtra("scheduleInfo");
+        scheduleId = postInfo.getId();
 
         if (!Places.isInitialized()) {
             Places.initialize(getApplicationContext(), apiKey);
@@ -155,13 +176,13 @@ public class SearchPlaceActivity extends AppCompatActivity
     }
 
     @Override
-    public void onClick(View v){
+    public void onClick(View v) {
 
-        switch(v.getId()){
+        switch (v.getId()) {
             //경로 검색 버튼을 눌렀을 때
             case R.id.btn_route:
                 try {
-                    if(address==null){
+                    if (address == null) {
                         final Snackbar snackbar = Snackbar.make(layout_search, "목적지를 입력해주세요^^", Snackbar.LENGTH_INDEFINITE);
                         snackbar.setAction("확인", new View.OnClickListener() {
                             @Override
@@ -170,7 +191,7 @@ public class SearchPlaceActivity extends AppCompatActivity
                             }
                         });
                         snackbar.show();
-                    }else{
+                    } else {
                         //DirectionActivity로 넘어간다.
                         Intent i = new Intent(this, DirectionActivity.class);
                         i.putExtra("address", address);
@@ -180,8 +201,8 @@ public class SearchPlaceActivity extends AppCompatActivity
                     e.printStackTrace();
                 }
                 break;
-            //카테고리 버튼을 눌렀을 때
-            case R.id.btn_category:
+            //투표추가 버튼을 눌렀을 때
+            case R.id.btn_vote:
                 if (address == null) {
                     final Snackbar snackbar = Snackbar.make(layout_search, "목적지를 입력해주세요^^", Snackbar.LENGTH_INDEFINITE);
                     snackbar.setAction("확인", new View.OnClickListener() {
@@ -191,59 +212,90 @@ public class SearchPlaceActivity extends AppCompatActivity
                         }
                     });
                     snackbar.show();
-                }else{
-                    mMap.clear();
-                    if (previous_marker != null)
-                        previous_marker.clear();//지역정보 마커 클리어
-                    show();
-                    break;
+                } else {
+                    db.collection("vote").whereEqualTo("scheduleID", scheduleId).get()
+                            .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                @Override
+                                public void onComplete(@NonNull com.google.android.gms.tasks.Task<QuerySnapshot> task) {
+                                    if (task.isSuccessful()) {
+                                        for (QueryDocumentSnapshot document : task.getResult()) {
+                                            id = document.getId(); // document 이름(id)
+                                            System.out.println("list 있음");
+                                        }
+                                        if (id == null) {
+                                            VoteInfo info = new VoteInfo(scheduleId);
+                                            db.collection("vote").add(info)
+                                                    .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                                                        @Override
+                                                        public void onSuccess(DocumentReference documentReference) {
+                                                            id = documentReference.getId();
+                                                            Log.d("Document Create", "Creating Success");
+                                                        }
+                                                    })
+                                                    .addOnFailureListener(new OnFailureListener() {
+                                                        @Override
+                                                        public void onFailure(@NonNull Exception e) {
+                                                            Log.d("Document Create", "Error creating documents: ", task.getException());
+                                                        }
+                                                    });
+                                        }
+                                    } else {
+                                        Log.d("Document Read", "Error getting documents: ", task.getException());
+                                    }
+                                }
+                            });
+
+                    android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(SearchPlaceActivity.this);
+                    builder.setTitle("투표 추가")        // 제목
+                            .setMessage("투표리스트에 추가하시겠습니까?")        // 메세지
+                            // .setCancelable(false)        // 뒤로 버튼 클릭시 취소 가능 설정
+                            .setPositiveButton("확인", new DialogInterface.OnClickListener(){
+                                // 확인 버튼 클릭시 설정, 오른쪽 버튼입니다.
+                                public void onClick(DialogInterface dialog, int whichButton){//투표리스트에 추가
+                                    DocumentReference docRef = db.collection("vote").document(id);
+
+                                    docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                        @Override
+                                        public void onComplete(@NonNull com.google.android.gms.tasks.Task<DocumentSnapshot> task) {
+                                            if (task.isSuccessful()) {
+                                                DocumentSnapshot document = task.getResult();
+                                                if (document.exists()) {
+                                                    // 해당 문서가 존재하는 경우
+                                                    List<HashMap<String, Object>> list = (List<HashMap<String, Object>>) document.get("place");
+                                                    size = list.size();
+                                                } else {
+                                                    // 존재하지 않는 문서
+                                                    Log.d("Attend", "No Document");
+                                                }
+                                            } else {
+                                                Log.d("Attend", "Task Fail : " + task.getException());
+                                            }
+                                        }
+                                    });
+
+                                    HashMap<String, Object> map = new HashMap<>();
+                                    GeoPoint location = new GeoPoint(arrival.latitude, arrival.longitude);
+                                    map.put("latlng", location);
+                                    map.put("vote", 0);
+
+                                    if (size >= 5) { // 리스트에 5개 이상 존재할 때
+                                        Toast.makeText(SearchPlaceActivity.this, "더이상 투표리스트에 추가할 수 없습니다.", Toast.LENGTH_SHORT).show();
+                                    } else {
+                                        db.collection("vote").document(id).update("place", FieldValue.arrayUnion(map));
+                                        Toast.makeText(SearchPlaceActivity.this, "투표리스트에 추가되었습니다.", Toast.LENGTH_SHORT).show();
+                                    }
+                                }
+                            })
+                            .setNegativeButton("취소", new DialogInterface.OnClickListener(){// 취소 버튼 클릭시
+                                public void onClick(DialogInterface dialog, int whichButton){//취소 이벤트...
+                                }
+                            });
+                    AlertDialog dialog = builder.create();    // 알림창 객체 생성
+                    dialog.show();    // 알림창 띄우기
+
                 }
+                break;
         }
-    }
-
-
-    void show() //카테고리 보여주기
-    {
-        // 카테고리를 선택 할 수 있는 리스트를 띄운다.
-        AlertDialog.Builder builder=new AlertDialog.Builder(this);
-        builder.setTitle("장소 타입 선택");
-        ArrayAdapter<String> adapter= new ArrayAdapter<String>(
-                this,android.R.layout.simple_list_item_1,category_name_array
-        );
-        DialogListener listener=new DialogListener();
-        builder.setAdapter(adapter,listener);
-        builder.setNegativeButton("취소",null);
-        builder.show();
-    }
-    // 다이얼로그의 리스너
-    class DialogListener implements DialogInterface.OnClickListener{
-
-        @Override
-        public void onClick(DialogInterface dialogInterface, int i) {
-            // 사용자가 선택한 항목 인덱스번째의 type 값을 가져온다.
-            String type=category_value_array[i];
-            // 주변 정보를 가져온다
-            showPlaceInformation(arrival,type);
-        }
-    }
-
-    public void showPlaceInformation(LatLng location,String type)
-    {
-        mMap.clear();//지도 클리어
-        String apiKey = getString(R.string.api_key);
-
-        if (previous_marker != null)
-            previous_marker.clear();//지역정보 마커 클리어
-
-        new NRPlaces.Builder()
-                .listener(SearchPlaceActivity.this)
-                .key(apiKey)
-                .latlng(location.latitude, location.longitude)//현재 위치
-                .radius(500) //500 미터 내에서 검색
-                .type(type) //음식점
-                .build()
-                .execute();
-
     }
 
     @Override
@@ -258,48 +310,6 @@ public class SearchPlaceActivity extends AppCompatActivity
         mMap.clear();
     }
 
-    @Override
-    public void onPlacesFailure(PlacesException e) {
-
-    }
-
-    @Override
-    public void onPlacesStart() {
-
-    }
-
-    @Override
-    public void onPlacesSuccess(final List<noman.googleplaces.Place> places) {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                for (noman.googleplaces.Place place : places) {
-
-                    LatLng latLng
-                            = new LatLng(place.getLatitude()
-                            , place.getLongitude());
-
-                    //주소
-                    String markerSnippet = getCurrentAddress(latLng);
-
-                    MarkerOptions markerOptions = new MarkerOptions();
-                    markerOptions.position(latLng);
-                    markerOptions.title(place.getName());
-                    markerOptions.snippet(markerSnippet);
-                    Marker item = mMap.addMarker(markerOptions);
-                    previous_marker.add(item);
-
-                }
-
-                //중복 마커 제거
-                HashSet<Marker> hashSet = new HashSet<Marker>();
-                hashSet.addAll(previous_marker);
-                previous_marker.clear();
-                previous_marker.addAll(hashSet);
-
-            }
-        });
-    }
     public String getCurrentAddress(LatLng latlng) {
 
         //지오코더... GPS를 주소로 변환
@@ -334,12 +344,6 @@ public class SearchPlaceActivity extends AppCompatActivity
         }
 
     }
-
-    @Override
-    public void onPlacesFinished() {
-
-    }
-
 
     class Point {
         // 위도
