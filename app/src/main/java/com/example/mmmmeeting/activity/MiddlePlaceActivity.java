@@ -81,7 +81,9 @@ public class MiddlePlaceActivity extends AppCompatActivity implements OnMapReady
 
     //private ArrayList<LatLng> position;
     private int[] userTime;
-    private LatLng midP;
+    //##
+    private LatLng midP = new LatLng(37.6663555,127.0557141);
+    //#private LatLng midP;
 
     private int countTry;
     private LinearLayout midpoint_select;
@@ -201,9 +203,11 @@ public class MiddlePlaceActivity extends AppCompatActivity implements OnMapReady
         PolygonCenter(hull);
         curPoint = new LatLng(center.x, center.y);
         //중간지점 찾기 (사용자 위치들과 무게중심 좌표 넘겨주기)
-        findMidPoint(hull, curPoint);
+        //#findMidPoint(hull, curPoint);
 
-        String midAdr = getCurrentAddress(midP);
+        //#String midAdr = getCurrentAddress(midP);
+        //##
+        String midAdr = "서울특별시 상계8동 동일로 1545";
 
         //LinearLayout 정의
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(

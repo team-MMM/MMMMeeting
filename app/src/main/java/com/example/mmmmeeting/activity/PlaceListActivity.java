@@ -9,6 +9,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.os.health.SystemHealthManager;
 import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.RelativeSizeSpan;
@@ -63,6 +64,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -77,8 +80,8 @@ import noman.googleplaces.PlacesListener;
 public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCallback, PlacesListener {
 
     GoogleMap mMap;
-    //임의지정
     LatLng midpoint = new LatLng(37.584114826538716, 127.05876976018965);
+
 
     LinearLayout fl_place_list,place_list_view;
 
@@ -163,7 +166,7 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
                             }
                         });
                     }
-                }, 1000); // 1초후
+                }, 5000); // 1초후
             }
 
             @Override
@@ -237,7 +240,7 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
             }
         };
 
-        mHandler.postDelayed(r, 1000); // 1초후
+        mHandler.postDelayed(r, 3000); // 1초후
     }
 
     public void showPlaceInformation(String type, int radius)
@@ -253,6 +256,8 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
                 .type(type)
                 .build()
                 .execute();
+
+        System.out.println("showPlaceInfo");
     }
 
 
@@ -303,157 +308,30 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
     @Override
     public void onPlacesSuccess(final List<Place> places) {
 
-        runOnUiThread(new Runnable() {
-            @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+        ArrayList<Place> placeList = new ArrayList<>();
+        System.out.println("place success");
+        Runnable r = new Runnable() {
             @Override
             public void run() {
                 count++;
                 int i=0;
                 for (noman.googleplaces.Place place : places) {
-
-                    //place.getPlaceId();
-                    String placeName=null;
-                    float rating=0;
-                    placeInfo=getPlaceJson(place.getLatitude(),place.getLongitude(),place.getPlaceId());
-
-                    try {
-                        System.out.println("try들어옴");
-                        JSONObject jsonObject = new JSONObject(placeInfo);
-                        System.out.println("장소정보 JSON : "+placeInfo);
-
-                        String sresult;
-
-                        sresult = jsonObject.getString("result");
-                        JSONObject resultObject = new JSONObject(sresult);
-                        rating = Float.parseFloat(resultObject.getString("rating"));
-                        placeName = resultObject.getString("name");
-
-                        System.out.println("rating값 : "+rating);
-                        System.out.println("장소 명 : "+placeName);
-
-                        LatLng latLng
-                                = new LatLng(place.getLatitude()
-                                , place.getLongitude());
-
-                        //주소
-                        String placeAddress = getCurrentAddress(latLng);
-
-
-                        LinearLayout.LayoutParams param = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
-                                ViewGroup.LayoutParams.WRAP_CONTENT);
-
-                        LinearLayout.LayoutParams fl_param = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                                ViewGroup.LayoutParams.WRAP_CONTENT);
-
-                        fl_place_list = new LinearLayout(PlaceListActivity.this);
-                        fl_place_list.setOrientation(LinearLayout.VERTICAL);
-                        fl_place_list.setLayoutParams(fl_param);
-                        fl_place_list.setBackgroundColor(Color.WHITE);
-                        fl_place_list.setPadding(0,10,0,30);
-
-
-                        RelativeLayout.LayoutParams rl_param = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
-                                ViewGroup.LayoutParams.WRAP_CONTENT);
-
-                        RelativeLayout pl_name = new RelativeLayout(PlaceListActivity.this);
-                        pl_name.setLayoutParams(rl_param);
-                        //pl_name.setOrientation(LinearLayout.HORIZONTAL);
-
-
-                        //장소 이름, 주소 출력부분
-                        TextView pInfo = new TextView(PlaceListActivity.this);
-                        SpannableString s = new SpannableString(placeName+"\n"+placeAddress);
-                        s.setSpan(new RelativeSizeSpan(1.8f),0,placeName.length(),0);
-                        s.setSpan(new ForegroundColorSpan(Color.parseColor("#62ABD9")),0,placeName.length(),0);
-                        pInfo.setText(s);
-                        pInfo.setLayoutParams(rl_param);
-                        pl_name.addView(pInfo);
-
-                        //좋아요버튼
-                        Button favorite = new Button(PlaceListActivity.this);
-                        RelativeLayout.LayoutParams btn_param = new RelativeLayout.LayoutParams(90,90);
-                        btn_param.addRule(RelativeLayout.ALIGN_PARENT_RIGHT,RelativeLayout.TRUE);
-                        favorite.setLayoutParams(btn_param);
-                        favorite.setPadding(0,20,5,0);
-                        favorite.setId(i+1);
-                        favorite.setBackground(ContextCompat.getDrawable(PlaceListActivity.this,R.drawable.heart));
-                        pl_name.addView(favorite);
-
-                        //좋아요 count
-                        TextView favorite_count = new TextView(PlaceListActivity.this);
-                        RelativeLayout.LayoutParams fc_param = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
-                                ViewGroup.LayoutParams.WRAP_CONTENT);
-                        //fc_param.addRule(RelativeLayout.CENTER_HORIZONTAL,RelativeLayout.TRUE);
-                        fc_param.addRule(RelativeLayout.LEFT_OF,favorite.getId());
-                        favorite_count.setLayoutParams(fc_param);
-
-                        favorite_count.setText("0");
-                        pl_name.addView(favorite_count);
-
-                        fl_place_list.addView(pl_name);
-
-                        //LinearLayout 생성
-                        LinearLayout ly = new LinearLayout(PlaceListActivity.this);
-                        //LinearLayout.LayoutParams lyparams = param;
-                        ly.setLayoutParams(param);
-                        ly.setOrientation(LinearLayout.HORIZONTAL);
-
-                        TextView rate_tv = new TextView(PlaceListActivity.this);
-                        rate_tv.setText("별점 : "+rating+" | ");
-                        rate_tv.setLayoutParams(param);
-                        ly.addView(rate_tv);
-
-                        RatingBar rb = new RatingBar(PlaceListActivity.this,null,android.R.attr.ratingBarStyleSmall);
-                        rb.setNumStars(5);
-                        rb.setRating(rating);
-                        rb.setStepSize((float)0.1);
-                        rb.setPadding(0,5,0,0);
-                        rb.setLayoutParams(param);
-                        ly.addView(rb);
-
-                        fl_place_list.addView(ly);
-
-                        place_list_view.addView(fl_place_list);
-
-                        favorite.setOnClickListener(new View.OnClickListener(){
-
-                            @Override
-                            public void onClick(View v) {
-                                int selected_count=0;
-
-                                v.setSelected(!v.isSelected());//선택여부 반전
-
-                                if(v.isSelected()){//현재 좋아요 누른 상태
-
-                                    selected_count++;
-                                    favorite_count.setText(String.valueOf(selected_count));
-                                }
-                                else{
-                                    if(selected_count>0)
-                                        selected_count--;
-                                    favorite_count.setText(String.valueOf(selected_count));
-                                }
-
-
-                            }
-                        });
-
-                        MarkerOptions markerOptions = new MarkerOptions();
-                        markerOptions.position(latLng);
-                        markerOptions.title(place.getName());
-                        markerOptions.snippet(placeAddress);
-                        mMap.addMarker(markerOptions);
-
-//                        Marker item = mMap.addMarker(markerOptions);
-//                        previous_marker.add(item);
-
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
+                    placeList.add(places.get(i));
                     i++;
+
                 }
+                System.out.println(placeList);
+
             }
-        });
+        };
+
+        mHandler.postDelayed(r,2000);
+        try {
+            sortRating(placeList);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
 
     }
 
@@ -745,5 +623,257 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
 //                    break;
             }
         }
+    }
+
+    /*
+    순차적으로 실행하기 위해서 Runnable 객체를 Handler에 넘겨주었음!
+    Handler가 메세지 큐에 있는걸 순서대로 실행
+    순서: 카테고리 계산 -> showPlaceInfo -> placeSuccess -> sortRating -> showUI
+     */
+
+    // 별점 순서대로 정렬 -> 거리 점수 (0.4:0.6) 반영한 최종 점수 구함
+    // 최종 점수대로 num개를 ArrayList에 저장 -> showUI 함수에 넘겨줌
+    private void sortRating(ArrayList<Place> placeList) throws JSONException {
+
+        ArrayList<Place> newPlaceList = new ArrayList<>();
+        HashMap<Integer, Float> ratingMap = new HashMap<>();
+
+        System.out.println("sortRating start!");
+        Runnable r = new Runnable() {
+            @Override
+            public void run() {
+                int num = 5;
+                for (int i = 0; i < placeList.size(); i++) {
+                    placeInfo = getPlaceJson(placeList.get(i).getLatitude(), placeList.get(i).getLongitude(), placeList.get(i).getPlaceId());
+                    JSONObject jsonObject = null;
+                    try {
+                        System.out.println(i);
+                        jsonObject = new JSONObject(placeInfo);
+                        String sresult;
+                        sresult = jsonObject.getString("result");
+                        JSONObject resultObject = new JSONObject(sresult);
+                        float rating = Float.parseFloat(resultObject.getString("rating"));
+                        ratingMap.put(i,rating);
+                        System.out.println(i + "번 rating 점수" + ratingMap.get(i));
+                        //ratingList.add(ratingMap);
+                        //System.out.println(i + "번 rating 점수" + ratingList.get(i));
+                    } catch (JSONException e) {
+                        float a = 0;
+                        System.out.println("exception "+i);
+                        ratingMap.put(i,a);
+                        //ratingList.add(ratingMap);
+                        System.out.println(i + "번 rating 점수" + ratingMap.get(i));
+                        e.printStackTrace();
+                    }
+
+                }
+
+                // Sort 할 때 인덱스만 가져오려고 array 생성
+                // ratingList는 ratingMap의 key값만 가지고 있음
+                // Sort 후 ratingList가 (5,4,2,1,0)이면 placeList.get(해당 인덱스) -> 순위대로 place 가져옴
+                ArrayList<Integer> ratingList = new ArrayList<>(ratingMap.keySet());
+
+                for (int i = 0; i < placeList.size(); i++) {
+                    double latitude = placeList.get(i).getLatitude() - midpoint.latitude;
+                    double longitude = placeList.get(i).getLongitude() - midpoint.longitude;
+
+                    // 0~1사이에 분포, 0에 가까울 수록 중간 지점과 가깝다
+                    double euclidean = Math.sqrt(Math.pow(latitude, 2.0) + Math.pow(longitude, 2.0));
+                    // 0~5점 사이에 분포한 선호도 값과 비슷하게 분포하도록 역수+로그를 이용해서 변환 -> 점수 높을수록 가까움
+                    // 0~3.5점 사이에 분포
+                    euclidean = Math.log10(1.0 / euclidean);
+
+                    // double형인 점수를 float으로 변환
+                    float distancePoint = Float.valueOf(String.valueOf(euclidean));
+                    //System.out.println(distancePoint);
+                    float rating = ratingMap.get(i).floatValue();
+
+                    // rating 점수 + 거리 점수의 가중치를 [0.4/0.6]으로 환산한 최종 점수
+                    ratingMap.put(i,(float)(0.4 * rating + 0.6 * distancePoint));
+                    System.out.println(i + "번 최종 점수" + ratingMap.get(i));
+                    //System.out.println(i + "번 최종 점수" + ratingList.get(i));
+                }
+
+                // 최종 점수로 내림차순 정렬
+                // ratingMap의 value인 최종 점수를 기준으로 정렬, ratingMap의 key값이 ratingList의 값
+                // ratingList = {5,4,2,1,0}
+                Collections.sort(ratingList, (o1, o2) -> (ratingMap.get(o2).compareTo(ratingMap.get(o1))));
+
+                System.out.println("ratingList: "+ratingList);
+
+                // 지금은 num을 임시로 5개로 했는데, 5개 보다 검색 결과가 작으면 인덱스 에러 때문에 다시 세팅
+                if(ratingList.size() < num)
+                    num = ratingList.size();
+
+                // 상위 num개 만큼 다시 placeList에 저장
+                for (int i = 0; i < num; i++) {
+                    System.out.println("ratingNum: "+ratingList.get(i));
+                    newPlaceList.add(placeList.get(ratingList.get(i)));
+                }
+                showUI(newPlaceList);
+            }
+
+        };
+        mHandler.postDelayed(r, 2000);
+    }
+
+    // sortRating이 넘겨준 newPlaceList를 화면에 띄움
+   private void showUI(ArrayList<Place> placeList){
+        System.out.println("showPlace");
+        Runnable r = new Runnable() {
+            @Override
+            public void run() {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        //place.getPlaceId();
+                        for (int i = 0; i < placeList.size(); i++) {
+
+                            Place place = placeList.get(i);
+                            String placeName = null;
+                            float rating = 0;
+                            placeInfo = getPlaceJson(place.getLatitude(), place.getLongitude(), place.getPlaceId());
+
+                            try {
+                                System.out.println("try들어옴");
+                                JSONObject jsonObject = new JSONObject(placeInfo);
+                                System.out.println("장소정보 JSON : " + placeInfo);
+
+                                String sresult;
+
+                                sresult = jsonObject.getString("result");
+                                JSONObject resultObject = new JSONObject(sresult);
+                                rating = Float.parseFloat(resultObject.getString("rating"));
+                                placeName = resultObject.getString("name");
+
+                                System.out.println("rating값 : " + rating);
+                                System.out.println("장소 명 : " + placeName);
+
+                                LatLng latLng
+                                        = new LatLng(place.getLatitude()
+                                        , place.getLongitude());
+
+                                //주소
+                                String placeAddress = getCurrentAddress(latLng);
+
+
+                                LinearLayout.LayoutParams param = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
+                                        ViewGroup.LayoutParams.WRAP_CONTENT);
+
+                                LinearLayout.LayoutParams fl_param = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                                        ViewGroup.LayoutParams.WRAP_CONTENT);
+
+                                fl_place_list = new LinearLayout(PlaceListActivity.this);
+                                fl_place_list.setOrientation(LinearLayout.VERTICAL);
+                                fl_place_list.setLayoutParams(fl_param);
+                                fl_place_list.setBackgroundColor(Color.WHITE);
+                                fl_place_list.setPadding(0, 10, 0, 30);
+
+
+                                RelativeLayout.LayoutParams rl_param = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
+                                        ViewGroup.LayoutParams.WRAP_CONTENT);
+
+                                RelativeLayout pl_name = new RelativeLayout(PlaceListActivity.this);
+                                pl_name.setLayoutParams(rl_param);
+                                //pl_name.setOrientation(LinearLayout.HORIZONTAL);
+
+
+                                //장소 이름, 주소 출력부분
+                                TextView pInfo = new TextView(PlaceListActivity.this);
+                                SpannableString s = new SpannableString(placeName + "\n" + placeAddress);
+                                s.setSpan(new RelativeSizeSpan(1.8f), 0, placeName.length(), 0);
+                                s.setSpan(new ForegroundColorSpan(Color.parseColor("#62ABD9")), 0, placeName.length(), 0);
+                                pInfo.setText(s);
+                                pInfo.setLayoutParams(rl_param);
+                                pl_name.addView(pInfo);
+
+                                //좋아요버튼
+                                Button favorite = new Button(PlaceListActivity.this);
+                                RelativeLayout.LayoutParams btn_param = new RelativeLayout.LayoutParams(90, 90);
+                                btn_param.addRule(RelativeLayout.ALIGN_PARENT_RIGHT, RelativeLayout.TRUE);
+                                favorite.setLayoutParams(btn_param);
+                                favorite.setPadding(0, 20, 5, 0);
+                                favorite.setId(i + 1);
+                                favorite.setBackground(ContextCompat.getDrawable(PlaceListActivity.this, R.drawable.heart));
+                                pl_name.addView(favorite);
+
+                                //좋아요 count
+                                TextView favorite_count = new TextView(PlaceListActivity.this);
+                                RelativeLayout.LayoutParams fc_param = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
+                                        ViewGroup.LayoutParams.WRAP_CONTENT);
+                                //fc_param.addRule(RelativeLayout.CENTER_HORIZONTAL,RelativeLayout.TRUE);
+                                fc_param.addRule(RelativeLayout.LEFT_OF, favorite.getId());
+                                favorite_count.setLayoutParams(fc_param);
+
+                                favorite_count.setText("0");
+                                pl_name.addView(favorite_count);
+
+                                fl_place_list.addView(pl_name);
+
+                                //LinearLayout 생성
+                                LinearLayout ly = new LinearLayout(PlaceListActivity.this);
+                                //LinearLayout.LayoutParams lyparams = param;
+                                ly.setLayoutParams(param);
+                                ly.setOrientation(LinearLayout.HORIZONTAL);
+
+                                TextView rate_tv = new TextView(PlaceListActivity.this);
+                                rate_tv.setText("별점 : " + rating + " | ");
+                                rate_tv.setLayoutParams(param);
+                                ly.addView(rate_tv);
+
+                                RatingBar rb = new RatingBar(PlaceListActivity.this, null, android.R.attr.ratingBarStyleSmall);
+                                rb.setNumStars(5);
+                                rb.setRating(rating);
+                                rb.setStepSize((float) 0.1);
+                                rb.setPadding(0, 5, 0, 0);
+                                rb.setLayoutParams(param);
+                                ly.addView(rb);
+
+                                fl_place_list.addView(ly);
+
+                                place_list_view.addView(fl_place_list);
+
+                                favorite.setOnClickListener(new View.OnClickListener() {
+
+                                    @Override
+                                    public void onClick(View v) {
+                                        int selected_count = 0;
+
+                                        v.setSelected(!v.isSelected());//선택여부 반전
+
+                                        if (v.isSelected()) {//현재 좋아요 누른 상태
+
+                                            selected_count++;
+                                            favorite_count.setText(String.valueOf(selected_count));
+                                        } else {
+                                            if (selected_count > 0)
+                                                selected_count--;
+                                            favorite_count.setText(String.valueOf(selected_count));
+                                        }
+
+
+                                    }
+                                });
+
+                                MarkerOptions markerOptions = new MarkerOptions();
+                                markerOptions.position(latLng);
+                                markerOptions.title(place.getName());
+                                markerOptions.snippet(placeAddress);
+                                mMap.addMarker(markerOptions);
+
+//                        Marker item = mMap.addMarker(markerOptions);
+//                        previous_marker.add(item);
+
+                            } catch (JSONException e) {
+                                System.out.println("UI exception");
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+                });
+
+            }
+        };
+        mHandler.postDelayed(r,3000);
     }
 }
