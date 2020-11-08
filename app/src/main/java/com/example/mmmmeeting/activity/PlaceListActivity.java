@@ -863,6 +863,7 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
 
                                 place_list_view.addView(fl_place_list);
 
+                                String finalPlaceName = placeName;
                                 favorite.setOnClickListener(new View.OnClickListener() {
                                     @Override
                                     public void onClick(View v) {
@@ -893,6 +894,7 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
                                         GeoPoint location = new GeoPoint(place.getLatitude(), place.getLongitude());
                                         map.put("latlng", location);
                                         map.put("vote", 0);
+                                        map.put("name", finalPlaceName);
 
                                         if(v.isSelected()){//현재 add버튼 누른 상태
                                             System.out.println("size : "+ size);

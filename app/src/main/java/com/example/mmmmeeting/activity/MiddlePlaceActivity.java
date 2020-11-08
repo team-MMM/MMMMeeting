@@ -233,7 +233,8 @@ public class MiddlePlaceActivity extends AppCompatActivity implements OnMapReady
         btn_mid.setText("선택");
         RelativeLayout.LayoutParams btn_params = new RelativeLayout.LayoutParams(
                 ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT);
-        btn_params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT|RelativeLayout.ALIGN_PARENT_BOTTOM,RelativeLayout.TRUE);
+        btn_params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT,RelativeLayout.TRUE);
+        btn_params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM,RelativeLayout.TRUE);
         btn_params.addRule(RelativeLayout.BELOW,tv_mid.getId());
         btn_mid.setLayoutParams(btn_params);
         ly.addView(btn_mid);
@@ -256,13 +257,13 @@ public class MiddlePlaceActivity extends AppCompatActivity implements OnMapReady
                 s.setSpan(new ForegroundColorSpan(Color.parseColor("#62ABD9")),22,22+midAdr.length(),0);
                 alertDialogBuilder.setMessage(s)
                         .setCancelable(false)
-                        .setPositiveButton("NO", new DialogInterface.OnClickListener() {
+                        .setPositiveButton("아니오", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
                                 //프로그램 종료
                                 MiddlePlaceActivity.this.finish();
                             }
-                        }).setNegativeButton("YES", new DialogInterface.OnClickListener() {
+                        }).setNegativeButton("네", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
 
