@@ -1,6 +1,8 @@
 package com.example.mmmmeeting.activity;
 
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
@@ -25,6 +27,7 @@ import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -33,8 +36,6 @@ public class CheckLateActivity extends AppCompatActivity implements View.OnClick
     private int hour,minute;
     private Date calDate;
     private String scID;
-    private boolean timeFlag;
-    private boolean lateFlag;
     FirebaseUser user;
     FirebaseFirestore db;
 
@@ -44,8 +45,7 @@ public class CheckLateActivity extends AppCompatActivity implements View.OnClick
     Button attendanceBtn;
 
     MyThread thread;
-
-    GoogleMap mMap;
+    Handler handler;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -97,10 +97,16 @@ public class CheckLateActivity extends AppCompatActivity implements View.OnClick
 
         });
 
-        thread = new MyThread();
-        thread.start();
 
-        //MyWorker.start(this);
+        handler =new Handler(){
+            @Override
+            public void handleMessage(Message msg){
+                Bundle bd = msg.getData( ) ;
+                String str = bd.getString("arg");
+                sendToast(str);
+            }
+        };
+
 
     }
 
@@ -129,22 +135,27 @@ public class CheckLateActivity extends AppCompatActivity implements View.OnClick
 
                 Log.d("my",current+" "+calDate);
 
-                // now > calDate : 현재 시간이 약속 시간을 지났을 때 약 2초 뒤에 창 종료됨
+                // now > calDate : 현재 시간이 약속 시간을 지났을 때 약 1초 뒤에 창 종료됨
                 if(now.compareTo(calDate) == 1){
-                    lateFlag = true;
-                    try {
-                        thread.sleep(2000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    showToast();
+                    // flag를 없애고 bundle로 값을 전달해줌
+                    Bundle bd = new Bundle();
+                    bd.putString("arg", "Late");
+                    sendMessage(bd);
+                    stopThread();
                     break;
                 }else if(nowHour == hour && nowMinute >= minute-5 ){
-                    // 약속 시간 5분 전부터 flag true를 줘서 출석체크 버튼을 누를 수 있음
-                    timeFlag = true;
+                    Bundle bd = new Bundle();
+                    bd.putString("arg","TimeCheck");
+                    sendMessage(bd);
+                    stopThread();
+
+                }else{
+                    Bundle bd = new Bundle();
+                    bd.putString("arg","NotNow");
+                    sendMessage(bd);
+                    stopThread();
                 }
             }
-            finish();
 
         }
 
@@ -153,22 +164,50 @@ public class CheckLateActivity extends AppCompatActivity implements View.OnClick
         }
     }
 
-    public void showToast(){
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                Toast.makeText(getApplicationContext(),"약속 시간이 지났습니다.",Toast.LENGTH_SHORT).show();
-            }
-        });
+    private void sendMessage(Bundle bd){
+        Message msg = handler.obtainMessage();
+        msg.setData(bd);
+        handler.sendMessage(msg);
     }
+    public void sendToast(String str){
+
+        switch (str) {
+            case "Late":
+                Toast.makeText(getApplicationContext(),"약속 시간이 지나서 출석체크 할 수 없습니다.",Toast.LENGTH_SHORT).show();
+                break;
+            case "TimeCheck":
+                String date_text = new SimpleDateFormat(
+                        "hh시 mm분").format(calDate);
+                System.out.println(date_text);
+                Toast.makeText(getApplicationContext(),"약속 시간 " + date_text+"을 잘 지키셨군요!", Toast.LENGTH_SHORT).show();
+
+                // 스케쥴 lateComer에 출첵한 사람 저장 -> 타이틀 변경 예정
+                DocumentReference docRef = db.collection("schedule").document(scID);
+                docRef.update("lateComer", FieldValue.arrayUnion(user.getUid()));
+                break;
+
+            case "NotNow":
+                Toast.makeText(getApplicationContext(),"만남 5분 전부터 출석체크 가능합니다.",Toast.LENGTH_SHORT).show();
+                break;
+        }
+    }
+
 
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.checkAttendBtn:
-                checkAttend();
+                // 버튼 누르면 thread 실행해서 시간 받아오고 바로 종료되게 함
+                // -> thread를 계속 실행하니까 flag값이 계속 바뀜
+                thread = new MyThread();
+                thread.start();
+                finish();
+
         }
     }
 
+
+    /*
+    원래 flag랑 같이 쓰던 코든데 혹시 몰라서 남겨둠
     private void checkAttend(){
 
         // 약속 시간이 지났을 때
@@ -205,12 +244,16 @@ public class CheckLateActivity extends AppCompatActivity implements View.OnClick
 
     }
 
+     */
+
 
     // 종료될 때 뒤로 가기 버튼 누를 때 등등 thread도 종료되도록
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        thread.stopThread();
+        if(thread!=null){
+            thread.stopThread();
+        }
 
     }
 
