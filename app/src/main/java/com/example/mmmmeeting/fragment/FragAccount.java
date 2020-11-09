@@ -71,7 +71,7 @@ public class FragAccount extends Fragment {
                                 if (document.get("name").toString().equals(meetingName)) {
                                     System.out.println("여기 들어옴");
                                     setLayoutOfAccount(document.getData().get("userID"));
-                                    break;
+                                    return;
                                 }
                             }
                         }

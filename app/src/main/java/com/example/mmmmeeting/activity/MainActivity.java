@@ -165,8 +165,8 @@ public class MainActivity extends BasicActivity implements View.OnClickListener 
                                 if(document.getData().get("userID").toString().contains(mAuth.getUid())){
                                     // db에서 현재 유저 uid 삭제
                                     DocumentReference userdel = db.collection("meetings").document(document.getId());
-                                    if(document.get("reader").equals(mAuth.getUid())){
-                                        userdel.update("reader", "");
+                                    if(document.get("leader").equals(mAuth.getUid())){
+                                        userdel.update("leader", "");
                                     }
                                     userdel.update("userID", FieldValue.arrayRemove(mAuth.getUid()));
                                     Log.d("Delete", document.getId() + " => " + document.getData());
@@ -174,7 +174,7 @@ public class MainActivity extends BasicActivity implements View.OnClickListener 
                                     meetingMemberCheck(document.getId());
 
                                     finish();
-                                    break;
+                                    return;
                                 } else {
                                     Log.d("Delete", "No Document");
                                     finish();

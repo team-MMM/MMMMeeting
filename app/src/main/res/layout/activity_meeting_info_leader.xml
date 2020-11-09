@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:gravity="center"
-    tools:context=".activity.MeetingInfoActivity">
+    tools:context=".activity.MeetingInfoLeaderActivity">
 
     <TextView
         android:text="모임 이름"
@@ -102,6 +102,16 @@
             android:layout_margin="10sp"
             android:background="@drawable/button_shape"
             android:text="초대하기"
+            android:textSize="15sp"/>
+
+        <Button
+            android:id="@+id/newLeader"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="10sp"
+            android:layout_margin="10sp"
+            android:background="@drawable/button_shape"
+            android:text="양도하기"
             android:textSize="15sp"/>
 
     </LinearLayout>

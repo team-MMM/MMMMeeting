@@ -91,8 +91,8 @@ public class MeetingDeleteActivity extends AppCompatActivity {
 
                     if (document.getData().get("userID").toString().contains(user.getUid())) {
                         // db에서 현재 유저 uid 삭제
-                        if(document.get("reader").equals(user.getUid())){
-                            userdel.update("reader", "");
+                        if(document.get("leader").equals(user.getUid())){
+                            userdel.update("leader", "");
                         }
                         userdel.update("userID", FieldValue.arrayRemove(user.getUid()));
                         startToast("모임에서 탈퇴했습니다.");
@@ -100,7 +100,7 @@ public class MeetingDeleteActivity extends AppCompatActivity {
 
                         meetingMemberCheck(code); //모임의 모임원이 아무도 없는지 확인 후 없으면 모임 제거거
 
-                       myStartActivity(MainActivity.class);
+                        myStartActivity(MainActivity.class);
                         finish();
                     } else {
                         Log.d("Delete", "No Document");
@@ -163,9 +163,7 @@ public class MeetingDeleteActivity extends AppCompatActivity {
                                 if(document.getData().get("meetingID").toString().equals(name)){
                                     Log.d("일정 삭제",document.getData().get("title").toString());
                                     scheduleDel.document(document.getId()).delete();
-                                    break;
-                                } else {
-                                    Log.d("Document Snapshot", "No Document");
+                                    return;
                                 }
                             }
                         } else {
@@ -189,7 +187,7 @@ public class MeetingDeleteActivity extends AppCompatActivity {
                                 if(document.getData().get("meetingID").toString().equals(name)){
                                     Log.d("일정 삭제",document.getData().get("title").toString());
                                     boardDel.document(document.getId()).delete();
-                                    break;
+                                    return;
                                 } else {
                                     Log.d("Document Snapshot", "No Document");
                                 }

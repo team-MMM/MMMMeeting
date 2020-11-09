@@ -6,7 +6,7 @@ import java.util.ArrayList;
 public class MeetingInfo {
     private String meetingName;
     private String description;
-    private String reader;
+    private String leader;
     private ArrayList<String> userID = new ArrayList<>();
 
     public MeetingInfo(String name, String description){
@@ -38,11 +38,11 @@ public class MeetingInfo {
         return userID;
     }
 
-    public String getReader() {
-        return reader;
+    public String getLeader() {
+        return leader;
     }
 
-    public void setReader(String reader){
-        this.reader=reader;
+    public void setLeader(String leader){
+        this.leader=leader;
     }
 }

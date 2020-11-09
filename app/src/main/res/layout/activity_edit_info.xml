@@ -67,33 +67,33 @@
         android:text="모임 장소별 선호도를 입력해 주세요." />
 
     <RelativeLayout
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    >
-    <TextView
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textColor="@android:color/black"
-        android:layout_marginLeft="10sp"
-        android:textSize="20sp"
-        android:layout_alignParentLeft="true"
-        android:layout_centerInParent="true"
-        android:text="식당"
-        />
+        >
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@android:color/black"
+            android:layout_marginLeft="10sp"
+            android:textSize="20sp"
+            android:layout_alignParentLeft="true"
+            android:layout_centerInParent="true"
+            android:text="식당"
+            />
 
-    <RatingBar
-        android:id="@+id/restaurantRate"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="10sp"
-        android:layout_alignParentRight="true"
-        android:isIndicator="false"
-        android:numStars="5"
-        android:rating="0"
-        android:stepSize="0.5"
-        android:max = "5"
-        style="@style/Widget.AppCompat.RatingBar.Indicator"
-        />
+        <RatingBar
+            android:id="@+id/restaurantRate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="10sp"
+            android:layout_alignParentRight="true"
+            android:isIndicator="false"
+            android:numStars="5"
+            android:rating="0"
+            android:stepSize="0.5"
+            android:max = "5"
+            style="@style/Widget.AppCompat.RatingBar.Indicator"
+            />
 
     </RelativeLayout>
 
@@ -101,90 +101,90 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         >
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textColor="@android:color/black"
-        android:layout_marginLeft="10sp"
-        android:textSize="20sp"
-        android:layout_alignParentLeft="true"
-        android:layout_centerInParent="true"
-        android:text="카페"
-        />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@android:color/black"
+            android:layout_marginLeft="10sp"
+            android:textSize="20sp"
+            android:layout_alignParentLeft="true"
+            android:layout_centerInParent="true"
+            android:text="카페"
+            />
 
-    <RatingBar
-        android:id="@+id/cafetRate"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="10sp"
-        android:layout_alignParentRight="true"
-        android:isIndicator="false"
-        android:numStars="5"
-        android:rating="0"
-        android:stepSize="0.5"
-        android:max = "5"
-        style="@style/Widget.AppCompat.RatingBar.Indicator"
-        />
+        <RatingBar
+            android:id="@+id/cafetRate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="10sp"
+            android:layout_alignParentRight="true"
+            android:isIndicator="false"
+            android:numStars="5"
+            android:rating="0"
+            android:stepSize="0.5"
+            android:max = "5"
+            style="@style/Widget.AppCompat.RatingBar.Indicator"
+            />
     </RelativeLayout>
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         >
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textColor="@android:color/black"
-        android:layout_marginLeft="10sp"
-        android:textSize="20sp"
-        android:layout_alignParentLeft="true"
-        android:layout_centerInParent="true"
-        android:text="공원"
-        />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@android:color/black"
+            android:layout_marginLeft="10sp"
+            android:textSize="20sp"
+            android:layout_alignParentLeft="true"
+            android:layout_centerInParent="true"
+            android:text="공원"
+            />
 
-    <RatingBar
-        android:id="@+id/parkRate"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="10sp"
-        android:layout_alignParentRight="true"
-        android:isIndicator="false"
-        android:numStars="5"
-        android:rating="0"
-        android:stepSize="0.5"
-        android:max = "5"
-        style="@style/Widget.AppCompat.RatingBar.Indicator"
-        />
+        <RatingBar
+            android:id="@+id/parkRate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="10sp"
+            android:layout_alignParentRight="true"
+            android:isIndicator="false"
+            android:numStars="5"
+            android:rating="0"
+            android:stepSize="0.5"
+            android:max = "5"
+            style="@style/Widget.AppCompat.RatingBar.Indicator"
+            />
     </RelativeLayout>
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         >
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textColor="@android:color/black"
-        android:layout_marginLeft="10sp"
-        android:textSize="20sp"
-        android:layout_alignParentLeft="true"
-        android:layout_centerInParent="true"
-        android:text="쇼핑몰"
-        />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@android:color/black"
+            android:layout_marginLeft="10sp"
+            android:textSize="20sp"
+            android:layout_alignParentLeft="true"
+            android:layout_centerInParent="true"
+            android:text="쇼핑몰"
+            />
 
-    <RatingBar
-        android:id="@+id/shoppingRate"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="10sp"
-        android:layout_alignParentRight="true"
-        android:isIndicator="false"
-        android:numStars="5"
-        android:rating="0"
-        android:stepSize="0.5"
-        android:max = "5"
-        style="@style/Widget.AppCompat.RatingBar.Indicator"
-        />
+        <RatingBar
+            android:id="@+id/shoppingRate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="10sp"
+            android:layout_alignParentRight="true"
+            android:isIndicator="false"
+            android:numStars="5"
+            android:rating="0"
+            android:stepSize="0.5"
+            android:max = "5"
+            style="@style/Widget.AppCompat.RatingBar.Indicator"
+            />
     </RelativeLayout>
 
     <RelativeLayout

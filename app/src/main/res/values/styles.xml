@@ -12,7 +12,7 @@
         <item name="windowActionBar">false</item>
         <item name="colorPrimary">#A1CDE1</item>
         <item name="colorPrimaryDark">#A1CDE1</item>
-        <item name="colorAccent">@color/colorAccent</item>
+        <item name="colorAccent">@color/ic_launcher_new_background</item>
     </style>
 
 

@@ -48,7 +48,7 @@ public class MemberInitActivity extends BasicActivity implements View.OnClickLis
         act = findViewById(R.id.actRate);
 
         beforeInfo();
-        
+
         checkButton.setOnClickListener(this);
         addressSearch.setOnClickListener(this);
 
@@ -129,7 +129,7 @@ public class MemberInitActivity extends BasicActivity implements View.OnClickLis
                     profileUpdate();
                     break;
                 }
-            // 주소 찾기
+                // 주소 찾기
             case R.id.addressSearchBtn:
                 myStartActivity(SearchAddressActivity.class);
                 finish();

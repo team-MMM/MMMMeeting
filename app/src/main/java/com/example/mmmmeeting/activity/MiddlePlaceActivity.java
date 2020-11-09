@@ -3,15 +3,29 @@
 package com.example.mmmmeeting.activity;
 
 
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.location.Address;
 import android.location.Geocoder;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.text.SpannableString;
+import android.text.style.ForegroundColorSpan;
+import android.text.style.RelativeSizeSpan;
 import android.util.Log;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.mmmmeeting.Info.ScheduleInfo;
@@ -22,6 +36,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolygonOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -43,23 +58,38 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ExecutionException;
 import com.google.maps.android.PolyUtil;
+import com.google.maps.android.SphericalUtil;
+
+import noman.googleplaces.NRPlaces;
+import noman.googleplaces.Place;
+import noman.googleplaces.PlaceType;
+import noman.googleplaces.PlacesException;
+import noman.googleplaces.PlacesListener;
 
 
-public class MiddlePlaceActivity extends AppCompatActivity implements OnMapReadyCallback {
+public class MiddlePlaceActivity extends AppCompatActivity implements OnMapReadyCallback, PlacesListener {
 
     private ScheduleInfo postInfo;
     private String meetingname;
+    private String scheduleId;
 
     //private ArrayList<LatLng> position;
     private int[] userTime;
-    private LatLng midP;
+    //##
+    private LatLng midP = new LatLng(37.6663555,127.0557141);
+    //#private LatLng midP;
 
     private int countTry;
+    private LinearLayout midpoint_select;
+
+
 
     JSONArray routesArray;
     JSONArray legsArray;
@@ -78,11 +108,15 @@ public class MiddlePlaceActivity extends AppCompatActivity implements OnMapReady
     int j = 0;
     Point center = new Point(0, 0);
 
+    List<Marker> previous_marker = null;
+    int radius = 1000;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_place_middle);
 
+        midpoint_select=(LinearLayout)findViewById(R.id.midpoint_select);
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
@@ -103,7 +137,7 @@ public class MiddlePlaceActivity extends AppCompatActivity implements OnMapReady
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         postInfo = (ScheduleInfo) getIntent().getSerializableExtra("scheduleInfo");
         meetingname = postInfo.getMeetingID();
-
+        scheduleId = postInfo.getId();
 
 
         // meetings collection에 모임 이름인 문서 읽기
@@ -153,18 +187,9 @@ public class MiddlePlaceActivity extends AppCompatActivity implements OnMapReady
 
     // 중간 지점 찾기 시작!
     private void gStart(String[] addr, String[] name){
-       /*
-        for (String str : addr) {
-            System.out.println(str);
-        }
-        */
         BitmapDrawable bitmapdraw1 = (BitmapDrawable) getResources().getDrawable(R.drawable.user);
         Bitmap b = bitmapdraw1.getBitmap();
         Bitmap UserMarker = Bitmap.createScaledBitmap(b, 100, 100, false);
-
-        BitmapDrawable bitmapdraw2 = (BitmapDrawable) getResources().getDrawable(R.drawable.middleplace);
-        Bitmap c = bitmapdraw2.getBitmap();
-        Bitmap MiddleMarker = Bitmap.createScaledBitmap(c, 100, 100, false);
 
         Point[] points = new Point[addr.length];
         for (String str : addr) {
@@ -179,10 +204,95 @@ public class MiddlePlaceActivity extends AppCompatActivity implements OnMapReady
         PolygonCenter(hull);
         curPoint = new LatLng(center.x, center.y);
         //중간지점 찾기 (사용자 위치들과 무게중심 좌표 넘겨주기)
-        findMidPoint(hull, curPoint);
+        //#findMidPoint(hull, curPoint);
+
+        //#String midAdr = getCurrentAddress(midP);
+        //##
+        String midAdr = "서울특별시 상계8동 동일로 1545";
+
+        //LinearLayout 정의
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT);
+        //LinearLayout 정의
+        RelativeLayout.LayoutParams rl_params = new RelativeLayout.LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT);
+
+        //LinearLayout 생성
+        RelativeLayout ly = new RelativeLayout(this);
+        ly.setLayoutParams(rl_params);
+        //ly.setOrientation(LinearLayout.HORIZONTAL);
+
+        TextView tv_mid = new TextView(this);
+        int id =1;
+        tv_mid.setId(id);
+        tv_mid.setText("중간지점 주소 : "+midAdr);
+        tv_mid.setLayoutParams(rl_params);
+        ly.addView(tv_mid);
+
+        Button btn_mid = new Button(this);
+        btn_mid.setText("선택");
+        RelativeLayout.LayoutParams btn_params = new RelativeLayout.LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT);
+        btn_params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT,RelativeLayout.TRUE);
+        btn_params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM,RelativeLayout.TRUE);
+        btn_params.addRule(RelativeLayout.BELOW,tv_mid.getId());
+        btn_mid.setLayoutParams(btn_params);
+        ly.addView(btn_mid);
+
+
+        midpoint_select.addView(ly);
+        midpoint_select.setVisibility(View.VISIBLE);
+
+        btn_mid.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(MiddlePlaceActivity.this);
+                //제목
+                alertDialogBuilder.setTitle("중간지점 선택");
+
+                //AlertDialog 세팅
+                SpannableString s = new SpannableString("이 곳을 중간지점으로 선택하시겠습니까?\n"+midAdr);
+                s.setSpan(new RelativeSizeSpan(0.5f),22,22+midAdr.length(),0);
+                s.setSpan(new ForegroundColorSpan(Color.parseColor("#62ABD9")),22,22+midAdr.length(),0);
+                alertDialogBuilder.setMessage(s)
+                        .setCancelable(false)
+                        .setPositiveButton("아니오", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                //프로그램 종료
+                                MiddlePlaceActivity.this.finish();
+                            }
+                        }).setNegativeButton("네", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+
+                        //장소리스트 화면으로 넘어감
+                        Intent intent = new Intent(MiddlePlaceActivity.this, PlaceListActivity.class);
+
+                        Bundle bundle = new Bundle();
+                        bundle.putParcelable("midpoint",midP);
+                        bundle.putString("name", meetingname);
+                        bundle.putString("scheduleId", scheduleId);
+                        intent.putExtras(bundle);
+                        //i.putExtra("midpoint",midP);
+                        startActivity(intent);
+                    }
+                });
+
+                //다이얼로그 생성
+                AlertDialog alertDialog = alertDialogBuilder.create();
+
+                //다이얼로그 보여주기
+                alertDialog.show();
+
+            }
+        });
+
         //중간지점 지도 위에 표시
-        mMap.addMarker(new MarkerOptions().position(midP).title("중간지점 찾음!").icon(BitmapDescriptorFactory.fromBitmap(MiddleMarker)));
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(midP, 10));
+        //mMap.addMarker(new MarkerOptions().position(midP).title("중간지점 찾음!").icon(BitmapDescriptorFactory.fromBitmap(MiddleMarker)));
+        //mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(midP, 10));
+        findSub(midP);
     }
 
     // 지오코딩(주소->좌표)
@@ -320,10 +430,7 @@ public class MiddlePlaceActivity extends AppCompatActivity implements OnMapReady
             }
             //findMidPoint(hull,midP);
         }
-
-
         System.out.println("update Check : " + check);
-
 
         // 1. 중간지점이 범위 내에 있다면 다시 midpoint가 맞는지 탐색하고
         // 2. 범위 내에 없다면 범위 내의 임의의 지점을 설정해줘서 다시 탐색하는 방식으로? 수정해야할듯
@@ -446,6 +553,130 @@ public class MiddlePlaceActivity extends AppCompatActivity implements OnMapReady
         return inside;
     }
 
+    // 중간지점 근처 역 찾기
+    private void findSub(LatLng midP){
+        String apiKey = getString(R.string.api_key);
+        previous_marker = new ArrayList<Marker>();
+
+        if (previous_marker != null)
+            previous_marker.clear();//지역정보 마커 클리어
+
+        new NRPlaces.Builder()
+                .listener(MiddlePlaceActivity.this)
+                .key(apiKey)
+                .latlng(midP.latitude, midP.longitude)//중간지점 위치
+                .radius(radius) //500 미터 내에서 검색
+                .type(PlaceType.SUBWAY_STATION) //지하철
+                .language("ko", "KR")
+                .build()
+                .execute();
+    }
+    // 500 미터 내에 없을 경우 찾을 때 까지 500 미터 늘려서 다시 계산
+    @Override
+    public void onPlacesFailure(PlacesException e) {
+        String apiKey = getString(R.string.api_key);
+        if(radius < 3000) {
+            radius += 1000;
+            new NRPlaces.Builder()
+                    .listener(MiddlePlaceActivity.this)
+                    .key(apiKey)
+                    .latlng(midP.latitude, midP.longitude)//현재 위치
+                    .radius(radius) //500 미터 내에서 검색
+                    .type(PlaceType.SUBWAY_STATION) //지하철
+                    .language("ko", "KR")
+                    .build()
+                    .execute();
+        }
+    }
+
+    @Override
+    public void onPlacesStart() {
+
+    }
+
+    @Override
+    public void onPlacesSuccess(final List<noman.googleplaces.Place> places) {
+        BitmapDrawable bitmapdraw2 = (BitmapDrawable) getResources().getDrawable(R.drawable.middleplace);
+        Bitmap c = bitmapdraw2.getBitmap();
+        Bitmap MiddleMarker = Bitmap.createScaledBitmap(c, 100, 100, false);
+        // 중간지점과 가장 가까운 역 표시
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                double distance = (double)radius;
+                double temp = 0.0;
+                LatLng latlng = new LatLng(0,0);
+                int i=1;
+                int size = places.size();
+                String name = null;
+                for (noman.googleplaces.Place place : places) {
+                    LatLng latLng
+                            = new LatLng(place.getLatitude(), place.getLongitude());
+                    temp = distance;
+                    distance = SphericalUtil.computeDistanceBetween(midP, latLng);
+                    System.out.println(place.getName()+ " 거리 : "+ distance);
+                    if(distance < temp) {
+                        latlng = latLng;
+                        name = place.getName();
+                    }
+                    if(i==size) {
+                        String markerSnippet = getCurrentAddress(latlng);
+
+                        MarkerOptions markerOptions = new MarkerOptions();
+                        markerOptions.position(latlng);
+                        markerOptions.title(name+"역");
+                        markerOptions.snippet(markerSnippet).icon(BitmapDescriptorFactory.fromBitmap(MiddleMarker));
+                        Marker item = mMap.addMarker(markerOptions);
+                        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latlng, 10));
+                        previous_marker.add(item);
+                        midP= latlng;
+                    }
+                    i++;
+                }
+                //중복 마커 제거
+                HashSet<Marker> hashSet = new HashSet<Marker>();
+                hashSet.addAll(previous_marker);
+                previous_marker.clear();
+                previous_marker.addAll(hashSet);
+
+            }
+        });
+    }
+
+    @Override
+    public void onPlacesFinished() {
+
+    }
+
+    public String getCurrentAddress(LatLng latlng) {
+        //지오코더... GPS를 주소로 변환
+        Geocoder geocoder = new Geocoder(this, Locale.getDefault());
+
+        List<Address> addresses;
+
+        try {
+            addresses = geocoder.getFromLocation(
+                    latlng.latitude,
+                    latlng.longitude,
+                    1);
+        } catch (IOException ioException) {
+            //네트워크 문제
+            Toast.makeText(this, "지오코더 서비스 사용불가", Toast.LENGTH_LONG).show();
+            return "지오코더 서비스 사용불가";
+        } catch (IllegalArgumentException illegalArgumentException) {
+            Toast.makeText(this, "잘못된 GPS 좌표", Toast.LENGTH_LONG).show();
+            return "잘못된 GPS 좌표";
+        }
+
+        if (addresses == null || addresses.size() == 0) {
+            Toast.makeText(this, "주소 미발견", Toast.LENGTH_LONG).show();
+            return "주소 미발견";
+        } else {
+            Address address = addresses.get(0);
+            return address.getAddressLine(0).toString();
+        }
+
+    }
 
     ////////////////////////
     //URL연결, JSON 받아오기///
@@ -509,4 +740,3 @@ public class MiddlePlaceActivity extends AppCompatActivity implements OnMapReady
         return resultText;
     }
 }
-

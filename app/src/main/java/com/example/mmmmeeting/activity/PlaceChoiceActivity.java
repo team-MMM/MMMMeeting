@@ -39,7 +39,7 @@ public class PlaceChoiceActivity extends AppCompatActivity implements View.OnCli
                 break;
             // 장소 검색
             case(R.id.searchBtn):
-                myStartActivity(SearchPlaceActivity.class);
+                myStartActivity(SearchPlaceActivity.class, postInfo);
                 finish();
                 break;
         }
