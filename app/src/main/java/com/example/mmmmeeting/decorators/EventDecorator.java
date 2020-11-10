@@ -1,7 +1,12 @@
 package com.example.mmmmeeting.decorators;
 
 import android.app.Activity;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+import android.text.style.ForegroundColorSpan;
+import android.text.style.RelativeSizeSpan;
+import android.graphics.Typeface;
+import android.text.style.StyleSpan;
 
 import com.example.mmmmeeting.R;
 import com.prolificinteractive.materialcalendarview.CalendarDay;
@@ -17,13 +22,11 @@ import java.util.HashSet;
  */
 public class EventDecorator implements DayViewDecorator {
 
-    private final Drawable drawable;
     private int color;
     private HashSet<CalendarDay> dates;
     private int check;
 
     public EventDecorator(int color, Collection<CalendarDay> dates, Activity context, int check) {
-        drawable = context.getResources().getDrawable(R.drawable.more);
         this.color = color;
         this.dates = new HashSet<>(dates);
         this.check = check;
@@ -37,10 +40,12 @@ public class EventDecorator implements DayViewDecorator {
     @Override
     public void decorate(DayViewFacade view) {
         if(check==0){
-            view.setSelectionDrawable(drawable); // 날짜 테두리 그리기
+            view.addSpan(new StyleSpan(Typeface.BOLD)); // 오늘 날짜 굵게
+            view.addSpan(new RelativeSizeSpan(1.4f));
+            view.addSpan(new ForegroundColorSpan(Color.BLUE)); //날짜 색
         }
         else if(check==1) {
-            view.addSpan(new DotSpan(5, color)); // 날짜 밑에 점
+            view.addSpan(new DotSpan(6, color)); // 날짜 밑에 점
         }
     }
 }
