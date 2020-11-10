@@ -120,6 +120,9 @@ public class ScheduleAdapter extends RecyclerView.Adapter<ScheduleAdapter.MainVi
         if(postInfo.getMeetingDate()!=null && postInfo.getMeetingPlace()!=null) {
             frame.setVisibility(View.VISIBLE);
         }
+        else{
+            frame.setVisibility(View.INVISIBLE);
+        }
 
 
         ReadScheduleView readScheduleView = cardView.findViewById(R.id.readScheduleView);
