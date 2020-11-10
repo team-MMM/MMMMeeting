@@ -892,9 +892,11 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
 
                                         HashMap<String, Object> map = new HashMap<>();
                                         GeoPoint location = new GeoPoint(place.getLatitude(), place.getLongitude());
+                                        List<String> voter = new ArrayList<>();
                                         map.put("latlng", location);
                                         map.put("vote", 0);
                                         map.put("name", finalPlaceName);
+                                        map.put("voter", voter);
 
                                         if(v.isSelected()){//현재 add버튼 누른 상태
                                             System.out.println("size : "+ size);
