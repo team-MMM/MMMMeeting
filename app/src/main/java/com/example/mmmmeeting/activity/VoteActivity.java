@@ -46,7 +46,7 @@ import androidx.core.content.ContextCompat;
 
 public class VoteActivity extends AppCompatActivity {
     ScheduleInfo schedule;
-    public String id = null;
+    String id = null;
     String scheduleId;
     LinearLayout fl_place_list, place_list_view;
 
@@ -75,17 +75,22 @@ public class VoteActivity extends AppCompatActivity {
                             for (QueryDocumentSnapshot document : task.getResult()) {
                                 id = document.getId(); // document 이름(id)
                                 System.out.println("list 있음");
+                                checkVote();
                             }
-                            if(id==null){
+                       //     if(id==null){
                                 //없으면 없다고 화면 띄워주기
-                            }
+                    //        }
                         } else {
                             Log.d("Document Read", "Error getting documents: ", task.getException());
                         }
                     }
                 });
 
-        id="2CfWJPeo2dvXGnC7p46Z";
+       // id="2CfWJPeo2dvXGnC7p46Z";
+
+    }
+
+    public void checkVote(){
         DocumentReference docRef = db.collection("vote").document(id);
         docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
