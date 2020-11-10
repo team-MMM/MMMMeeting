@@ -275,9 +275,11 @@ public class SearchPlaceActivity extends AppCompatActivity
 
                                     HashMap<String, Object> map = new HashMap<>();
                                     GeoPoint location = new GeoPoint(arrival.latitude, arrival.longitude);
+                                    List<String> voter = new ArrayList<>();
                                     map.put("latlng", location);
                                     map.put("vote", 0);
                                     map.put("name", address);
+                                    map.put("voter", voter);
 
                                     if (size >= 5) { // 리스트에 5개 이상 존재할 때
                                         Toast.makeText(SearchPlaceActivity.this, "더이상 투표리스트에 추가할 수 없습니다.", Toast.LENGTH_SHORT).show();
