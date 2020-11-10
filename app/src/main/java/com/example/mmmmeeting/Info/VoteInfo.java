@@ -9,6 +9,7 @@ import java.util.Map;
 public class VoteInfo {
     private String scheduleID;
     private ArrayList<HashMap<String,Object>> places = new ArrayList<>();
+    private String state = "valid";
 
     public VoteInfo(String scheduleID){
         this.scheduleID = scheduleID;
@@ -32,5 +33,9 @@ public class VoteInfo {
     public ArrayList<HashMap<String,Object>> getPlace() {
         return places;
     }
+
+    public String getState(){ return this.state;}
+
+    public void setState(String status){ this.state = status;}
 
 }

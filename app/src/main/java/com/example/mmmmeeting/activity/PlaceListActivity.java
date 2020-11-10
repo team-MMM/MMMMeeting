@@ -107,6 +107,7 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
     FirebaseFirestore db = FirebaseFirestore.getInstance();
     private int count; //success
     int size;
+    String state = "valid";
 
     Spinner spinner;
     ArrayAdapter<String> arrayAdapter;
@@ -273,6 +274,7 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
                             }
                             if(id==null){
                                 VoteInfo info = new VoteInfo(scheduleId);
+                                info.setState("valid");
                                 db.collection("vote").add(info)
                                         .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                                             @Override
@@ -978,6 +980,7 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
                                                         // 해당 문서가 존재하는 경우
                                                         List<HashMap<String,Object>> list = (List<HashMap<String, Object>>)document.get("place");
                                                         size = list.size();
+                                                        state = document.getData().get("state").toString(); // 투표 상태 
                                                     } else {
                                                         // 존재하지 않는 문서
                                                         Log.d("Attend", "No Document");
@@ -994,18 +997,29 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
                                         map.put("vote", 0);
                                         map.put("name", finalPlaceName);
 
-                                        if(v.isSelected()){//현재 add버튼 누른 상태
-                                            System.out.println("size : "+ size);
-                                            if(size >= 5){ // 리스트에 5개 이상 존재할 때
-                                                Toast.makeText(PlaceListActivity.this,"더이상 투표리스트에 추가할 수 없습니다.",Toast.LENGTH_SHORT).show();
-                                            }else {
-                                                db.collection("vote").document(id).update("place", FieldValue.arrayUnion(map));
-                                                Toast.makeText(PlaceListActivity.this, "투표리스트에 추가되었습니다.", Toast.LENGTH_SHORT).show();
+                                         if(state=="valid") { //투표 시작 전 상태
+                                            HashMap<String, Object> map = new HashMap<>();
+                                            GeoPoint location = new GeoPoint(place.getLatitude(), place.getLongitude());
+                                            List<String> voter = new ArrayList<>();
+                                            map.put("latlng", location);
+                                            map.put("vote", 0);
+                                            map.put("name", finalPlaceName);
+                                            map.put("voter", voter);
+
+                                            if (v.isSelected()) {//현재 add버튼 누른 상태
+                                                System.out.println("size : " + size);
+                                                if (size >= 5) { // 리스트에 5개 이상 존재할 때
+                                                    Toast.makeText(PlaceListActivity.this, "더이상 투표리스트에 추가할 수 없습니다.", Toast.LENGTH_SHORT).show();
+                                                } else {
+                                                    db.collection("vote").document(id).update("place", FieldValue.arrayUnion(map));
+                                                    Toast.makeText(PlaceListActivity.this, "투표리스트에 추가되었습니다.", Toast.LENGTH_SHORT).show();
+                                                }
+                                            } else {
+                                                db.collection("vote").document(id).update("place", FieldValue.arrayRemove(map));
+                                                Toast.makeText(PlaceListActivity.this, "취소되었습니다.", Toast.LENGTH_SHORT).show();
                                             }
-                                        }
-                                        else{
-                                            db.collection("vote").document(id).update("place", FieldValue.arrayRemove(map));
-                                            Toast.makeText(PlaceListActivity.this,"취소되었습니다.",Toast.LENGTH_SHORT).show();
+                                        }else{
+                                            Toast.makeText(PlaceListActivity.this, "이미 투표가 시작되었습니다.", Toast.LENGTH_SHORT).show();
                                         }
                                     }
                                 });
