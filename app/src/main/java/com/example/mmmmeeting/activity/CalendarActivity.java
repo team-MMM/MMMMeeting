@@ -65,7 +65,6 @@ import com.google.android.gms.tasks.Task;
 
 import com.google.firebase.storage.FirebaseStorage;
 
-
 public class CalendarActivity extends AppCompatActivity {
     public String fname=null; //날짜별 메모 저장 파일 이름
     public String str=null;
@@ -79,7 +78,7 @@ public class CalendarActivity extends AppCompatActivity {
 
 
     Map<String, String> calendarMap = new HashMap<>(); // 날짜별 메모 저장
-    private final OneDayDecorator oneDayDecorator = new OneDayDecorator();
+   // private final OneDayDecorator oneDayDecorator = new OneDayDecorator();
     MaterialCalendarView materialCalendarView;
     ArrayList<String> result = new ArrayList<>(); //점 표시할 날짜들
     ArrayList<String> selectedDay = new ArrayList<>(); //확정된 날짜
@@ -91,7 +90,6 @@ public class CalendarActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_calendar);
-
         materialCalendarView = (MaterialCalendarView)findViewById(R.id.calendarView);
 
         materialCalendarView.state().edit()
@@ -104,7 +102,7 @@ public class CalendarActivity extends AppCompatActivity {
         materialCalendarView.addDecorators(
                 new SundayDecorator(),  // 일요일 색칠
                 new SaturdayDecorator(), // 토요일 색칠
-                oneDayDecorator); // 오늘 날짜 색칠
+                new OneDayDecorator(CalendarActivity.this)); // 오늘 날짜 색칠
 
         diaryTextView=findViewById(R.id.diaryTextView);
         save_Btn=findViewById(R.id.save_Btn);
@@ -304,7 +302,7 @@ public class CalendarActivity extends AppCompatActivity {
             if (isFinishing()) {
                 return;
             }
-            materialCalendarView.addDecorator(new EventDecorator(Color.BLUE, calendarDays, CalendarActivity.this, 1));
+            materialCalendarView.addDecorator(new EventDecorator(Color.GREEN, calendarDays, CalendarActivity.this, 1));
         }
     }
 
@@ -388,7 +386,7 @@ public class CalendarActivity extends AppCompatActivity {
             CalendarDay day = CalendarDay.from(calendar);
             dates.add(day);
         }
-        materialCalendarView.addDecorator(new EventDecorator(Color.BLUE, dates, CalendarActivity.this, 0));
+        materialCalendarView.addDecorator(new EventDecorator(Color.GREEN, dates, CalendarActivity.this, 0));
     }
 
     public void removeDeco(){
@@ -397,7 +395,7 @@ public class CalendarActivity extends AppCompatActivity {
         materialCalendarView.addDecorators( //모든 데코 표시
                 new SundayDecorator(),
                 new SaturdayDecorator(),
-                oneDayDecorator);
+                new OneDayDecorator(CalendarActivity.this));
         new ApiSimulator(result).executeOnExecutor(Executors.newSingleThreadExecutor()); // 데코 표시
     }
 }
