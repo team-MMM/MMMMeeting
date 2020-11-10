@@ -12,7 +12,7 @@ import com.example.mmmmeeting.Info.ScheduleInfo;
 import com.example.mmmmeeting.R;
 
 public class PlaceChoiceActivity extends AppCompatActivity implements View.OnClickListener {
-    Button btn_middle, btn_search;
+    Button btn_middle, btn_search, btn_vote;
     private ScheduleInfo postInfo;
 
     protected void onCreate(Bundle savedInstanceState) {
@@ -23,9 +23,11 @@ public class PlaceChoiceActivity extends AppCompatActivity implements View.OnCli
 
         btn_middle = findViewById(R.id.middleBtn);
         btn_search = findViewById(R.id.searchBtn);
+        btn_vote = findViewById(R.id.voteBtn);
 
         btn_middle.setOnClickListener(this);
         btn_search.setOnClickListener(this);
+        btn_vote.setOnClickListener(this);
 
     }
 
@@ -42,6 +44,10 @@ public class PlaceChoiceActivity extends AppCompatActivity implements View.OnCli
                 myStartActivity(SearchPlaceActivity.class, postInfo);
                 finish();
                 break;
+            case(R.id.voteBtn):
+                myStartActivity(VoteActivity.class, postInfo);
+                finish();
+                break;     
         }
 
     }
