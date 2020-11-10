@@ -6,9 +6,9 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
+        android:layout_height="368dp"
         android:layout_gravity="center"
+        android:orientation="vertical"
         android:padding="10dp">
 
 
@@ -17,20 +17,30 @@
             android:layout_width="match_parent"
             android:layout_height="100dp"
             android:layout_margin="20sp"
+            android:background="@drawable/button_shape"
             android:ems="10"
             android:text="중간지점 찾기"
-           android:textSize="20sp"
-            android:background="@drawable/button_shape" />
+            android:textSize="20sp" />
 
         <Button
             android:id="@+id/searchBtn"
             android:layout_width="match_parent"
             android:layout_height="100dp"
             android:layout_margin="20sp"
+            android:background="@drawable/button_shape"
             android:ems="10"
             android:text="장소 검색하기"
-            android:textSize="20sp"
-            android:background="@drawable/button_shape" />
+            android:textSize="20sp" />
+
+        <Button
+            android:id="@+id/voteBtn"
+            android:layout_width="118dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="10sp"
+            android:background="@drawable/button_shape"
+            android:text="장소 투표하기"
+            android:textColor="@color/ic_launcher_new_background" />
     </LinearLayout>
 
 
