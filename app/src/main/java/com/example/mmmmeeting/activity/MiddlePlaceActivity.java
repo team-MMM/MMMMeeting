@@ -82,6 +82,7 @@ public class MiddlePlaceActivity extends AppCompatActivity implements OnMapReady
 
     //private ArrayList<LatLng> position;
     private double[] userTime;
+    private double[] userDist;
     //##
     //private LatLng midP = new LatLng(37.6663555,127.0557141);
     private LatLng midP;
@@ -101,6 +102,7 @@ public class MiddlePlaceActivity extends AppCompatActivity implements OnMapReady
 
     private double latVector, lonVector;
     private int avgTime;
+    private double avgDist;
 
     private GoogleMap mMap;
 
@@ -360,47 +362,84 @@ public class MiddlePlaceActivity extends AppCompatActivity implements OnMapReady
         avgTime = 0;
 
         //유저들 이동시간 받아오기
-        for (int i = 0; i < hull.length; i++) {
-            //이동시간 받기
-            double time = getPathTime(hull[i].getposition(), m);
-            //이동시간 저장
-            userTime[i] = time;
+//        for (int i = 0; i < hull.length; i++) {
+//            //이동시간 받기
+//            double time = getPathTime(hull[i].getposition(), m);
+//            //이동시간 저장
+//            userTime[i] = time;
+//
+//            System.out.println("현재 position부터 중간점까지의 이동시간 : " + time);
+//
+//            //중간지점부터 사용자 위치까지의 단위벡터 구하기
+//            Point unitVector = getUnitVector(m, hull[i].getposition());
+//
+//            //시간가중치와 단위벡터의 곱
+//            latVector += unitVector.getX() * time;
+//            lonVector += unitVector.getY() * time;
+//
+//            // 총 이동시간의 합
+//            avgTime += time;
+//        }
 
-            System.out.println("현재 position부터 중간점까지의 이동시간 : " + time);
 
+        avgDist=0.0;
+        //이동시간 저장할 공간
+        userDist = new double[hull.length];
+        //유저들의 이동좌표
+        for(int i=0;i<hull.length;i++){
+            double dist = SphericalUtil.computeDistanceBetween(hull[i].getposition(), m);
+
+            userDist[i]=dist;
             //중간지점부터 사용자 위치까지의 단위벡터 구하기
             Point unitVector = getUnitVector(m, hull[i].getposition());
 
             //시간가중치와 단위벡터의 곱
-            latVector += unitVector.getX() * time;
-            lonVector += unitVector.getY() * time;
+            latVector += unitVector.getX() * dist;
+            lonVector += unitVector.getY() * dist;
 
             // 총 이동시간의 합
-            avgTime += time;
+            avgDist += dist;
+
         }
 
+
         //이동시간의 평균
-        avgTime /= hull.length;
+        //avgTime /= hull.length;
+        avgDist/=hull.length;
 
         //시간가중치와 단위벡터의 곱의 합을 평균이동시간과 유저들의 수의 곱으로 나눈다.
-        latVector /= (avgTime * hull.length);
-        lonVector /= (avgTime * hull.length);
-
+//        latVector /= (avgTime * hull.length);
+//        lonVector /= (avgTime * hull.length);
+        latVector /= (avgDist * hull.length);
+        lonVector /= (avgDist * hull.length);
 
         //최적의 경로인지 확인하기 위함
         boolean isOptimized = false;
         int optC = 0;
 
         //새로운 점이 최적인가?
-        for (int i = 0; i < userTime.length; i++) {
+//        for (int i = 0; i < userTime.length; i++) {
+//            //임의로 최적의 경로 확인
+//            //사용자 이동시간과 평균 이동시간의 차이가 30분이 넘지 않았을 때 최적이라고 임의로 지정해놓음 (바꿔야함)
+//            if (Math.abs(userTime[i] - avgTime) < 30) {
+//                System.out.println(i + "차이 : " + Math.abs(userTime[i] - avgTime));
+//                optC++;
+//            }
+//            //마지막 점까지 이동시간과 평균시간의 차이가 30분을 넘지 않으면 최적
+//            if (optC == userTime[userTime.length - 1])
+//                isOptimized = true;
+//        }
+
+        //새로운 점이 최적인가?
+        for (int i = 0; i < userDist.length; i++) {
             //임의로 최적의 경로 확인
             //사용자 이동시간과 평균 이동시간의 차이가 30분이 넘지 않았을 때 최적이라고 임의로 지정해놓음 (바꿔야함)
-            if (Math.abs(userTime[i] - avgTime) < 30) {
-                System.out.println(i + "차이 : " + Math.abs(userTime[i] - avgTime));
+            if (Math.abs(userDist[i] - avgDist) < 30) {
+                System.out.println(i + "차이 : " + Math.abs(userDist[i] - avgDist));
                 optC++;
             }
             //마지막 점까지 이동시간과 평균시간의 차이가 30분을 넘지 않으면 최적
-            if (optC == userTime[userTime.length - 1])
+            if (optC == userDist[userDist.length - 1])
                 isOptimized = true;
         }
 
@@ -422,8 +461,11 @@ public class MiddlePlaceActivity extends AppCompatActivity implements OnMapReady
             countTry++;
             System.out.println("중간지점 count : " + countTry);
             System.out.println("중간지점은 여기! : " + m);
-            for (int i = 0; i < userTime.length; i++) {
-                System.out.println("사용자들로부터 중간지점까지의 이동시간은 : " + userTime[i]);
+//            for (int i = 0; i < userTime.length; i++) {
+//                System.out.println("사용자들로부터 중간지점까지의 이동시간은 : " + userTime[i]);
+//            }
+            for (int i = 0; i < userDist.length; i++) {
+                System.out.println("사용자들로부터 중간지점까지의 이동거리는 : " + userDist[i]);
             }
             if (countTry < 6) {
                 findMidPoint(hull, m);
