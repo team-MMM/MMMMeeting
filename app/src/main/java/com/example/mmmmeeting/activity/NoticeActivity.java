@@ -131,7 +131,9 @@ public class NoticeActivity extends AppCompatActivity {
                     diaryNotification(calendar);
 
                     Calendar cal = calendar;
-                    cal.set(Calendar.HOUR_OF_DAY, hour_24-9); //db와 9시간 차 없애줘야함(UTC+9)
+//                    cal.set(Calendar.HOUR_OF_DAY, hour_24-9); //db와 9시간 차 없애줘야함(UTC+9)
+                    cal.set(Calendar.HOUR_OF_DAY, hour_24);
+
                     Date dateTime = cal.getTime();
                     Intent intentT = new Intent();
                     intentT.putExtra("fulldate" , dateTime); //전체 날짜 전달
