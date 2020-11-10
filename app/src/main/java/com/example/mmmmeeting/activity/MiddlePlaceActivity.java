@@ -12,6 +12,8 @@ import android.location.Address;
 import android.location.Geocoder;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.RelativeSizeSpan;
@@ -103,6 +105,8 @@ public class MiddlePlaceActivity extends AppCompatActivity implements OnMapReady
     private double latVector, lonVector;
     private int avgTime;
     private double avgDist;
+    private boolean flag;
+    private int flagCount;
 
     private GoogleMap mMap;
 
@@ -112,6 +116,21 @@ public class MiddlePlaceActivity extends AppCompatActivity implements OnMapReady
 
     List<Marker> previous_marker = null;
     int radius = 1000;
+
+    Handler mHandler = new Handler(){
+        public void handleMessage(android.os.Message msg)
+        {
+            Bundle bd = msg.getData( ) ;            /// 전달 받은 메세지에서 번들을 받음
+            if(bd.getString("flag")!=null){
+                String flagStr = bd.getString("flag");
+                // placessuccess가 2번 이상인 상황: flag 설정해서 동작하지 못하게 함
+                if(flagStr == "NO"){
+                    flag = true;
+                }
+            }
+        } ;
+
+    } ;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -618,6 +637,16 @@ public class MiddlePlaceActivity extends AppCompatActivity implements OnMapReady
 
     @Override
     public void onPlacesSuccess(final List<noman.googleplaces.Place> places) {
+        flagCount++;
+        if(flagCount>=2) {
+            Bundle bd = new Bundle();      /// 번들 생성
+            bd.putString("flag", "NO"); // 번들에 값 넣기
+            Message msg = mHandler.obtainMessage();   /// 핸들에 전달할 메세지 구조체 받기
+            msg.setData(bd);                     /// 메세지에 번들 넣기
+            mHandler.handleMessage(msg);
+        }
+        if(flag) return;
+
         BitmapDrawable bitmapdraw2 = (BitmapDrawable) getResources().getDrawable(R.drawable.middleplace);
         Bitmap c = bitmapdraw2.getBitmap();
         Bitmap MiddleMarker = Bitmap.createScaledBitmap(c, 100, 100, false);

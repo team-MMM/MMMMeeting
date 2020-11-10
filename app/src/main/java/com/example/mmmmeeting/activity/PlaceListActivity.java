@@ -96,13 +96,16 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
     private String placeInfo;
 
     private String Tag = "category Test";
+    private int flagCount;
+    private boolean flag;
+    private int preferNum = 0;
     String name;
     String scheduleId;
     String id = null;
     ArrayList<String> category=new ArrayList<>();
     ArrayList<Float[]> userRatings =new ArrayList<>();
     FirebaseFirestore db = FirebaseFirestore.getInstance();
-    int count; //success
+    private int count; //success
     int size;
 
     Spinner spinner;
@@ -112,10 +115,28 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
         public void handleMessage(android.os.Message msg)
         {
             Bundle bd = msg.getData( ) ;            /// 전달 받은 메세지에서 번들을 받음
-            ArrayList<String> categoryList = bd.getStringArrayList("arg");    /// 번들에 들어있는 값 꺼냄
-            // Category 찾은 다음에 쓸 함수
-            spinnerAdd(categoryList);
+            if(bd.getStringArrayList("arg")!=null) {
+                ArrayList<String> categoryList = bd.getStringArrayList("arg");    /// 번들에 들어있는 값 꺼냄
+                // Category 찾은 다음에 쓸 함수
+                spinnerAdd(categoryList);
+            }else if(bd.getString("flag")!=null) {
+                String flagStr = bd.getString("flag");
+                // placessuccess가 2번 이상인 상황: flag 설정해서 동작하지 못하게 함
+                if (flagStr == "NO") {
+                    flag = true;
+                } else if (flagStr == "RESET") {
+                    // 카테고리 넘어갈 때 동작: flag 리셋, 카테고리가 몇 번째 순서인지 받아옴
+                    flag = false;
+                    flagCount = 0;
+                    preferNum = bd.getInt("num");
+                }
+                // 찾은 장소가 없는 상황
+            }else if(bd.getInt("NoPlace") == 0){
+                System.out.println(bd.getInt("NoPlace"));
+                noPlace();
+            }
         } ;
+
     } ;
 
     private void spinnerAdd(ArrayList<String> categoryList) {
@@ -135,12 +156,14 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
                     case "shopping":
                         //shopping_mall + department_store
                         Log.d(Tag, "Shopping");
+                        sendResetFlag(position);
                         showPlaceInformation("shopping_mall",1000);
                         showPlaceInformation("department_store",1000);
                         break;
                     case "activity":
                         // amusement_park + aquarium +art_gallery +stadium +zoo
                         Log.d(Tag, "Activity");
+                        sendResetFlag(position);
                         showPlaceInformation("amusement_park",1000);
                         showPlaceInformation("aquarium",1000);
                         showPlaceInformation("art_gallery",1000);
@@ -149,14 +172,17 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
                         break;
                     case "cafe":
                         Log.d(Tag, "Cafe");
-                        showPlaceInformation("cafe",500);
+                        sendResetFlag(position);
+                        showPlaceInformation("cafe",1000);
                         break;
                     case "restaurant":
                         Log.d(Tag, "restaurant");
-                        showPlaceInformation("restaurant",500);
+                        sendResetFlag(position);
+                        showPlaceInformation("restaurant",1000);
                         break;
                     case "park":
                         Log.d(Tag, "park");
+                        sendResetFlag(position);
                         showPlaceInformation("park",1000);
                         break;
                 }
@@ -169,7 +195,7 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
                             public void run() {
                                 Log.d(Tag, "check count " + count);
                                 if(count==0){
-                                view1.setVisibility(View.VISIBLE);
+                                    view1.setVisibility(View.VISIBLE);
                                 }
                             }
                         });
@@ -182,6 +208,15 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
 
             }
         });
+    }
+
+    private void sendResetFlag(int position){
+        Bundle bd = new Bundle();      /// 번들 생성
+        bd.putString("flag", "RESET"); // 번들에 값 넣기
+        bd.putInt("num",position);
+        Message msg = mHandler.obtainMessage();   /// 핸들에 전달할 메세지 구조체 받기
+        msg.setData(bd);                     /// 메세지에 번들 넣기
+        mHandler.handleMessage(msg);
     }
 
     private void layoutclear() {
@@ -301,6 +336,41 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
         System.out.println("showPlaceInfo");
     }
 
+    public void noPlace(){
+        runOnUiThread(new Runnable(){
+            @Override
+            public void run() {
+                // 계속 실패만 하는 경우 => 중복 출력 방지
+                place_list_view.removeAllViews();
+
+                //layout_width, layout_height, gravity 설정
+                LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                lp.gravity = Gravity.CENTER;
+                lp.setMargins(10,100,10,10);
+
+                view1 = new TextView(PlaceListActivity.this);
+
+                // 결과 레이아웃이 없으면 View.VISIBLE로..
+                // 어디에 넣어야 결과가 잘 나오려나
+                view1.setVisibility(View.GONE);
+
+
+                view1.setText("중간지점 근처에 현재 카테고리에 해당하는 장소가 존재하지 않습니다.");
+                view1.setTextSize(25f);
+                view1.setTextColor(Color.BLACK);
+                view1.setBackgroundColor(Color.WHITE);
+                view1.setGravity(Gravity.CENTER);
+                view1.setPadding(20,20,20,20);
+                view1.setLayoutParams(lp);
+                //부모 뷰에 추가
+                place_list_view.addView(view1);
+
+                Log.d(Tag, "on Failure");
+            }
+        });
+
+    }
+
 
     @Override
     public void onPlacesFailure(PlacesException e) {
@@ -348,7 +418,10 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
 
     @Override
     public void onPlacesSuccess(final List<Place> places) {
-
+        // placesSuccess 2번 이상 되는 것 막는 count
+        flagCount++;
+        count = 0;
+        // count = 0 : 검색된 장소가 없는 것 -> place failure로 넘어감
         ArrayList<Place> placeList = new ArrayList<>();
         System.out.println("place success");
         Runnable r = new Runnable() {
@@ -359,16 +432,33 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
                 for (noman.googleplaces.Place place : places) {
                     placeList.add(places.get(i));
                     i++;
-
                 }
                 System.out.println(placeList);
+
+                // count = 0이면 장소가 없다고 표시하기 위함
+                Bundle bd = new Bundle();      /// 번들 생성
+                bd.putInt("NoPlace", count); // 번들에 값 넣기
+                Message msg = mHandler.obtainMessage();   /// 핸들에 전달할 메세지 구조체 받기
+                msg.setData(bd);                     /// 메세지에 번들 넣기
+                mHandler.handleMessage(msg);
 
             }
         };
 
         mHandler.postDelayed(r,2000);
+
+
+
         try {
-            sortRating(placeList);
+            if(flagCount>=2){
+                Bundle bd = new Bundle();      /// 번들 생성
+                bd.putString("flag", "NO"); // 번들에 값 넣기
+                Message msg = mHandler.obtainMessage();   /// 핸들에 전달할 메세지 구조체 받기
+                msg.setData(bd);                     /// 메세지에 번들 넣기
+                mHandler.handleMessage(msg);
+            }else {
+                sortRating(placeList);
+            }
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -683,7 +773,14 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
         Runnable r = new Runnable() {
             @Override
             public void run() {
-                int num = 5;
+                int num;
+                if(preferNum == 0){
+                    num = 8;
+                }else if(preferNum == 1){
+                    num = 5;
+                }else{
+                    num = 3;
+                }
                 for (int i = 0; i < placeList.size(); i++) {
                     placeInfo = getPlaceJson(placeList.get(i).getLatitude(), placeList.get(i).getLongitude(), placeList.get(i).getPlaceId());
                     JSONObject jsonObject = null;
@@ -759,8 +856,9 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
     }
 
     // sortRating이 넘겨준 newPlaceList를 화면에 띄움
-   private void showUI(ArrayList<Place> placeList){
+    private void showUI(ArrayList<Place> placeList){
         System.out.println("showPlace");
+        if(flag) return;
         Runnable r = new Runnable() {
             @Override
             public void run() {
@@ -892,11 +990,9 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
 
                                         HashMap<String, Object> map = new HashMap<>();
                                         GeoPoint location = new GeoPoint(place.getLatitude(), place.getLongitude());
-                                        List<String> voter = new ArrayList<>();
                                         map.put("latlng", location);
                                         map.put("vote", 0);
                                         map.put("name", finalPlaceName);
-                                        map.put("voter", voter);
 
                                         if(v.isSelected()){//현재 add버튼 누른 상태
                                             System.out.println("size : "+ size);
@@ -924,7 +1020,32 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
 //                        previous_marker.add(item);
 
                             } catch (JSONException e) {
-                                System.out.println("UI exception");
+                                place_list_view.removeAllViews();
+
+                                //layout_width, layout_height, gravity 설정
+                                LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                                lp.gravity = Gravity.CENTER;
+                                lp.setMargins(10,100,10,10);
+
+                                view1 = new TextView(PlaceListActivity.this);
+
+                                // 결과 레이아웃이 없으면 View.VISIBLE로..
+                                // 어디에 넣어야 결과가 잘 나오려나
+                                view1.setVisibility(View.GONE);
+
+
+                                view1.setText("중간지점 근처에 현재 카테고리에 해당하는 장소가 존재하지 않습니다.");
+                                view1.setTextSize(25f);
+                                view1.setTextColor(Color.BLACK);
+                                view1.setBackgroundColor(Color.WHITE);
+                                view1.setGravity(Gravity.CENTER);
+                                view1.setPadding(20,20,20,20);
+                                view1.setLayoutParams(lp);
+                                //부모 뷰에 추가
+                                place_list_view.addView(view1);
+                                view1.setVisibility(View.VISIBLE);
+
+                                Log.d(Tag, "on Failure");
                                 e.printStackTrace();
                             }
                         }
