@@ -47,6 +47,7 @@
         <activity android:name=".activity.PlaceListActivity"/>
         <activity android:name=".activity.CheckLateActivity"/>
         <activity android:name=".activity.NoticeActivity"/>
+        <activity android:name=".activity.VoteActivity"/>
 
         <receiver android:name=".DeviceBootReceiver"
             android:enabled="false">
