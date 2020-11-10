@@ -59,7 +59,7 @@
     
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyAMjzNcvmVwExmuyfw82V-G-DXmhVAUymY" />
+            android:value="AIzaSyDZFlYs370FtbLuByL1cebdJdh8R-KF1xk" />
     </application>
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.SEND_SMS" />
