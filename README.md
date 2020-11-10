@@ -1,5 +1,8 @@
 # MMMMeeting
 <br>
+![달력](https://user-images.githubusercontent.com/72245176/98647871-dfa34900-2378-11eb-9093-8f08cf060f46.png)
+
+<br>
 // 2020.11.08 변경(윤지) <br>
 * 투표 db 생성 -> 약속 id, 장소 이름, 위치, 투표 수 저장 -> 관련 info(VoteInfo)<br>
 * 투표 db 저장 <br>
