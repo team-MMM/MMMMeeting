@@ -4,11 +4,13 @@ package com.example.mmmmeeting.adapter;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -26,7 +28,10 @@ import com.example.mmmmeeting.activity.ContentScheduleActivity;
 import com.example.mmmmeeting.view.ReadScheduleView;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 
 public class ScheduleAdapter extends RecyclerView.Adapter<ScheduleAdapter.MainViewHolder> {
     private ArrayList<ScheduleInfo> mDataset;
@@ -89,9 +94,33 @@ public class ScheduleAdapter extends RecyclerView.Adapter<ScheduleAdapter.MainVi
     public void onBindViewHolder(@NonNull final MainViewHolder holder, int position) {
         CardView cardView = holder.cardView;
         TextView titleTextView = cardView.findViewById(R.id.titleTextView);
+        TextView meetingDateView = cardView.findViewById(R.id.meetingDate);
+        TextView meetingPlaceView = cardView.findViewById(R.id.meetingPlace);
+
 
         ScheduleInfo postInfo = mDataset.get(position);
         titleTextView.setText(postInfo.getTitle());
+
+        if(postInfo.getMeetingDate()!=null){
+            Date meetingDate =  postInfo.getMeetingDate();
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy년 MM월 dd일 a hh시 mm분");
+            meetingDateView.setText("모임 날짜 : "+ sdf.format(meetingDate));
+        }else {
+            meetingDateView.setText("모임 날짜 : 미정");
+        }
+
+        if(postInfo.getMeetingPlace()!=null){
+            meetingPlaceView.setText("모임 장소 : "+postInfo.getMeetingPlace());
+        }else {
+            meetingPlaceView.setText("모임 장소 : 미정");
+        }
+
+
+        FrameLayout frame =cardView.findViewById(R.id.frame);
+        if(postInfo.getMeetingDate()!=null && postInfo.getMeetingPlace()!=null) {
+            frame.setVisibility(View.VISIBLE);
+        }
+
 
         ReadScheduleView readScheduleView = cardView.findViewById(R.id.readScheduleView);
         LinearLayout contentsLayout = cardView.findViewById(R.id.contentsLayout);

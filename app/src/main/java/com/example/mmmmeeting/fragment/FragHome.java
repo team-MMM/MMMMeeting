@@ -177,12 +177,22 @@ public class FragHome extends Fragment {
                                 Log.d(TAG, document.getId() + " => " + document.getData());
                                 if(document.getData().get("meetingID").toString().equals(meetingName)){
                                     Log.d("update Test", meetingName);
-                                    postList.add(new ScheduleInfo(
+                                    ScheduleInfo temp = new ScheduleInfo(
                                             document.getData().get("title").toString(),
                                             document.getData().get("meetingID").toString(),
                                             (ArrayList<String>) document.getData().get("contents"),
                                             new Date(document.getDate("createdAt").getTime()),
-                                            document.getId()));
+                                            document.getId());
+
+                                    if(document.get("meetingPlace")!=null){
+                                        temp.setMeetingPlace(document.get("meetingPlace").toString());
+                                    }
+
+                                    if(document.get("meetingDate")!=null){
+                                        temp.setMeetingDate(document.getDate("meetingDate"));
+                                    }
+
+                                    postList.add(temp);
                                 }
                             }
                             scheduleAdapter.notifyDataSetChanged();

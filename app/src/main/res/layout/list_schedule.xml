@@ -7,6 +7,13 @@
     android:layout_margin="5dp"
     app:cardCornerRadius="10dp">
 
+    <FrameLayout
+        android:id="@+id/frame"
+        android:background="@color/colorAccent"
+        android:layout_width="8dp"
+        android:layout_height="match_parent"
+        android:visibility="invisible"/>
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -29,6 +36,8 @@
                 android:textSize="20sp"
                 android:textStyle="bold"
                 tools:text="타이블" />
+
+
 
             <androidx.cardview.widget.CardView
                 android:id="@+id/menu"
@@ -54,12 +63,41 @@
             android:layout_marginBottom="5dp"
             android:background="#DDDDDD"/>
 
+
+        <TextView
+            android:id="@+id/meetingDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@android:color/black"
+            android:layout_margin="5sp"
+            android:text="모임날짜 : 미정"
+            android:textSize="15sp"
+            />
+
+        <TextView
+            android:id="@+id/meetingPlace"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@android:color/black"
+            android:textSize="15sp"
+            android:text="모임장소 : 미정"
+            android:layout_margin="5sp"
+            />
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="5dp"
+            android:background="#DDDDDD"/>
+
         <com.example.mmmmeeting.view.ReadScheduleView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/readScheduleView">
 
         </com.example.mmmmeeting.view.ReadScheduleView>
+
 
     </LinearLayout>
 
