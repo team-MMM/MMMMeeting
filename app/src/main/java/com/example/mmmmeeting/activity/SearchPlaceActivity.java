@@ -106,6 +106,7 @@ public class SearchPlaceActivity extends AppCompatActivity
     FirebaseFirestore db = FirebaseFirestore.getInstance();
     private String id=null;
     int size;
+    String state="valid";
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState){
@@ -224,6 +225,7 @@ public class SearchPlaceActivity extends AppCompatActivity
                                         }
                                         if (id == null) {
                                             VoteInfo info = new VoteInfo(scheduleId);
+                                            info.setState("valid");
                                             db.collection("vote").add(info)
                                                     .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                                                         @Override
@@ -263,6 +265,7 @@ public class SearchPlaceActivity extends AppCompatActivity
                                                     // 해당 문서가 존재하는 경우
                                                     List<HashMap<String, Object>> list = (List<HashMap<String, Object>>) document.get("place");
                                                     size = list.size();
+                                                    state = document.getData().get("state").toString(); // 투표 상태
                                                 } else {
                                                     // 존재하지 않는 문서
                                                     Log.d("Attend", "No Document");
@@ -272,6 +275,8 @@ public class SearchPlaceActivity extends AppCompatActivity
                                             }
                                         }
                                     });
+
+                                    if(state=="valid"){ // 투표 시작 전 상태
 
                                     HashMap<String, Object> map = new HashMap<>();
                                     GeoPoint location = new GeoPoint(arrival.latitude, arrival.longitude);
@@ -286,6 +291,10 @@ public class SearchPlaceActivity extends AppCompatActivity
                                     } else {
                                         db.collection("vote").document(id).update("place", FieldValue.arrayUnion(map));
                                         Toast.makeText(SearchPlaceActivity.this, "투표리스트에 추가되었습니다.", Toast.LENGTH_SHORT).show();
+                                    }
+                                    }
+                                    else{
+                                        Toast.makeText(SearchPlaceActivity.this, "이미 투표가 시작되었습니다.", Toast.LENGTH_SHORT).show();
                                     }
                                 }
                             })
