@@ -81,18 +81,18 @@ public class MiddlePlaceActivity extends AppCompatActivity implements OnMapReady
     private String scheduleId;
 
     //private ArrayList<LatLng> position;
-    private int[] userTime;
+    private double[] userTime;
     //##
-    private LatLng midP = new LatLng(37.6663555,127.0557141);
-    //#private LatLng midP;
+    //private LatLng midP = new LatLng(37.6663555,127.0557141);
+    private LatLng midP;
 
     private int countTry;
     private LinearLayout midpoint_select;
 
 
+    private String duration;
+    private double Dur;
 
-    JSONArray routesArray;
-    JSONArray legsArray;
 
     //임의로 중간지점 대충 지정
     private LatLng curPoint = new LatLng(37.56593052663891, 126.97680764976288);
@@ -204,11 +204,11 @@ public class MiddlePlaceActivity extends AppCompatActivity implements OnMapReady
         PolygonCenter(hull);
         curPoint = new LatLng(center.x, center.y);
         //중간지점 찾기 (사용자 위치들과 무게중심 좌표 넘겨주기)
-        //#findMidPoint(hull, curPoint);
+        findMidPoint(hull, curPoint);
 
-        //#String midAdr = getCurrentAddress(midP);
+        String midAdr = getCurrentAddress(midP);
         //##
-        String midAdr = "서울특별시 상계8동 동일로 1545";
+        //String midAdr = "서울특별시 상계8동 동일로 1545";
 
         //LinearLayout 정의
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
@@ -353,7 +353,7 @@ public class MiddlePlaceActivity extends AppCompatActivity implements OnMapReady
 
 
         //이동시간 저장할 공간
-        userTime = new int[hull.length];
+        userTime = new double[hull.length];
 
         latVector = 0;
         lonVector = 0;
@@ -362,7 +362,7 @@ public class MiddlePlaceActivity extends AppCompatActivity implements OnMapReady
         //유저들 이동시간 받아오기
         for (int i = 0; i < hull.length; i++) {
             //이동시간 받기
-            int time = getPathTime(hull[i].getposition(), m);
+            double time = getPathTime(hull[i].getposition(), m);
             //이동시간 저장
             userTime[i] = time;
 
@@ -463,54 +463,34 @@ public class MiddlePlaceActivity extends AppCompatActivity implements OnMapReady
     }
 
     //이동시간 구하기
-    public int getPathTime(LatLng start, LatLng end) {
+    public double getPathTime(LatLng start, LatLng end) {
         System.out.println("들어왔습니다.");
         String getJS = getJSON(start, end);
-        String Dur = null;
 
         try {
             JSONObject jsonObject = new JSONObject(getJS);
 
-            routesArray = jsonObject.getJSONArray("routes");
+            JSONObject route= jsonObject.getJSONObject("route");
+            System.out.println("route 출력 : "+route);
 
-            int i = 0;
-            do {
-                //routes Array 배열의 길이만큼 반복을 돌리면서
+            JSONObject traOb = (JSONObject) route.getJSONArray("traoptimal").get(0);
+            JSONObject summary = traOb.getJSONObject("summary");
 
-                legsArray = ((JSONObject) routesArray.get(i)).getJSONArray("legs");
-                //JSONObject legJsonObject = legsArray.getJSONObject(i);
-                JSONObject legJsonObject = legsArray.getJSONObject(0);
-
-                //총 이동시간 => 이건 leg마다 다르니까 step에 같이 출력하기
-                String duration = legJsonObject.getString("duration");
-                //Object에서 키 값이 duration인 변수를 찾아서 저장
-                JSONObject durJsonObject = new JSONObject(duration);
-                //duration에도 Object가 존재하므로 Object를 변수에 저장
-                //getDuration[j] = durJsonObject.getString("text");
-                Dur = durJsonObject.getString("text");
-                i++;
-            } while (i < routesArray.length());
+            //총 이동시간 => 이건 leg마다 다르니까 step에 같이 출력하기
+            duration = summary.getString("duration");
+            System.out.println("duration출력 : "+duration);
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        int totalT = 0;
-        if (Dur == null) {
+        double totalT = 0;
+        if (duration == null) {
             System.out.println("이동시간 정보가 없습니다. " + "시작 : " + start);
             totalT = 0;
         } else {
-            String[] t = Dur.split(" ");
-            if (t[0].contains("시간")) {
-                String[] hour = t[0].split("시간");
-                int h = Integer.parseInt(hour[0]);
-                String[] min = t[1].split("분");
-                int m = Integer.parseInt(min[0]);
-                totalT = h * 60 + m;
-
-            } else {
-                String[] min = t[0].split("분");
-                int m = Integer.parseInt(min[0]);
-                totalT = m;
-            }
+            Dur = Double.parseDouble(duration);
+            Dur = Dur/60000;
+            System.out.println("이동시간은 다음과 같다 : "+Dur);
+            totalT=Dur;
         }
 
         return totalT;
@@ -692,6 +672,12 @@ public class MiddlePlaceActivity extends AppCompatActivity implements OnMapReady
                 url = new URL(str_url);
 
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                conn.setRequestMethod("GET");
+                //네이버 플랫폼에서 발급받은 키
+                conn.setRequestProperty("X-NCP-APIGW-API-KEY-ID", "p16r9d98f3");
+                conn.setRequestProperty("X-NCP-APIGW-API-KEY", "kCciijwt6AT7OGT6mx7IUDHXfV6NYrW41O03R3cj");
+                conn.setDoInput(true);
+                conn.connect();
 
                 if (conn.getResponseCode() == conn.HTTP_OK) {
                     InputStreamReader tmp = new InputStreamReader(conn.getInputStream(), "UTF-8");
@@ -719,14 +705,11 @@ public class MiddlePlaceActivity extends AppCompatActivity implements OnMapReady
 
     public String getJSON(LatLng depart, LatLng arrival) {
 
-        String apiKey = getString(R.string.api_key);
+        String str_origin = depart.longitude + "," + depart.latitude;
+        String str_dest = arrival.longitude + "," + arrival.latitude;
 
-        String str_origin = depart.latitude + "," + depart.longitude;
-        String str_dest = arrival.latitude + "," + arrival.longitude;
-
-        str_url = "https://maps.googleapis.com/maps/api/directions/json?" +
-                "origin=" + str_origin + "&destination=" + str_dest + "&mode=transit" +
-                "&alternatives=true&language=Ko&key=" + apiKey;
+        str_url = "https://naveropenapi.apigw.ntruss.com/map-direction/v1/driving?" +
+                "start="+str_origin+"&goal="+str_dest;
 
         String resultText = "값이 없음";
 

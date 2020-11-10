@@ -60,6 +60,15 @@
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyDZFlYs370FtbLuByL1cebdJdh8R-KF1xk" />
+
+        <meta-data
+            android:name="com.naver.maps.map.CLIENT_ID"
+            android:value="p16r9d98f3"/>
+
+        <meta-data
+            android:name="com.naver.maps.map.CLIENT_TYPE"
+            android:value="gov" />
+
     </application>
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.SEND_SMS" />
