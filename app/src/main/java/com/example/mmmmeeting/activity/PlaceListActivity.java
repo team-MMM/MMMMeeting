@@ -991,12 +991,6 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
                                             }
                                         });
 
-                                        HashMap<String, Object> map = new HashMap<>();
-                                        GeoPoint location = new GeoPoint(place.getLatitude(), place.getLongitude());
-                                        map.put("latlng", location);
-                                        map.put("vote", 0);
-                                        map.put("name", finalPlaceName);
-
                                          if(state=="valid") { //투표 시작 전 상태
                                             HashMap<String, Object> map = new HashMap<>();
                                             GeoPoint location = new GeoPoint(place.getLatitude(), place.getLongitude());
