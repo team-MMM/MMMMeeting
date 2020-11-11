@@ -53,6 +53,7 @@ public class VoteActivity extends AppCompatActivity {
     public Button start_Btn,end_Btn;
     HashMap<String, Object> votePlace = new HashMap<>(); // 투표할 장소
     int selected_count; //투표수
+    List<HashMap<String,Object>> list = new ArrayList<>(); // 투표할 장소정보 리스트
     FirebaseFirestore db = FirebaseFirestore.getInstance();
 
     @Override
@@ -89,7 +90,50 @@ public class VoteActivity extends AppCompatActivity {
                     }
                 });
 
+        start_Btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) { // 시작 버튼 클릭
+                db.collection("vote").document(id).update("state", "invalid"); //투표상태를 변경
+            }
 
+        });
+
+        end_Btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) { // 종료 버튼 클릭
+                //일단 최다 득표
+                int count; // 장소별 투표수
+                int max; // 최대값
+                int check=0; // 최다 득표가 여러개인지 체크
+                ArrayList<Integer> vote_count = new ArrayList<>(); // 장소별 투표수 리스트
+                List<HashMap<String,Object>> maxList = new ArrayList<>(); //최다 득표 장소 리스트
+                for (int i = 0; i < list.size(); i++) { // vote_count에 투표수를 넣음
+                    votePlace = list.get(i);
+                    count=Integer.parseInt(String.valueOf(votePlace.get("vote")));
+                    vote_count.add(count);
+                }
+                max = Collections.max(vote_count); // 최다 득표수 찾기
+                for (int i = 0; i < vote_count.size(); i++) { // 최다 득표 장소들을 리스트에 넣음
+                    if(vote_count.get(i)==max){
+                        check++; // 여러개임을 표시
+                        maxList.add(list.get(i));
+                    //    votePlace = list.get(i);
+                    }
+                }
+                if(check==1){ //최다 득표 장수가 하나면 바로 등록
+                    String name = (String) votePlace.get("name");
+                    Toast.makeText(VoteActivity.this, "가장 많은 투표를 받은 장소는 " + name +"입니다.", Toast.LENGTH_SHORT).show();
+                    db.collection("schedule").document(scheduleId).update("meetingPlace", name); // db에 최종장소 올리기
+                    Toast.makeText(VoteActivity.this, name +"(으)로 약속장소가 설정되었습니다.", Toast.LENGTH_SHORT).show();
+                }
+                else{
+                    Toast.makeText(VoteActivity.this, "가장 많은 투표를 받은 장소가 " + check +"곳입니다."+ "\n" + "최종 선택이 필요합니다.", Toast.LENGTH_SHORT).show();
+                    place_list_view.removeAllViews(); // view 지우기
+                    createList(maxList); // 최다 득표로 목록 다시 생성
+                }
+            }
+
+        });
 
     }
 
@@ -102,7 +146,7 @@ public class VoteActivity extends AppCompatActivity {
                     DocumentSnapshot document = task.getResult();
                     if (document.exists()) {
                         // 해당 문서가 존재하는 경우
-                        List<HashMap<String, Object>> list = (List<HashMap<String, Object>>) document.get("place");
+                        list = (List<HashMap<String, Object>>) document.get("place");
                         createList(list);
                     } else {
                         // 존재하지 않는 문서
@@ -279,41 +323,6 @@ public class VoteActivity extends AppCompatActivity {
                 }
             });
         };
-
-        start_Btn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) { // 시작 버튼 클릭
-                db.collection("vote").document(id).update("state", "invalid");
-            }
-
-        });
-        
-        end_Btn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) { // 종료 버튼 클릭
-                //일단 최다 득표
-                int count; // 장소별 투표수
-                int max; // 최대값
-                ArrayList<Integer> vote_count = new ArrayList<>();
-                for (int i = 0; i < voteList.size(); i++) {
-                    votePlace = voteList.get(i);
-                    count=Integer.parseInt(String.valueOf(votePlace.get("vote")));
-                    vote_count.add(count);
-                }
-                max = Collections.max(vote_count);
-                for (int i = 0; i < vote_count.size(); i++) {
-                    if(vote_count.get(i)==max){
-                        votePlace = voteList.get(i);
-                        String name = (String) votePlace.get("name");
-                        Toast.makeText(VoteActivity.this, "가장 많은 투표를 받은 장소는 " + name +"입니다.", Toast.LENGTH_SHORT).show();
-                        db.collection("schedule").document(scheduleId).update("meetingPlace", name);
-                        Toast.makeText(VoteActivity.this, name +"(으)로 약속장소가 설정되었습니다.", Toast.LENGTH_SHORT).show();
-                    }
-                }
-            }
-
-        });
-
     }
 
     public void updateDB(int selected_count, HashMap<String, Object> votePlace){
