@@ -35,7 +35,6 @@
             android:background="@drawable/back_name"
             android:text="투표 시작" />
 
-
         <Button
             android:id="@+id/end_Btn"
             android:layout_width="0dp"
@@ -43,10 +42,16 @@
             android:layout_weight="1"
             android:background="@drawable/back_name"
             android:text="투표 종료" />
+
+
     </LinearLayout>
 
-
+        <Button
+            android:id="@+id/com_Btn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/back_name"
+            android:layout_below="@+id/place_list_view"
+            android:text="투표 완료" />
 
 </RelativeLayout>
-
-
