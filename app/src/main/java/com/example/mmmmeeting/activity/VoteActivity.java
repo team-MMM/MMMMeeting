@@ -39,6 +39,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Collections;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -49,7 +50,7 @@ public class VoteActivity extends AppCompatActivity {
     String id = null;
     String scheduleId;
     LinearLayout fl_place_list, place_list_view;
-
+    public Button start_Btn,end_Btn;
     HashMap<String, Object> votePlace = new HashMap<>(); // 투표할 장소
     int selected_count; //투표수
     FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -59,6 +60,9 @@ public class VoteActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_vote);
         place_list_view = findViewById(R.id.place_list_view);
+
+        start_Btn=findViewById(R.id.start_Btn);
+        end_Btn=findViewById(R.id.end_Btn);
 
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON,
                 WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
@@ -74,7 +78,6 @@ public class VoteActivity extends AppCompatActivity {
                         if (task.isSuccessful()) {
                             for (QueryDocumentSnapshot document : task.getResult()) {
                                 id = document.getId(); // document 이름(id)
-                                System.out.println("list 있음");
                                 checkVote();
                             }
                        //     if(id==null){
@@ -86,7 +89,7 @@ public class VoteActivity extends AppCompatActivity {
                     }
                 });
 
-       // id="2CfWJPeo2dvXGnC7p46Z";
+
 
     }
 
@@ -276,6 +279,41 @@ public class VoteActivity extends AppCompatActivity {
                 }
             });
         };
+
+        start_Btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) { // 시작 버튼 클릭
+                db.collection("vote").document(id).update("state", "invalid");
+            }
+
+        });
+        
+        end_Btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) { // 종료 버튼 클릭
+                //일단 최다 득표
+                int count; // 장소별 투표수
+                int max; // 최대값
+                ArrayList<Integer> vote_count = new ArrayList<>();
+                for (int i = 0; i < voteList.size(); i++) {
+                    votePlace = voteList.get(i);
+                    count=Integer.parseInt(String.valueOf(votePlace.get("vote")));
+                    vote_count.add(count);
+                }
+                max = Collections.max(vote_count);
+                for (int i = 0; i < vote_count.size(); i++) {
+                    if(vote_count.get(i)==max){
+                        votePlace = voteList.get(i);
+                        String name = (String) votePlace.get("name");
+                        Toast.makeText(VoteActivity.this, "가장 많은 투표를 받은 장소는 " + name +"입니다.", Toast.LENGTH_SHORT).show();
+                        db.collection("schedule").document(scheduleId).update("meetingPlace", name);
+                        Toast.makeText(VoteActivity.this, name +"(으)로 약속장소가 설정되었습니다.", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            }
+
+        });
+
     }
 
     public void updateDB(int selected_count, HashMap<String, Object> votePlace){
