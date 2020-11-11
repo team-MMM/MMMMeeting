@@ -26,6 +26,8 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
@@ -47,14 +49,17 @@ import androidx.core.content.ContextCompat;
 
 public class VoteActivity extends AppCompatActivity {
     ScheduleInfo schedule;
-    String id = null;
+    String id = null; //vote id
     String scheduleId;
     LinearLayout fl_place_list, place_list_view;
-    public Button start_Btn,end_Btn;
+    public Button start_Btn,end_Btn, com_Btn;
     HashMap<String, Object> votePlace = new HashMap<>(); // 투표할 장소
     int selected_count; //투표수
     List<HashMap<String,Object>> list = new ArrayList<>(); // 투표할 장소정보 리스트
     FirebaseFirestore db = FirebaseFirestore.getInstance();
+    final FirebaseUser user= FirebaseAuth.getInstance().getCurrentUser();
+    String userId = null; // 현재 user id
+    String leaderId = null; // 모임의 방장 id
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,6 +69,10 @@ public class VoteActivity extends AppCompatActivity {
 
         start_Btn=findViewById(R.id.start_Btn);
         end_Btn=findViewById(R.id.end_Btn);
+        com_Btn=findViewById(R.id.com_Btn);
+
+        start_Btn.setVisibility(View.INVISIBLE);
+        end_Btn.setVisibility(View.INVISIBLE);
 
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON,
                 WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
@@ -71,6 +80,24 @@ public class VoteActivity extends AppCompatActivity {
         Intent intent = getIntent();
         schedule = (ScheduleInfo) getIntent().getSerializableExtra("scheduleInfo");
         scheduleId = schedule.getId();
+
+        userId = user.getUid(); // 현재 user id
+
+        db.collection("meetings").whereEqualTo("name", schedule.getMeetingID()).get() //meeting 정보 받아오기
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull com.google.android.gms.tasks.Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                leaderId=document.getData().get("leader").toString();
+                            //    leaderId=(String)document.getDate().get("leader"); // 모임 방장 id 받아오기
+                            }
+                        } else {
+                            Log.d("Document Read", "Error getting documents: ", task.getException());
+                        }
+                    }
+                });
+
 
         db.collection("vote").whereEqualTo("scheduleID", scheduleId).get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
@@ -94,8 +121,8 @@ public class VoteActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) { // 시작 버튼 클릭
                 db.collection("vote").document(id).update("state", "invalid"); //투표상태를 변경
+                Toast.makeText(VoteActivity.this, "투표를 시작합니다."+"\n"+"이제 투표 목록을 변경할 수 없습니다.", Toast.LENGTH_SHORT).show();
             }
-
         });
 
         end_Btn.setOnClickListener(new View.OnClickListener() {
@@ -128,6 +155,7 @@ public class VoteActivity extends AppCompatActivity {
                 }
                 else{
                     Toast.makeText(VoteActivity.this, "가장 많은 투표를 받은 장소가 " + check +"곳입니다."+ "\n" + "최종 선택이 필요합니다.", Toast.LENGTH_SHORT).show();
+                    start_Btn.setVisibility(View.INVISIBLE);
                     place_list_view.removeAllViews(); // view 지우기
                     createList(maxList); // 최다 득표로 목록 다시 생성
                 }
@@ -163,11 +191,11 @@ public class VoteActivity extends AppCompatActivity {
         for (int i = 0; i < voteList.size(); i++) {
             votePlace = voteList.get(i);
 
-            String placeName = (String) votePlace.get("name");
-            GeoPoint g = (GeoPoint) votePlace.get("latlng");
-            LatLng latLng = new LatLng((double) g.getLatitude(), (double) g.getLongitude());
-            String placeAddress = getCurrentAddress(latLng); //주소
-            selected_count = Integer.parseInt(String.valueOf(votePlace.get("vote")));
+            String placeName = (String) votePlace.get("name"); //주소 이름
+            GeoPoint g = (GeoPoint) votePlace.get("latlng"); //위도, 경도
+            LatLng latLng = new LatLng((double) g.getLatitude(), (double) g.getLongitude()); //latlng 변수로 전환
+            String placeAddress = getCurrentAddress(latLng); //주소로 변환
+            selected_count = Integer.parseInt(String.valueOf(votePlace.get("vote"))); //투표수
 
             LinearLayout.LayoutParams param = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
                     ViewGroup.LayoutParams.WRAP_CONTENT);
@@ -227,107 +255,130 @@ public class VoteActivity extends AppCompatActivity {
             fl_place_list.addView(ly);
 
             place_list_view.addView(fl_place_list);
-
             favorite.setOnClickListener(new View.OnClickListener(){
                 @Override
                 public void onClick(View v) {
+                    ArrayList<String> voterList = new ArrayList<>(); //투표한 사람 리스트
                     TextView textView;
                     v.setSelected(!v.isSelected());//선택여부 반전
                     switch (v.getId()){
                         case (0):
                             votePlace=voteList.get(0);
                             selected_count = Integer.parseInt(String.valueOf(votePlace.get("vote")));
-                           // TextView textView1 = (TextView) findViewById(0);
+                            voterList = (ArrayList<String>) votePlace.get("voter"); //이 장소에 투표한 유저들
                             textView= (TextView) findViewById(0);
                             if(v.isSelected()){//현재 좋아요 누른 상태
                                 selected_count++;
                                 textView.setText(String.valueOf(selected_count));
-                                updateDB(selected_count, votePlace);
+                                updateDB_plus(selected_count, votePlace, voterList);
                             }
                             else{
                                 if(selected_count>0)
-                                selected_count--;
+                                    selected_count--;
                                 textView.setText(String.valueOf(selected_count)) ;
-                                updateDB(selected_count, votePlace);
+                                updateDB_minus(selected_count, votePlace, voterList);
                             }
                             break;
                         case(1):
                             votePlace=voteList.get(1);
                             selected_count = Integer.parseInt(String.valueOf(votePlace.get("vote")));
-                            //TextView textView2 = (TextView) findViewById(1);
+                            voterList = (ArrayList<String>) votePlace.get("voter"); //이 장소에 투표한 유저들
                             textView= (TextView) findViewById(1);
                             if(v.isSelected()){//현재 좋아요 누른 상태
                                 selected_count++;
                                 textView.setText(String.valueOf(selected_count)) ;
-                                updateDB(selected_count, votePlace);
+                                updateDB_plus(selected_count, votePlace, voterList);
                             }
                             else{
                                 if(selected_count>0)
                                     selected_count--;
                                 textView.setText(String.valueOf(selected_count)) ;
-                                updateDB(selected_count, votePlace);
+                                updateDB_minus(selected_count, votePlace, voterList);
                             }
                             break;
                         case(2):
                             votePlace=voteList.get(2);
                             selected_count = Integer.parseInt(String.valueOf(votePlace.get("vote")));
-                            //TextView textView3 = (TextView) findViewById(2);
+                            voterList = (ArrayList<String>) votePlace.get("voter"); //이 장소에 투표한 유저들
                             textView= (TextView) findViewById(2);
                             if(v.isSelected()){//현재 좋아요 누른 상태
                                 selected_count++;
                                 textView.setText(String.valueOf(selected_count)) ;
-                                updateDB(selected_count, votePlace);
+                                updateDB_plus(selected_count, votePlace, voterList);
                             }
                             else{
                                 if(selected_count>0)
                                     selected_count--;
                                 textView.setText(String.valueOf(selected_count)) ;
-                                updateDB(selected_count, votePlace);
+                                updateDB_minus(selected_count, votePlace, voterList);
                             }
                             break;
                         case(3):
                             votePlace=voteList.get(3);
                             selected_count = Integer.parseInt(String.valueOf(votePlace.get("vote")));
-                            //TextView textView4 = (TextView) findViewById(3);
+                            voterList = (ArrayList<String>) votePlace.get("voter"); //이 장소에 투표한 유저들
                             textView= (TextView) findViewById(3);
                             if(v.isSelected()){//현재 좋아요 누른 상태
                                 selected_count++;
                                 textView.setText(String.valueOf(selected_count)) ;
-                                updateDB(selected_count, votePlace);
+                                updateDB_plus(selected_count, votePlace, voterList);
                             }
                             else{
                                 if(selected_count>0)
                                     selected_count--;
                                 textView.setText(String.valueOf(selected_count)) ;
-                                updateDB(selected_count, votePlace);
+                                updateDB_minus(selected_count, votePlace, voterList);
                             }
                             break;
                         case(4):
                             votePlace=voteList.get(4);
                             selected_count = Integer.parseInt(String.valueOf(votePlace.get("vote")));
-                            //TextView textView5 = (TextView) findViewById(4);
+                            voterList = (ArrayList<String>) votePlace.get("voter"); //이 장소에 투표한 유저들
                             textView= (TextView) findViewById(4);
                             if(v.isSelected()){//현재 좋아요 누른 상태
                                 selected_count++;
                                 textView.setText(String.valueOf(selected_count)) ;
-                                updateDB(selected_count, votePlace);
+                                updateDB_plus(selected_count, votePlace, voterList);
                             }
                             else{
                                 if(selected_count>0)
                                     selected_count--;
                                 textView.setText(String.valueOf(selected_count)) ;
-                                updateDB(selected_count, votePlace);
+                                updateDB_minus(selected_count, votePlace, voterList);
                             }
                             break;
                     }
                 }
             });
         };
+        com_Btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) { // 완료 버튼 클릭
+                System.out.println("리더러ㅓ러러"+leaderId);
+                System.out.println("유저저저저저"+userId);
+                if(userId.equals(leaderId) ){// 방장이면 시작, 종료 버튼을 보여줌
+                    start_Btn.setVisibility(View.VISIBLE);
+                    end_Btn.setVisibility(View.VISIBLE);
+                    com_Btn.setVisibility(View.INVISIBLE);
+                }
+                else{//일반 유저면
+                    finish();
+                }
+            }
+        });
     }
 
-    public void updateDB(int selected_count, HashMap<String, Object> votePlace){
+    public void updateDB_plus(int selected_count, HashMap<String, Object> votePlace, ArrayList<String> voterList){
         db.collection("vote").document(id).update("place", FieldValue.arrayRemove(votePlace));
         votePlace.put("vote", selected_count);
+        voterList.add(userId);
+        db.collection("vote").document(id).update("place", FieldValue.arrayUnion(votePlace));
+    }
+
+    public void updateDB_minus(int selected_count, HashMap<String, Object> votePlace, ArrayList<String> voterList){
+        db.collection("vote").document(id).update("place", FieldValue.arrayRemove(votePlace));
+        votePlace.put("vote", selected_count);
+        voterList.remove(userId);
         db.collection("vote").document(id).update("place", FieldValue.arrayUnion(votePlace));
     }
 
