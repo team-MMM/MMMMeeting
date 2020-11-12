@@ -57,6 +57,7 @@ import com.google.firebase.firestore.GeoPoint;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -82,7 +83,7 @@ import noman.googleplaces.Place;
 import noman.googleplaces.PlacesException;
 import noman.googleplaces.PlacesListener;
 
-public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCallback, PlacesListener {
+public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCallback{
 
     GoogleMap mMap;
     LatLng midpoint = new LatLng(37.584114826538716, 127.05876976018965);
@@ -90,24 +91,18 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
 
     LinearLayout fl_place_list,place_list_view;
 
-    TextView view1;
-
     private String str_url = null;
     private String placeInfo;
 
     private String Tag = "category Test";
-    private int flagCount;
-    private boolean flag;
-    private int preferNum = 0;
     String name;
     String scheduleId;
     String id = null;
     ArrayList<String> category=new ArrayList<>();
     ArrayList<Float[]> userRatings =new ArrayList<>();
     FirebaseFirestore db = FirebaseFirestore.getInstance();
-    private int count; //success
+    int count; //success
     int size;
-    String state = "valid";
 
     Spinner spinner;
     ArrayAdapter<String> arrayAdapter;
@@ -116,28 +111,10 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
         public void handleMessage(android.os.Message msg)
         {
             Bundle bd = msg.getData( ) ;            /// 전달 받은 메세지에서 번들을 받음
-            if(bd.getStringArrayList("arg")!=null) {
-                ArrayList<String> categoryList = bd.getStringArrayList("arg");    /// 번들에 들어있는 값 꺼냄
-                // Category 찾은 다음에 쓸 함수
-                spinnerAdd(categoryList);
-            }else if(bd.getString("flag")!=null) {
-                String flagStr = bd.getString("flag");
-                // placessuccess가 2번 이상인 상황: flag 설정해서 동작하지 못하게 함
-                if (flagStr == "NO") {
-                    flag = true;
-                } else if (flagStr == "RESET") {
-                    // 카테고리 넘어갈 때 동작: flag 리셋, 카테고리가 몇 번째 순서인지 받아옴
-                    flag = false;
-                    flagCount = 0;
-                    preferNum = bd.getInt("num");
-                }
-                // 찾은 장소가 없는 상황
-            }else if(bd.getInt("NoPlace") == 0){
-                System.out.println(bd.getInt("NoPlace"));
-                noPlace();
-            }
+            ArrayList<String> categoryList = bd.getStringArrayList("arg");    /// 번들에 들어있는 값 꺼냄
+            // Category 찾은 다음에 쓸 함수
+            spinnerAdd(categoryList);
         } ;
-
     } ;
 
     private void spinnerAdd(ArrayList<String> categoryList) {
@@ -157,14 +134,12 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
                     case "shopping":
                         //shopping_mall + department_store
                         Log.d(Tag, "Shopping");
-                        sendResetFlag(position);
                         showPlaceInformation("shopping_mall",1000);
                         showPlaceInformation("department_store",1000);
                         break;
                     case "activity":
                         // amusement_park + aquarium +art_gallery +stadium +zoo
                         Log.d(Tag, "Activity");
-                        sendResetFlag(position);
                         showPlaceInformation("amusement_park",1000);
                         showPlaceInformation("aquarium",1000);
                         showPlaceInformation("art_gallery",1000);
@@ -173,35 +148,18 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
                         break;
                     case "cafe":
                         Log.d(Tag, "Cafe");
-                        sendResetFlag(position);
-                        showPlaceInformation("cafe",1000);
+                        showPlaceInformation("cafe",500);
                         break;
                     case "restaurant":
                         Log.d(Tag, "restaurant");
-                        sendResetFlag(position);
-                        showPlaceInformation("restaurant",1000);
+                        showPlaceInformation("restaurant",500);
                         break;
                     case "park":
                         Log.d(Tag, "park");
-                        sendResetFlag(position);
                         showPlaceInformation("park",1000);
                         break;
                 }
 
-                new Handler().postDelayed(new Runnable(){
-                    @Override
-                    public void run() {
-                        runOnUiThread(new Runnable(){
-                            @Override
-                            public void run() {
-                                Log.d(Tag, "check count " + count);
-                                if(count==0){
-                                    view1.setVisibility(View.VISIBLE);
-                                }
-                            }
-                        });
-                    }
-                }, 5000); // 1초후
             }
 
             @Override
@@ -209,15 +167,6 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
 
             }
         });
-    }
-
-    private void sendResetFlag(int position){
-        Bundle bd = new Bundle();      /// 번들 생성
-        bd.putString("flag", "RESET"); // 번들에 값 넣기
-        bd.putInt("num",position);
-        Message msg = mHandler.obtainMessage();   /// 핸들에 전달할 메세지 구조체 받기
-        msg.setData(bd);                     /// 메세지에 번들 넣기
-        mHandler.handleMessage(msg);
     }
 
     private void layoutclear() {
@@ -274,7 +223,6 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
                             }
                             if(id==null){
                                 VoteInfo info = new VoteInfo(scheduleId);
-                                info.setState("valid");
                                 db.collection("vote").add(info)
                                         .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                                             @Override
@@ -321,157 +269,6 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
         mHandler.postDelayed(r, 3000); // 1초후
     }
 
-    public void showPlaceInformation(String type, int radius)
-    {
-        //mMap.clear();//지도 클리어
-        String apiKey = getString(R.string.api_key);
-
-        new NRPlaces.Builder()
-                .listener(PlaceListActivity.this)
-                .key(apiKey)
-                .latlng(midpoint.latitude, midpoint.longitude)//현재 위치
-                .radius(radius) //범위 내에서 검색(미터)
-                .type(type)
-                .build()
-                .execute();
-
-        System.out.println("showPlaceInfo");
-    }
-
-    public void noPlace(){
-        runOnUiThread(new Runnable(){
-            @Override
-            public void run() {
-                // 계속 실패만 하는 경우 => 중복 출력 방지
-                place_list_view.removeAllViews();
-
-                //layout_width, layout_height, gravity 설정
-                LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-                lp.gravity = Gravity.CENTER;
-                lp.setMargins(10,100,10,10);
-
-                view1 = new TextView(PlaceListActivity.this);
-
-                // 결과 레이아웃이 없으면 View.VISIBLE로..
-                // 어디에 넣어야 결과가 잘 나오려나
-                view1.setVisibility(View.GONE);
-
-
-                view1.setText("중간지점 근처에 현재 카테고리에 해당하는 장소가 존재하지 않습니다.");
-                view1.setTextSize(25f);
-                view1.setTextColor(Color.BLACK);
-                view1.setBackgroundColor(Color.WHITE);
-                view1.setGravity(Gravity.CENTER);
-                view1.setPadding(20,20,20,20);
-                view1.setLayoutParams(lp);
-                //부모 뷰에 추가
-                place_list_view.addView(view1);
-
-                Log.d(Tag, "on Failure");
-            }
-        });
-
-    }
-
-
-    @Override
-    public void onPlacesFailure(PlacesException e) {
-        Log.d(Tag, "In fail");
-
-        // 성공횟수가 0
-        if(count==0){
-            runOnUiThread(new Runnable(){
-                @Override
-                public void run() {
-                    // 계속 실패만 하는 경우 => 중복 출력 방지
-                    place_list_view.removeAllViews();
-
-                    //layout_width, layout_height, gravity 설정
-                    LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-                    lp.gravity = Gravity.CENTER;
-                    lp.setMargins(10,100,10,10);
-
-                    view1 = new TextView(PlaceListActivity.this);
-
-                    // 결과 레이아웃이 없으면 View.VISIBLE로..
-                    // 어디에 넣어야 결과가 잘 나오려나
-                    view1.setVisibility(View.GONE);
-
-
-                    view1.setText("중간지점 근처에 현재 카테고리에 해당하는 장소가 존재하지 않습니다.");
-                    view1.setTextSize(25f);
-                    view1.setTextColor(Color.BLACK);
-                    view1.setBackgroundColor(Color.WHITE);
-                    view1.setGravity(Gravity.CENTER);
-                    view1.setPadding(20,20,20,20);
-                    view1.setLayoutParams(lp);
-                    //부모 뷰에 추가
-                    place_list_view.addView(view1);
-
-                    Log.d(Tag, "on Failure");
-                }
-            });
-        }
-    }
-
-    @Override
-    public void onPlacesStart() {
-    }
-
-    @Override
-    public void onPlacesSuccess(final List<Place> places) {
-        // placesSuccess 2번 이상 되는 것 막는 count
-        flagCount++;
-        count = 0;
-        // count = 0 : 검색된 장소가 없는 것 -> place failure로 넘어감
-        ArrayList<Place> placeList = new ArrayList<>();
-        System.out.println("place success");
-        Runnable r = new Runnable() {
-            @Override
-            public void run() {
-                count++;
-                int i=0;
-                for (noman.googleplaces.Place place : places) {
-                    placeList.add(places.get(i));
-                    i++;
-                }
-                System.out.println(placeList);
-
-                // count = 0이면 장소가 없다고 표시하기 위함
-                Bundle bd = new Bundle();      /// 번들 생성
-                bd.putInt("NoPlace", count); // 번들에 값 넣기
-                Message msg = mHandler.obtainMessage();   /// 핸들에 전달할 메세지 구조체 받기
-                msg.setData(bd);                     /// 메세지에 번들 넣기
-                mHandler.handleMessage(msg);
-
-            }
-        };
-
-        mHandler.postDelayed(r,2000);
-
-
-
-        try {
-            if(flagCount>=2){
-                Bundle bd = new Bundle();      /// 번들 생성
-                bd.putString("flag", "NO"); // 번들에 값 넣기
-                Message msg = mHandler.obtainMessage();   /// 핸들에 전달할 메세지 구조체 받기
-                msg.setData(bd);                     /// 메세지에 번들 넣기
-                mHandler.handleMessage(msg);
-            }else {
-                sortRating(placeList);
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-
-    }
-
-    @Override
-    public void onPlacesFinished() {
-
-    }
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
@@ -558,19 +355,11 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
         }
     }
 
-    public String getPlaceJson(double latitude, double longtitude, String placeId) {
-
-        String apiKey = getString(R.string.api_key);
-        Intent a = getIntent();
+    public String getPlaceJson(double latitude, double longtitude) {
 
         String str_origin = latitude + "," + longtitude;
-        //String str_origin = currentPosition.latitude+","+currentPosition.longitude;
         System.out.println("현재위치는 : " + str_origin);
 
-
-        str_url = "https://maps.googleapis.com/maps/api/place/details/json?"+
-                "place_id="+placeId+"&fields=name,rating,formatted_phone_number"
-                +"&key="+apiKey+"&language=ko";
 
         String resultText = null;
 
@@ -766,302 +555,250 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
 
     // 별점 순서대로 정렬 -> 거리 점수 (0.4:0.6) 반영한 최종 점수 구함
     // 최종 점수대로 num개를 ArrayList에 저장 -> showUI 함수에 넘겨줌
-    private void sortRating(ArrayList<Place> placeList) throws JSONException {
+    private void showPlaceInformation(String type,int radius){
 
-        ArrayList<Place> newPlaceList = new ArrayList<>();
+        //LatLng[] placeList;
         HashMap<Integer, Float> ratingMap = new HashMap<>();
 
         System.out.println("sortRating start!");
-        Runnable r = new Runnable() {
-            @Override
-            public void run() {
-                int num;
-                if(preferNum == 0){
-                    num = 8;
-                }else if(preferNum == 1){
-                    num = 5;
-                }else{
-                    num = 3;
+
+        int num = 5;
+        str_url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location="
+                +midpoint.latitude+","+midpoint.longitude+
+                "&radius="+radius+"&types="+type+"&key=AIzaSyDZFlYs370FtbLuByL1cebdJdh8R-KF1xk&language=ko";
+
+        placeInfo = getPlaceJson(midpoint.latitude,midpoint.longitude);
+        System.out.println("placeInfo 출력: "+placeInfo);
+
+        JSONArray resultArray;
+
+        try {
+            System.out.println("try들어옴");
+            JSONObject jsonObject = new JSONObject(placeInfo);
+            System.out.println("장소정보 JSON : "+placeInfo);
+
+            resultArray = jsonObject.getJSONArray("results");
+            int resultSize = resultArray.length();
+            LatLng[] placeList = new LatLng[resultSize];
+            String[] place_name=new String[resultSize];
+            float[] rating = new float[resultSize];
+
+            int i=0;
+
+            do {
+                JSONObject resultObject = resultArray.getJSONObject(i);
+                String gm;
+                gm = resultObject.getString("geometry");
+                JSONObject geometry = new JSONObject(gm);
+                System.out.println("geometry: " + geometry);
+
+
+                String sloc;
+                sloc = geometry.getString("location");
+                JSONObject location = new JSONObject(sloc);
+                System.out.println("장소 : " + location);
+
+
+                float loc_lat = Float.parseFloat(location.getString("lat"));
+                float loc_lng = Float.parseFloat(location.getString("lng"));
+
+                //장소위치
+                LatLng placeloc = new LatLng(loc_lat, loc_lng);
+                placeList[i]=placeloc;
+                System.out.println("장소위치 출력 :" + placeloc + "lat : " + loc_lat + "lng : " + loc_lng);
+
+
+                place_name[i] = resultObject.getString("name");
+                System.out.println("장소 이름: " + place_name);
+
+                //주소
+                //String placeAddress = getCurrentAddress(placeloc);
+
+                if (resultObject.has("rating")) {
+                    rating[i] = Float.parseFloat(resultObject.getString("rating"));
+                } else {
+                    rating[i] = 0.0f;
                 }
-                for (int i = 0; i < placeList.size(); i++) {
-                    placeInfo = getPlaceJson(placeList.get(i).getLatitude(), placeList.get(i).getLongitude(), placeList.get(i).getPlaceId());
-                    JSONObject jsonObject = null;
-                    try {
-                        System.out.println(i);
-                        jsonObject = new JSONObject(placeInfo);
-                        String sresult;
-                        sresult = jsonObject.getString("result");
-                        JSONObject resultObject = new JSONObject(sresult);
-                        float rating = Float.parseFloat(resultObject.getString("rating"));
-                        ratingMap.put(i,rating);
-                        System.out.println(i + "번 rating 점수" + ratingMap.get(i));
-                        //ratingList.add(ratingMap);
-                        //System.out.println(i + "번 rating 점수" + ratingList.get(i));
-                    } catch (JSONException e) {
-                        float a = 0;
-                        System.out.println("exception "+i);
-                        ratingMap.put(i,a);
-                        //ratingList.add(ratingMap);
-                        System.out.println(i + "번 rating 점수" + ratingMap.get(i));
-                        e.printStackTrace();
-                    }
+                ratingMap.put(i,rating[i]);
 
-                }
+                System.out.println("별점: " + rating[i]);
+                i++;
+            }while(i<resultSize);
 
-                // Sort 할 때 인덱스만 가져오려고 array 생성
-                // ratingList는 ratingMap의 key값만 가지고 있음
-                // Sort 후 ratingList가 (5,4,2,1,0)이면 placeList.get(해당 인덱스) -> 순위대로 place 가져옴
-                ArrayList<Integer> ratingList = new ArrayList<>(ratingMap.keySet());
+            // Sort 할 때 인덱스만 가져오려고 array 생성
+            // ratingList는 ratingMap의 key값만 가지고 있음
+            // Sort 후 ratingList가 (5,4,2,1,0)이면 placeList.get(해당 인덱스) -> 순위대로 place 가져옴
+            ArrayList<Integer> ratingList = new ArrayList<>(ratingMap.keySet());
 
-                for (int i = 0; i < placeList.size(); i++) {
-                    double latitude = placeList.get(i).getLatitude() - midpoint.latitude;
-                    double longitude = placeList.get(i).getLongitude() - midpoint.longitude;
+            for (int j = 0; j < placeList.length; j++) {
+                double latitude = placeList[j].latitude - midpoint.latitude;
+                double longitude = placeList[j].longitude - midpoint.longitude;
 
-                    // 0~1사이에 분포, 0에 가까울 수록 중간 지점과 가깝다
-                    double euclidean = Math.sqrt(Math.pow(latitude, 2.0) + Math.pow(longitude, 2.0));
-                    // 0~5점 사이에 분포한 선호도 값과 비슷하게 분포하도록 역수+로그를 이용해서 변환 -> 점수 높을수록 가까움
-                    // 0~3.5점 사이에 분포
-                    euclidean = Math.log10(1.0 / euclidean);
+                // 0~1사이에 분포, 0에 가까울 수록 중간 지점과 가깝다
+                double euclidean = Math.sqrt(Math.pow(latitude, 2.0) + Math.pow(longitude, 2.0));
+                // 0~5점 사이에 분포한 선호도 값과 비슷하게 분포하도록 역수+로그를 이용해서 변환 -> 점수 높을수록 가까움
+                // 0~3.5점 사이에 분포
+                euclidean = Math.log10(1.0 / euclidean);
 
-                    // double형인 점수를 float으로 변환
-                    float distancePoint = Float.valueOf(String.valueOf(euclidean));
-                    //System.out.println(distancePoint);
-                    float rating = ratingMap.get(i).floatValue();
+                // double형인 점수를 float으로 변환
+                float distancePoint = Float.valueOf(String.valueOf(euclidean));
+                //System.out.println(distancePoint);
+                float rat = ratingMap.get(j).floatValue();
 
-                    // rating 점수 + 거리 점수의 가중치를 [0.4/0.6]으로 환산한 최종 점수
-                    ratingMap.put(i,(float)(0.4 * rating + 0.6 * distancePoint));
-                    System.out.println(i + "번 최종 점수" + ratingMap.get(i));
-                    //System.out.println(i + "번 최종 점수" + ratingList.get(i));
-                }
-
-                // 최종 점수로 내림차순 정렬
-                // ratingMap의 value인 최종 점수를 기준으로 정렬, ratingMap의 key값이 ratingList의 값
-                // ratingList = {5,4,2,1,0}
-                Collections.sort(ratingList, (o1, o2) -> (ratingMap.get(o2).compareTo(ratingMap.get(o1))));
-
-                System.out.println("ratingList: "+ratingList);
-
-                // 지금은 num을 임시로 5개로 했는데, 5개 보다 검색 결과가 작으면 인덱스 에러 때문에 다시 세팅
-                if(ratingList.size() < num)
-                    num = ratingList.size();
-
-                // 상위 num개 만큼 다시 placeList에 저장
-                for (int i = 0; i < num; i++) {
-                    System.out.println("ratingNum: "+ratingList.get(i));
-                    newPlaceList.add(placeList.get(ratingList.get(i)));
-                }
-                showUI(newPlaceList);
+                // rating 점수 + 거리 점수의 가중치를 [0.4/0.6]으로 환산한 최종 점수
+                ratingMap.put(j,(float)(0.4 * rat + 0.6 * distancePoint));
+                System.out.println(j + "번 최종 점수" + ratingMap.get(j));
             }
 
-        };
-        mHandler.postDelayed(r, 2000);
-    }
+            // 최종 점수로 내림차순 정렬
+            // ratingMap의 value인 최종 점수를 기준으로 정렬, ratingMap의 key값이 ratingList의 값
+            // ratingList = {5,4,2,1,0}
+            Collections.sort(ratingList, (o1, o2) -> (ratingMap.get(o2).compareTo(ratingMap.get(o1))));
 
-    // sortRating이 넘겨준 newPlaceList를 화면에 띄움
-    private void showUI(ArrayList<Place> placeList){
-        System.out.println("showPlace");
-        if(flag) return;
-        Runnable r = new Runnable() {
-            @Override
-            public void run() {
-                runOnUiThread(new Runnable() {
+            System.out.println("ratingList: "+ratingList);
+
+            // 지금은 num을 임시로 5개로 했는데, 5개 보다 검색 결과가 작으면 인덱스 에러 때문에 다시 세팅
+            if(ratingList.size() < num)
+                num = ratingList.size();
+
+            // 상위 num개 만큼 다시 placeList에 저장
+            for (int j = 0; j < num; j++) {
+                LinearLayout.LayoutParams param = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
+                        ViewGroup.LayoutParams.WRAP_CONTENT);
+
+                LinearLayout.LayoutParams fl_param = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                        ViewGroup.LayoutParams.WRAP_CONTENT);
+
+                fl_place_list = new LinearLayout(PlaceListActivity.this);
+                fl_place_list.setOrientation(LinearLayout.VERTICAL);
+                //param.bottomMargin = 100;
+                fl_place_list.setLayoutParams(fl_param);
+                fl_place_list.setBackgroundColor(Color.WHITE);
+                fl_place_list.setPadding(0,10,0,30);
+
+
+                RelativeLayout.LayoutParams rl_param = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
+                        ViewGroup.LayoutParams.WRAP_CONTENT);
+
+                RelativeLayout pl_name = new RelativeLayout(PlaceListActivity.this);
+                pl_name.setLayoutParams(rl_param);
+
+
+                String placeAddress = getCurrentAddress(placeList[ratingList.get(j)]);
+                //장소 이름, 주소 출력부분
+                TextView pInfo = new TextView(PlaceListActivity.this);
+                SpannableString s = new SpannableString(place_name[ratingList.get(j)]+"\n"+placeAddress);
+                s.setSpan(new RelativeSizeSpan(1.8f),0,place_name[ratingList.get(j)].length(),0);
+                s.setSpan(new ForegroundColorSpan(Color.parseColor("#62ABD9")),0,place_name[ratingList.get(j)].length(),0);
+                pInfo.setText(s);
+                pInfo.setLayoutParams(rl_param);
+                pl_name.addView(pInfo);
+
+                //좋아요버튼
+                Button favorite = new Button(PlaceListActivity.this);
+                RelativeLayout.LayoutParams btn_param = new RelativeLayout.LayoutParams(90, 90);
+                btn_param.addRule(RelativeLayout.ALIGN_PARENT_RIGHT, RelativeLayout.TRUE);
+                favorite.setLayoutParams(btn_param);
+                favorite.setPadding(0, 20, 5, 0);
+                favorite.setId(i + 1);
+                favorite.setBackground(ContextCompat.getDrawable(PlaceListActivity.this, R.drawable.addvote));
+                pl_name.addView(favorite);
+
+                fl_place_list.addView(pl_name);
+
+
+                //LinearLayout 생성
+                LinearLayout ly = new LinearLayout(PlaceListActivity.this);
+                //LinearLayout.LayoutParams lyparams = param;
+                ly.setLayoutParams(param);
+                ly.setOrientation(LinearLayout.HORIZONTAL);
+
+                TextView rate_tv = new TextView(PlaceListActivity.this);
+                rate_tv.setText("별점 : "+rating+" | ");
+                rate_tv.setLayoutParams(param);
+                ly.addView(rate_tv);
+
+                RatingBar rb = new RatingBar(PlaceListActivity.this,null,android.R.attr.ratingBarStyleSmall);
+                rb.setNumStars(5);
+                rb.setRating(rating[ratingList.get(j)]);
+                rb.setStepSize((float)0.1);
+                rb.setPadding(0,5,0,0);
+                rb.setLayoutParams(param);
+                ly.addView(rb);
+
+
+                fl_place_list.addView(ly);
+
+                place_list_view.addView(fl_place_list);
+
+                String finalPlaceName = place_name[ratingList.get(j)];
+                LatLng pl = placeList[ratingList.get(j)];
+                favorite.setOnClickListener(new View.OnClickListener() {
                     @Override
-                    public void run() {
-                        //place.getPlaceId();
-                        for (int i = 0; i < placeList.size(); i++) {
+                    public void onClick(View v) {
+                        v.setSelected(!v.isSelected());//선택여부 반전
 
-                            Place place = placeList.get(i);
-                            String placeName = null;
-                            float rating = 0;
-                            placeInfo = getPlaceJson(place.getLatitude(), place.getLongitude(), place.getPlaceId());
+                        DocumentReference docRef = db.collection("vote").document(id);
 
-                            try {
-                                System.out.println("try들어옴");
-                                JSONObject jsonObject = new JSONObject(placeInfo);
-                                System.out.println("장소정보 JSON : " + placeInfo);
-
-                                String sresult;
-
-                                sresult = jsonObject.getString("result");
-                                JSONObject resultObject = new JSONObject(sresult);
-                                rating = Float.parseFloat(resultObject.getString("rating"));
-                                placeName = resultObject.getString("name");
-
-                                System.out.println("rating값 : " + rating);
-                                System.out.println("장소 명 : " + placeName);
-
-                                LatLng latLng
-                                        = new LatLng(place.getLatitude()
-                                        , place.getLongitude());
-
-                                //주소
-                                String placeAddress = getCurrentAddress(latLng);
-
-
-                                LinearLayout.LayoutParams param = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
-                                        ViewGroup.LayoutParams.WRAP_CONTENT);
-
-                                LinearLayout.LayoutParams fl_param = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                                        ViewGroup.LayoutParams.WRAP_CONTENT);
-
-                                fl_place_list = new LinearLayout(PlaceListActivity.this);
-                                fl_place_list.setOrientation(LinearLayout.VERTICAL);
-                                fl_place_list.setLayoutParams(fl_param);
-                                fl_place_list.setBackgroundColor(Color.WHITE);
-                                fl_place_list.setPadding(0, 10, 0, 30);
-
-
-                                RelativeLayout.LayoutParams rl_param = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
-                                        ViewGroup.LayoutParams.WRAP_CONTENT);
-
-                                RelativeLayout pl_name = new RelativeLayout(PlaceListActivity.this);
-                                pl_name.setLayoutParams(rl_param);
-                                //pl_name.setOrientation(LinearLayout.HORIZONTAL);
-
-
-                                //장소 이름, 주소 출력부분
-                                TextView pInfo = new TextView(PlaceListActivity.this);
-                                SpannableString s = new SpannableString(placeName + "\n" + placeAddress);
-                                s.setSpan(new RelativeSizeSpan(1.8f), 0, placeName.length(), 0);
-                                s.setSpan(new ForegroundColorSpan(Color.parseColor("#62ABD9")), 0, placeName.length(), 0);
-                                pInfo.setText(s);
-                                pInfo.setLayoutParams(rl_param);
-                                pl_name.addView(pInfo);
-
-                                //좋아요버튼
-                                Button favorite = new Button(PlaceListActivity.this);
-                                RelativeLayout.LayoutParams btn_param = new RelativeLayout.LayoutParams(90, 90);
-                                btn_param.addRule(RelativeLayout.ALIGN_PARENT_RIGHT, RelativeLayout.TRUE);
-                                favorite.setLayoutParams(btn_param);
-                                favorite.setPadding(0, 20, 5, 0);
-                                favorite.setId(i + 1);
-                                favorite.setBackground(ContextCompat.getDrawable(PlaceListActivity.this, R.drawable.addvote));
-                                pl_name.addView(favorite);
-
-                                fl_place_list.addView(pl_name);
-
-                                //LinearLayout 생성
-                                LinearLayout ly = new LinearLayout(PlaceListActivity.this);
-                                //LinearLayout.LayoutParams lyparams = param;
-                                ly.setLayoutParams(param);
-                                ly.setOrientation(LinearLayout.HORIZONTAL);
-
-                                TextView rate_tv = new TextView(PlaceListActivity.this);
-                                rate_tv.setText("별점 : " + rating + " | ");
-                                rate_tv.setLayoutParams(param);
-                                ly.addView(rate_tv);
-
-                                RatingBar rb = new RatingBar(PlaceListActivity.this, null, android.R.attr.ratingBarStyleSmall);
-                                rb.setNumStars(5);
-                                rb.setRating(rating);
-                                rb.setStepSize((float) 0.1);
-                                rb.setPadding(0, 5, 0, 0);
-                                rb.setLayoutParams(param);
-                                ly.addView(rb);
-
-                                fl_place_list.addView(ly);
-
-                                place_list_view.addView(fl_place_list);
-
-                                String finalPlaceName = placeName;
-                                favorite.setOnClickListener(new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View v) {
-                                        v.setSelected(!v.isSelected());//선택여부 반전
-
-                                        DocumentReference docRef = db.collection("vote").document(id);
-
-                                        docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                                            @Override
-                                            public void onComplete(@NonNull com.google.android.gms.tasks.Task<DocumentSnapshot> task) {
-                                                if (task.isSuccessful()) {
-                                                    DocumentSnapshot document = task.getResult();
-                                                    if (document.exists()) {
-                                                        // 해당 문서가 존재하는 경우
-                                                        List<HashMap<String,Object>> list = (List<HashMap<String, Object>>)document.get("place");
-                                                        size = list.size();
-                                                        state = document.getData().get("state").toString(); // 투표 상태 
-                                                    } else {
-                                                        // 존재하지 않는 문서
-                                                        Log.d("Attend", "No Document");
-                                                    }
-                                                } else {
-                                                    Log.d("Attend", "Task Fail : " + task.getException());
-                                                }
-                                            }
-                                        });
-
-                                         if(state.equals("valid")) { //투표 시작 전 상태
-                                            HashMap<String, Object> map = new HashMap<>();
-                                            GeoPoint location = new GeoPoint(place.getLatitude(), place.getLongitude());
-                                            List<String> voter = new ArrayList<>();
-                                            map.put("latlng", location);
-                                            map.put("vote", 0);
-                                            map.put("name", finalPlaceName);
-                                            map.put("voter", voter);
-
-                                            if (v.isSelected()) {//현재 add버튼 누른 상태
-                                                System.out.println("size : " + size);
-                                                if (size >= 5) { // 리스트에 5개 이상 존재할 때
-                                                    Toast.makeText(PlaceListActivity.this, "더이상 투표리스트에 추가할 수 없습니다.", Toast.LENGTH_SHORT).show();
-                                                } else {
-                                                    db.collection("vote").document(id).update("place", FieldValue.arrayUnion(map));
-                                                    Toast.makeText(PlaceListActivity.this, "투표리스트에 추가되었습니다.", Toast.LENGTH_SHORT).show();
-                                                }
-                                            } else {
-                                                db.collection("vote").document(id).update("place", FieldValue.arrayRemove(map));
-                                                Toast.makeText(PlaceListActivity.this, "취소되었습니다.", Toast.LENGTH_SHORT).show();
-                                            }
-                                        }else{
-                                            Toast.makeText(PlaceListActivity.this, "이미 투표가 시작되었습니다.", Toast.LENGTH_SHORT).show();
-                                        }
+                        docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                            @Override
+                            public void onComplete(@NonNull com.google.android.gms.tasks.Task<DocumentSnapshot> task) {
+                                if (task.isSuccessful()) {
+                                    DocumentSnapshot document = task.getResult();
+                                    if (document.exists()) {
+                                        // 해당 문서가 존재하는 경우
+                                        List<HashMap<String,Object>> list = (List<HashMap<String, Object>>)document.get("place");
+                                        size = list.size();
+                                    } else {
+                                        // 존재하지 않는 문서
+                                        Log.d("Attend", "No Document");
                                     }
-                                });
-
-                                MarkerOptions markerOptions = new MarkerOptions();
-                                markerOptions.position(latLng);
-                                markerOptions.title(place.getName());
-                                markerOptions.snippet(placeAddress);
-                                mMap.addMarker(markerOptions);
-
-//                        Marker item = mMap.addMarker(markerOptions);
-//                        previous_marker.add(item);
-
-                            } catch (JSONException e) {
-                                place_list_view.removeAllViews();
-
-                                //layout_width, layout_height, gravity 설정
-                                LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-                                lp.gravity = Gravity.CENTER;
-                                lp.setMargins(10,100,10,10);
-
-                                view1 = new TextView(PlaceListActivity.this);
-
-                                // 결과 레이아웃이 없으면 View.VISIBLE로..
-                                // 어디에 넣어야 결과가 잘 나오려나
-                                view1.setVisibility(View.GONE);
-
-
-                                view1.setText("중간지점 근처에 현재 카테고리에 해당하는 장소가 존재하지 않습니다.");
-                                view1.setTextSize(25f);
-                                view1.setTextColor(Color.BLACK);
-                                view1.setBackgroundColor(Color.WHITE);
-                                view1.setGravity(Gravity.CENTER);
-                                view1.setPadding(20,20,20,20);
-                                view1.setLayoutParams(lp);
-                                //부모 뷰에 추가
-                                place_list_view.addView(view1);
-                                view1.setVisibility(View.VISIBLE);
-
-                                Log.d(Tag, "on Failure");
-                                e.printStackTrace();
+                                } else {
+                                    Log.d("Attend", "Task Fail : " + task.getException());
+                                }
                             }
+                        });
+
+                        HashMap<String, Object> map = new HashMap<>();
+                        GeoPoint location = new GeoPoint(pl.latitude,pl.longitude);
+                        List<String> voter = new ArrayList<>();
+                        map.put("latlng", location);
+                        map.put("vote", 0);
+                        map.put("name", finalPlaceName);
+                        map.put("voter", voter);
+
+                        if(v.isSelected()){//현재 add버튼 누른 상태
+                            System.out.println("size : "+ size);
+                            if(size >= 5){ // 리스트에 5개 이상 존재할 때
+                                Toast.makeText(PlaceListActivity.this,"더이상 투표리스트에 추가할 수 없습니다.",Toast.LENGTH_SHORT).show();
+                            }else {
+                                db.collection("vote").document(id).update("place", FieldValue.arrayUnion(map));
+                                Toast.makeText(PlaceListActivity.this, "투표리스트에 추가되었습니다.", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                        else{
+                            db.collection("vote").document(id).update("place", FieldValue.arrayRemove(map));
+                            Toast.makeText(PlaceListActivity.this,"취소되었습니다.",Toast.LENGTH_SHORT).show();
                         }
                     }
                 });
 
+                MarkerOptions markerOptions = new MarkerOptions();
+                markerOptions.position(pl);
+                markerOptions.title(finalPlaceName);
+                markerOptions.snippet(placeAddress);
+                mMap.addMarker(markerOptions);
+
+
+
             }
-        };
-        mHandler.postDelayed(r,3000);
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }catch(NullPointerException e){
+            e.printStackTrace();
+        }
+
     }
+
 }
