@@ -991,7 +991,7 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
                                             }
                                         });
 
-                                         if(state=="valid") { //투표 시작 전 상태
+                                         if(state.equals("valid")) { //투표 시작 전 상태
                                             HashMap<String, Object> map = new HashMap<>();
                                             GeoPoint location = new GeoPoint(place.getLatitude(), place.getLongitude());
                                             List<String> voter = new ArrayList<>();
