@@ -276,7 +276,7 @@ public class SearchPlaceActivity extends AppCompatActivity
                                         }
                                     });
 
-                                    if(state=="valid"){ // 투표 시작 전 상태
+                                    if(state.equals("valid")){ // 투표 시작 전 상태
 
                                     HashMap<String, Object> map = new HashMap<>();
                                     GeoPoint location = new GeoPoint(arrival.latitude, arrival.longitude);
