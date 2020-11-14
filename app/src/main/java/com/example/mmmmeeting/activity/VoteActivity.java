@@ -94,7 +94,7 @@ public class VoteActivity extends AppCompatActivity {
                         }
                     }
                 });
-        
+
         db.collection("vote").whereEqualTo("scheduleID", scheduleId).get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
@@ -122,6 +122,7 @@ public class VoteActivity extends AppCompatActivity {
                 Toast.makeText(VoteActivity.this, "투표를 시작합니다." + "\n" + "이제 투표 목록을 변경할 수 없습니다.", Toast.LENGTH_SHORT).show();
                 start_Btn.setVisibility(View.INVISIBLE); //시작 버튼을 지움
                 com_Btn.setVisibility(View.VISIBLE); // 투표 완료 버튼을 보여줌
+                end_Btn.setVisibility(View.VISIBLE);  // 투표 종료 버튼을 보여줌
             }
         });
 
@@ -185,7 +186,6 @@ public class VoteActivity extends AppCompatActivity {
                                 if (userId.equals(leaderId)) {// 방장이면 시작, 종료 버튼을 보여줌
                                     com_Btn.setVisibility(View.INVISIBLE);
                                     start_Btn.setVisibility(View.VISIBLE); //시작 버튼 보여주기
-                                    end_Btn.setVisibility(View.VISIBLE); // 종료 버튼 보여주기
                                 }
                                 else{ // 시작 안했는데 방장이 아니면
                                     com_Btn.setVisibility(View.INVISIBLE); // 투표 완료 버튼을 안보여줌
