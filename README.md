@@ -1,7 +1,7 @@
 # MMMMeeting
 <br>
 // 2020.11.14 변경(주영) <br>
-* 방장과 투표 상태에 따른 투표 버튼 변경br>
+* 방장과 투표 상태에 따른 투표 버튼 변경<br>
 - 투표 state : valid, invalid, done<br>
  > 방장 <br>
   - 투표 시작 전(valid) : 시작 버튼만 보임<br>
