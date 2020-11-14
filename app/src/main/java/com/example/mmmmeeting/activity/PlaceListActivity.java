@@ -135,29 +135,29 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
                     case "shopping":
                         //shopping_mall + department_store
                         Log.d(Tag, "Shopping");
-                        showPlaceInformation("shopping_mall",1000);
-                        showPlaceInformation("department_store",1000);
+                        showPlaceInformation("shopping_mall",2000);
+                        showPlaceInformation("department_store",2000);
                         break;
                     case "activity":
                         // amusement_park + aquarium +art_gallery +stadium +zoo
                         Log.d(Tag, "Activity");
-                        showPlaceInformation("amusement_park",1000);
-                        showPlaceInformation("aquarium",1000);
-                        showPlaceInformation("art_gallery",1000);
-                        showPlaceInformation("stadium",1000);
-                        showPlaceInformation("zoo",1000);
+                        showPlaceInformation("amusement_park",2000);
+                        showPlaceInformation("aquarium",2000);
+                        showPlaceInformation("art_gallery",2000);
+                        showPlaceInformation("stadium",2000);
+                        showPlaceInformation("zoo",2000);
                         break;
                     case "cafe":
                         Log.d(Tag, "Cafe");
-                        showPlaceInformation("cafe",500);
+                        showPlaceInformation("cafe",1500);
                         break;
                     case "restaurant":
                         Log.d(Tag, "restaurant");
-                        showPlaceInformation("restaurant",500);
+                        showPlaceInformation("restaurant",1500);
                         break;
                     case "park":
                         Log.d(Tag, "park");
-                        showPlaceInformation("park",1000);
+                        showPlaceInformation("park",2000);
                         break;
                 }
 
@@ -646,8 +646,8 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
                 //System.out.println(distancePoint);
                 float rat = ratingMap.get(j).floatValue();
 
-                // rating 점수 + 거리 점수의 가중치를 [0.4/0.6]으로 환산한 최종 점수
-                ratingMap.put(j,(float)(0.4 * rat + 0.6 * distancePoint));
+                // rating 점수 + 거리 점수의 가중치를 [0.1/0.1]으로 환산한 최종 점수
+                ratingMap.put(j,(float)(0.1 * rat + 0.1 * distancePoint));
                 System.out.println(j + "번 최종 점수" + ratingMap.get(j));
             }
 
@@ -715,7 +715,7 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
                 ly.setOrientation(LinearLayout.HORIZONTAL);
 
                 TextView rate_tv = new TextView(PlaceListActivity.this);
-                rate_tv.setText("별점 : "+rating+" | ");
+                rate_tv.setText("별점 : "+rating[ratingList.get(j)]+" | ");
                 rate_tv.setLayoutParams(param);
                 ly.addView(rate_tv);
 
