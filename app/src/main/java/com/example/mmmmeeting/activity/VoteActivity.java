@@ -122,6 +122,7 @@ public class VoteActivity extends AppCompatActivity {
                 Toast.makeText(VoteActivity.this, "투표를 시작합니다." + "\n" + "이제 투표 목록을 변경할 수 없습니다.", Toast.LENGTH_SHORT).show();
                 start_Btn.setVisibility(View.INVISIBLE); //시작 버튼을 지움
                 com_Btn.setVisibility(View.VISIBLE); // 투표 완료 버튼을 보여줌
+                end_Btn.setVisibility(View.VISIBLE);  // 투표 종료 버튼을 보여줌
             }
         });
 
