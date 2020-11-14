@@ -40,6 +40,8 @@ import com.example.mmmmeeting.decorators.EventDecorator;
 import com.example.mmmmeeting.decorators.OneDayDecorator;
 import com.example.mmmmeeting.decorators.SaturdayDecorator;
 import com.example.mmmmeeting.decorators.SundayDecorator;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.prolificinteractive.materialcalendarview.CalendarDay;
 import com.prolificinteractive.materialcalendarview.CalendarMode;
@@ -75,7 +77,9 @@ public class CalendarActivity extends AppCompatActivity {
     public String scID=null;
     public Date mdate; // 정해진 약속 날짜
     private FirebaseFirestore db;
-
+    final FirebaseUser user= FirebaseAuth.getInstance().getCurrentUser();
+    String userId = null; // 현재 user id
+    String leaderId = null; // 모임의 방장 id
 
     Map<String, String> calendarMap = new HashMap<>(); // 날짜별 메모 저장
    // private final OneDayDecorator oneDayDecorator = new OneDayDecorator();
@@ -116,6 +120,22 @@ public class CalendarActivity extends AppCompatActivity {
         Intent intent = getIntent();
         scInfo = (ScheduleInfo) getIntent().getSerializableExtra("scheduleInfo");
         scID=scInfo.getId(); // schedule ID 가져오기
+        userId = user.getUid(); // 현재 user id
+
+        db.collection("meetings").whereEqualTo("name", scInfo.getMeetingID()).get() //meeting 정보 받아오기
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull com.google.android.gms.tasks.Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                leaderId=document.getData().get("leader").toString();
+                                //    leaderId=(String)document.getDate().get("leader"); // 모임 방장 id 받아오기
+                            }
+                        } else {
+                            Log.d("Document Read", "Error getting documents: ", task.getException());
+                        }
+                    }
+                });
 
         DocumentReference docRef = db.collection("schedule").document(scID);
         docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() { //schedule에 저장된 calendarText 받아오기
@@ -181,45 +201,35 @@ public class CalendarActivity extends AppCompatActivity {
                 sel_Btn.setOnClickListener(new View.OnClickListener() { //선택 버튼 누르면
                     @Override
                     public void onClick(View view) {
-                        AlertDialog.Builder builder = new AlertDialog.Builder(CalendarActivity.this);
-                        builder.setTitle("날짜 확정")        // 제목
-                                .setMessage(shot_Day+"로 설정하시겠습니까?")        // 메세지
-                               // .setCancelable(false)        // 뒤로 버튼 클릭시 취소 가능 설정
-                                .setPositiveButton("확인", new DialogInterface.OnClickListener(){
-                                    // 확인 버튼 클릭시 설정, 오른쪽 버튼입니다.
-                                    public void onClick(DialogInterface dialog, int whichButton){//약속 날짜를 확정 //db로 해당 날짜 올리기
+                            AlertDialog.Builder builder = new AlertDialog.Builder(CalendarActivity.this);
+                            builder.setTitle("날짜 확정")        // 제목
+                                    .setMessage(shot_Day+"로 설정하시겠습니까?")        // 메세지
+                                    // .setCancelable(false)        // 뒤로 버튼 클릭시 취소 가능 설정
+                                    .setPositiveButton("확인", new DialogInterface.OnClickListener(){
+                                        // 확인 버튼 클릭시 설정, 오른쪽 버튼입니다.
+                                        public void onClick(DialogInterface dialog, int whichButton){//약속 날짜를 확정 //db로 해당 날짜 올리기
 
-                                        int day[] = new int[2]; // 약속 달과 일
-                                        day[0]=Month-1;
-                                        day[1]=Day;
-                                        Intent intent = new Intent(CalendarActivity.this, NoticeActivity.class);
-                                        intent.putExtra("meetingdate", day);
-                                        intent.putExtra("scInfo", scID);
-                                        startActivityForResult(intent, 0); // 시간 받아오기
+                                            int day[] = new int[2]; // 약속 달과 일
+                                            day[0]=Month-1;
+                                            day[1]=Day;
+                                            Intent intent = new Intent(CalendarActivity.this, NoticeActivity.class);
+                                            intent.putExtra("meetingdate", day);
+                                            intent.putExtra("scInfo", scID);
+                                            startActivityForResult(intent, 0); // 시간 받아오기
 
-                                        /*
-                                        try {
-                                            mdate = transDate.parse(shot_Day); //String을 Date로 변환
+                                            selectedDay.clear();
+                                            selectedDay.add(shot_Day);
+                                            removeDeco();
+                                            // selectDay(selectedDay); //확정 날짜 이벤트 표시
+
                                         }
-                                        catch(Exception ex){
-                                            ex.printStackTrace();
+                                    })
+                                    .setNegativeButton("취소", new DialogInterface.OnClickListener(){// 취소 버튼 클릭시
+                                        public void onClick(DialogInterface dialog, int whichButton){//취소 이벤트...
                                         }
-
-                                         */
-
-                                        selectedDay.clear();
-                                        selectedDay.add(shot_Day);
-                                        removeDeco();
-                                       // selectDay(selectedDay); //확정 날짜 이벤트 표시
-
-                                    }
-                                })
-                                .setNegativeButton("취소", new DialogInterface.OnClickListener(){// 취소 버튼 클릭시
-                                    public void onClick(DialogInterface dialog, int whichButton){//취소 이벤트...
-                                    }
-                                });
-                        AlertDialog dialog = builder.create();    // 알림창 객체 생성
-                        dialog.show();    // 알림창 띄우기
+                                    });
+                            AlertDialog dialog = builder.create();    // 알림창 객체 생성
+                            dialog.show();    // 알림창 띄우기
                     }
                 });
 
@@ -235,7 +245,9 @@ public class CalendarActivity extends AppCompatActivity {
                         save_Btn.setVisibility(View.INVISIBLE); // 저장 버튼 Invisible
                         cha_Btn.setVisibility(View.VISIBLE); // 수정 버튼 Visible
                         del_Btn.setVisibility(View.VISIBLE); // 삭제 버튼 Visible
-                        sel_Btn.setVisibility(View.VISIBLE); // 선택 버튼 Visible
+                        if(userId.equals(leaderId)) {
+                            sel_Btn.setVisibility(View.VISIBLE); // 선택 버튼 Visible
+                        }
                         contextEditText.setVisibility(View.INVISIBLE);
                         memotext.setVisibility(View.VISIBLE);
 
@@ -317,7 +329,9 @@ public class CalendarActivity extends AppCompatActivity {
             save_Btn.setVisibility(View.INVISIBLE);
             cha_Btn.setVisibility(View.VISIBLE);
             del_Btn.setVisibility(View.VISIBLE);
-            sel_Btn.setVisibility(View.VISIBLE); // 선택 버튼 Visible
+            if(userId.equals(leaderId)) {
+                sel_Btn.setVisibility(View.VISIBLE); // 선택 버튼 Visible
+            }
             cha_Btn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) { // 수정 버튼 클릭
