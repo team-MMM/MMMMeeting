@@ -103,6 +103,7 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
     FirebaseFirestore db = FirebaseFirestore.getInstance();
     int count; //success
     int size;
+    String state;
 
     Spinner spinner;
     ArrayAdapter<String> arrayAdapter;
