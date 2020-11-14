@@ -254,7 +254,34 @@ public class SearchPlaceActivity extends AppCompatActivity
                             .setPositiveButton("확인", new DialogInterface.OnClickListener(){
                                 // 확인 버튼 클릭시 설정, 오른쪽 버튼입니다.
                                 public void onClick(DialogInterface dialog, int whichButton){//투표리스트에 추가
-                                    DocumentReference docRef = db.collection("vote").document(id);
+                                  DocumentReference docRef = db.collection("vote").document(id);
+
+                                    Handler delayHandler = new Handler();
+                                    Runnable r = new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            if(state.equals("valid")){ // 투표 시작 전 상태
+                                                HashMap<String, Object> map = new HashMap<>();
+                                                GeoPoint location = new GeoPoint(arrival.latitude, arrival.longitude);
+                                                List<String> voter = new ArrayList<>();
+                                                map.put("latlng", location);
+                                                map.put("vote", 0);
+                                                map.put("name", address);
+                                                map.put("voter", voter);
+
+                                                if (size >= 5) { // 리스트에 5개 이상 존재할 때
+                                                    Toast.makeText(SearchPlaceActivity.this, "더이상 투표리스트에 추가할 수 없습니다.", Toast.LENGTH_SHORT).show();
+                                                } else {
+                                                    db.collection("vote").document(id).update("place", FieldValue.arrayUnion(map));
+                                                    Toast.makeText(SearchPlaceActivity.this, "투표리스트에 추가되었습니다.", Toast.LENGTH_SHORT).show();
+                                                }
+                                            }
+                                            else{
+                                                Toast.makeText(SearchPlaceActivity.this, "이미 투표가 시작되었습니다.", Toast.LENGTH_SHORT).show();
+                                            }
+                                        }
+                                    };
+                                    delayHandler.postDelayed(r, 500); // 0.5초후
 
                                     docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                                         @Override
@@ -275,27 +302,6 @@ public class SearchPlaceActivity extends AppCompatActivity
                                             }
                                         }
                                     });
-
-                                    if(state.equals("valid")){ // 투표 시작 전 상태
-
-                                    HashMap<String, Object> map = new HashMap<>();
-                                    GeoPoint location = new GeoPoint(arrival.latitude, arrival.longitude);
-                                    List<String> voter = new ArrayList<>();
-                                    map.put("latlng", location);
-                                    map.put("vote", 0);
-                                    map.put("name", address);
-                                    map.put("voter", voter);
-
-                                    if (size >= 5) { // 리스트에 5개 이상 존재할 때
-                                        Toast.makeText(SearchPlaceActivity.this, "더이상 투표리스트에 추가할 수 없습니다.", Toast.LENGTH_SHORT).show();
-                                    } else {
-                                        db.collection("vote").document(id).update("place", FieldValue.arrayUnion(map));
-                                        Toast.makeText(SearchPlaceActivity.this, "투표리스트에 추가되었습니다.", Toast.LENGTH_SHORT).show();
-                                    }
-                                    }
-                                    else{
-                                        Toast.makeText(SearchPlaceActivity.this, "이미 투표가 시작되었습니다.", Toast.LENGTH_SHORT).show();
-                                    }
                                 }
                             })
                             .setNegativeButton("취소", new DialogInterface.OnClickListener(){// 취소 버튼 클릭시
