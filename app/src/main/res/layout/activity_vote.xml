@@ -22,7 +22,7 @@
         android:id="@+id/vote"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/place_list_view"
+        android:layout_below="@+id/com_Btn"
         android:orientation="horizontal"
         android:background="@android:color/white"
         >
@@ -33,7 +33,8 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:background="@drawable/back_name"
-            android:text="투표 시작" />
+            android:text="투표 시작"
+            android:visibility="invisible" />
 
         <Button
             android:id="@+id/end_Btn"
@@ -41,7 +42,8 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:background="@drawable/back_name"
-            android:text="투표 종료" />
+            android:text="투표 종료"
+            android:visibility="invisible" />
 
 
     </LinearLayout>
@@ -53,5 +55,6 @@
             android:background="@drawable/back_name"
             android:layout_below="@+id/place_list_view"
             android:text="투표 완료" />
+
 
 </RelativeLayout>
