@@ -665,10 +665,13 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
         System.out.println("sortRating start!");
 
         int num;
+        // 1위
         if(preferNum == 0){
             num = 8;
+        // 2위
         }else if(preferNum == 1){
             num = 5;
+        // 3위
         }else{
             num = 3;
         }
