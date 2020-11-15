@@ -451,15 +451,33 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
 
     // 2-1 가중치 계산
     private void addWeight() {
+        double[] variance = new double[userRatings.size()];
         for(int i=0; i< userRatings.size(); i++){
-//            Log.d(Tag,Arrays.toString(userRatings.get(i)));
             // 2. 분산 구하기
-            double std = calVariance(userRatings.get(i));
-            if (std > 1.3) {  // 현재 설정 : 표준편차 값이 1.15 이상인 경우 카테고리의 점수 조정
+            variance[i]= calVariance(userRatings.get(i));
+        }
+
+        Arrays.sort(variance); //오름차순
+        Log.d(Tag, Arrays.toString(variance));
+
+        int n = variance.length;
+        double m=0;
+
+        if(n%2==0){ //짝수
+            m= (variance[n/2] + variance[(n/2)+1])/2;
+        }else {
+            m=variance[(n+1)/2];
+        }
+
+        //가중치 적용
+        for(int i=0; i< userRatings.size(); i++){
+            double temp = calVariance(userRatings.get(i));
+            if (temp > m) { // 사용자 분산이 분산의 중앙값보다 크면
                 // 사용자 별점 업데이트
                 this.userRatings.set(i,ratingUpdate(userRatings.get(i)));
             }
         }
+
     }
 
     // 2-1. 분산 계산 -> 표준편차 계산
@@ -489,8 +507,8 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
     private Float[] ratingUpdate(Float[] rating) {
 
         for (int i = 0; i < rating.length; i++) {
-            if (rating[i]>2.5) {
-                rating[i] = rating[i] * 2.0f;
+            if (rating[i]>3) {
+                rating[i] = rating[i] * 1.5f;
             }else{
                 rating[i] = rating[i] * 0.5f;
             }
