@@ -33,6 +33,7 @@ import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 
 public class FragHome extends Fragment {
     private static final String TAG = "HomeFragment";
@@ -185,7 +186,8 @@ public class FragHome extends Fragment {
                                             document.getId());
 
                                     if(document.get("meetingPlace")!=null){
-                                        temp.setMeetingPlace(document.get("meetingPlace").toString());
+                                        HashMap<String, Object> place = (HashMap<String, Object>)document.get("meetingPlace");
+                                        temp.setMeetingPlace(place.get("name").toString());
                                     }
 
                                     if(document.get("meetingDate")!=null){
