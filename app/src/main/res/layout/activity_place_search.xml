@@ -34,7 +34,7 @@
             android:id="@+id/btn_route"
             android:layout_width="100dp"
             android:layout_height="48dp"
-            android:layout_marginRight="50dp"
+            android:layout_marginRight="30dp"
             android:background="@drawable/back_name"
             android:text="경로 검색" />
 
@@ -42,8 +42,16 @@
             android:id="@+id/btn_vote"
             android:layout_width="100dp"
             android:layout_height="48dp"
+            android:layout_marginRight="30dp"
             android:background="@drawable/back_name"
             android:text="투표 추가" />
+
+        <Button
+            android:id="@+id/btn_delete"
+            android:layout_width="100dp"
+            android:layout_height="48dp"
+            android:background="@drawable/back_name"
+            android:text="투표 삭제" />
 
     </LinearLayout>
 

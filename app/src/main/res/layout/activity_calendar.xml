@@ -17,7 +17,8 @@
         app:mcv_selectionColor="#a9dbf0cb"
         app:mcv_showOtherDates="defaults"
         tools:layout_editor_absoluteX="108dp"
-        tools:layout_editor_absoluteY="-53dp" />
+        tools:layout_editor_absoluteY="-53dp"
+        tools:ignore="MissingConstraints" />
 
     <TextView
         android:id="@+id/diaryTextView"

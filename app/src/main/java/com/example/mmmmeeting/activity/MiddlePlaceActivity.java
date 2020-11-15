@@ -232,9 +232,6 @@ public class MiddlePlaceActivity extends AppCompatActivity implements OnMapReady
         //String midAdr = "서울특별시 상계8동 동일로 1545";
 
         //LinearLayout 정의
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT);
-        //LinearLayout 정의
         RelativeLayout.LayoutParams rl_params = new RelativeLayout.LayoutParams(
                 ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT);
 
@@ -257,6 +254,7 @@ public class MiddlePlaceActivity extends AppCompatActivity implements OnMapReady
         btn_params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT,RelativeLayout.TRUE);
         btn_params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM,RelativeLayout.TRUE);
         btn_params.addRule(RelativeLayout.BELOW,tv_mid.getId());
+        btn_params.setMargins(0,0,30,0);
         btn_mid.setLayoutParams(btn_params);
         ly.addView(btn_mid);
 

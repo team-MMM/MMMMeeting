@@ -104,6 +104,7 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
     int count; //success
     int size;
     String state;
+    boolean result = false; //투표리스트에 없음
 
     Spinner spinner;
     ArrayAdapter<String> arrayAdapter;
@@ -117,6 +118,7 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
             spinnerAdd(categoryList);
         } ;
     } ;
+    Handler delayHandler = new Handler();
 
     private void spinnerAdd(ArrayList<String> categoryList) {
 
@@ -675,7 +677,7 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
                 //param.bottomMargin = 100;
                 fl_place_list.setLayoutParams(fl_param);
                 fl_place_list.setBackgroundColor(Color.WHITE);
-                fl_place_list.setPadding(0,10,0,30);
+                fl_place_list.setPadding(20,10,0,30);
 
 
                 RelativeLayout.LayoutParams rl_param = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
@@ -695,18 +697,29 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
                 pInfo.setLayoutParams(rl_param);
                 pl_name.addView(pInfo);
 
-                //좋아요버튼
-                Button favorite = new Button(PlaceListActivity.this);
+                //삭제버튼
+                Button delete = new Button(PlaceListActivity.this);
+                RelativeLayout.LayoutParams btn_param2 = new RelativeLayout.LayoutParams(90, 90);
+                btn_param2.addRule(RelativeLayout.ALIGN_PARENT_RIGHT, RelativeLayout.TRUE);
+                btn_param2.setMargins(0,0,20,0);
+                delete.setLayoutParams(btn_param2);
+                delete.setPadding(0, 20, 5, 0);
+                delete.setId(2*(i + 1));
+                delete.setBackground(ContextCompat.getDrawable(PlaceListActivity.this, R.drawable.delete));
+                pl_name.addView(delete);
+
+                //추가버튼
+                Button add = new Button(PlaceListActivity.this);
                 RelativeLayout.LayoutParams btn_param = new RelativeLayout.LayoutParams(90, 90);
-                btn_param.addRule(RelativeLayout.ALIGN_PARENT_RIGHT, RelativeLayout.TRUE);
-                favorite.setLayoutParams(btn_param);
-                favorite.setPadding(0, 20, 5, 0);
-                favorite.setId(i + 1);
-                favorite.setBackground(ContextCompat.getDrawable(PlaceListActivity.this, R.drawable.addvote));
-                pl_name.addView(favorite);
+                btn_param.addRule(RelativeLayout.LEFT_OF, delete.getId());
+                btn_param.setMargins(0,0,10,0);
+                add.setLayoutParams(btn_param);
+                add.setPadding(0, 20, 5, 0);
+                add.setId(2*i + 1);
+                add.setBackground(ContextCompat.getDrawable(PlaceListActivity.this, R.drawable.add_location));
+                pl_name.addView(add);
 
                 fl_place_list.addView(pl_name);
-
 
                 //LinearLayout 생성
                 LinearLayout ly = new LinearLayout(PlaceListActivity.this);
@@ -734,48 +747,45 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
 
                 String finalPlaceName = place_name[ratingList.get(j)];
                 LatLng pl = placeList[ratingList.get(j)];
-                favorite.setOnClickListener(new View.OnClickListener() {
+                //투표추가 버튼
+                add.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                         v.setSelected(!v.isSelected());//선택여부 반전
-
+                        checkList(pl); // 투표리스트에 존재하는지 확인
                         DocumentReference docRef = db.collection("vote").document(id);
-
-                        Handler delayHandler = new Handler();
 
                         Runnable r = new Runnable() {
                             @Override
                             public void run() {
                                 if(state.equals("valid")) {
-                                    HashMap<String, Object> map = new HashMap<>();
-                                    GeoPoint location = new GeoPoint(pl.latitude, pl.longitude);
-                                    List<String> voter = new ArrayList<>();
-                                    map.put("latlng", location);
-                                    map.put("vote", 0);
-                                    map.put("name", finalPlaceName);
-                                    map.put("voter", voter);
+                                    if(result){
+                                        result = false;
+                                        Toast.makeText(PlaceListActivity.this, "이미 추가된 장소입니다.", Toast.LENGTH_SHORT).show();
+                                    }else{
+                                        HashMap<String, Object> map = new HashMap<>();
+                                        GeoPoint location = new GeoPoint(pl.latitude, pl.longitude);
+                                        List<String> voter = new ArrayList<>();
+                                        map.put("latlng", location);
+                                        map.put("vote", 0);
+                                        map.put("name", finalPlaceName);
+                                        map.put("voter", voter);
 
-                                    DocumentReference doc = db.collection("vote").document(id);
-                                    if (v.isSelected()) {//현재 add버튼 누른 상태
-                                        System.out.println("size : " + size);
                                         if (size >= 5) { // 리스트에 5개 이상 존재할 때
                                             Toast.makeText(PlaceListActivity.this, "더이상 투표리스트에 추가할 수 없습니다.", Toast.LENGTH_SHORT).show();
-                                        } else {
-                                            doc.update("place", FieldValue.arrayUnion(map));
+                                        }else{
+                                            db.collection("vote").document(id).update("place", FieldValue.arrayUnion(map));
                                             Toast.makeText(PlaceListActivity.this, "투표리스트에 추가되었습니다.", Toast.LENGTH_SHORT).show();
                                         }
-                                    } else {
-                                        doc.update("place", FieldValue.arrayRemove(map));
-                                        Toast.makeText(PlaceListActivity.this, "취소되었습니다.", Toast.LENGTH_SHORT).show();
                                     }
                                 }
                                 else{
                                     Toast.makeText(PlaceListActivity.this, "이미 투표가 시작되었습니다.", Toast.LENGTH_SHORT).show();
                                 }
+
                             }
                         };
 
-                        delayHandler.postDelayed(r, 500); // 0.5초후
+                        delayHandler.postDelayed(r, 1000); // 1초후
 
                         docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                             @Override
@@ -801,6 +811,66 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
 
                     }
                 });
+                //투표삭제 버튼
+                delete.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        checkList(pl); // 투표리스트에 존재하는지 확인
+                        DocumentReference docRef = db.collection("vote").document(id);
+
+                        Runnable r = new Runnable() {
+                            @Override
+                            public void run() {
+                                if(state.equals("valid")) {
+                                    if (result) {
+                                        result = false;
+                                        HashMap<String, Object> map = new HashMap<>();
+                                        GeoPoint location = new GeoPoint(pl.latitude, pl.longitude);
+                                        List<String> voter = new ArrayList<>();
+                                        map.put("latlng", location);
+                                        map.put("vote", 0);
+                                        map.put("name", finalPlaceName);
+                                        map.put("voter", voter);
+
+                                        System.out.println("size : " + size);
+                                        docRef.update("place", FieldValue.arrayRemove(map));
+                                        Toast.makeText(PlaceListActivity.this, "투표리스트에서 삭제되었습니다.", Toast.LENGTH_SHORT).show();
+                                    }
+                                    else{
+                                        Toast.makeText(PlaceListActivity.this, "투표리스트에 존재하지 않습니다.", Toast.LENGTH_SHORT).show();
+                                    }
+                                }
+                                else{
+                                    Toast.makeText(PlaceListActivity.this, "이미 투표가 시작되었습니다.", Toast.LENGTH_SHORT).show();
+                                }
+                            }
+                        };
+
+                        delayHandler.postDelayed(r, 1000); // 1초후
+
+                        docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                            @Override
+                            public void onComplete(@NonNull com.google.android.gms.tasks.Task<DocumentSnapshot> task) {
+                                if (task.isSuccessful()) {
+                                    DocumentSnapshot document = task.getResult();
+                                    if (document.exists()) {
+                                        // 해당 문서가 존재하는 경우
+                                        List<HashMap<String,Object>> list = (List<HashMap<String, Object>>)document.get("place");
+                                        size = (int)list.size();
+                                        state = document.getData().get("state").toString(); // 투표 상태
+                                        delayHandler.sendEmptyMessage(0);
+                                        Log.d("Attend", "Find document");
+                                    } else {
+                                        // 존재하지 않는 문서
+                                        Log.d("Attend", "No Document");
+                                    }
+                                } else {
+                                    Log.d("Attend", "Task Fail : " + task.getException());
+                                }
+                            }
+                        });
+                    }
+                });
 
                 MarkerOptions markerOptions = new MarkerOptions();
                 markerOptions.position(pl);
@@ -819,5 +889,37 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
         }
 
     }
+    //투표리스트에 해당 장소가 있는지 확인
+    private void checkList(LatLng location){
+        DocumentReference docRef = db.collection("vote").document(id);
+        docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull com.google.android.gms.tasks.Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    if (document.exists()) {
+                        // 해당 문서가 존재하는 경우
+                        List<HashMap<String,Object>> list = (List<HashMap<String, Object>>)document.get("place");
+                        for(int i =0; i<list.size(); i++) {
+                            HashMap<String, Object> hashMap = new HashMap<String, Object>();
+                            hashMap = list.get(i);
+                            GeoPoint geo = (GeoPoint) hashMap.get("latlng");
+                            LatLng loc = new LatLng(geo.getLatitude(),geo.getLongitude());
+                            if(loc.equals(location)){
+                                result = true; // 투표리스트에 이미 있음
+                                Log.d("CheckList", "Success");
+                            }
+                        }
+                    } else {
+                        // 존재하지 않는 문서
+                        Log.d("CheckList", "No Document");
+                    }
+                } else {
+                    Log.d("CheckList", "Task Fail : " + task.getException());
+                }
+            }
+        });
+    }
 
 }
+
