@@ -1,5 +1,6 @@
 package com.example.mmmmeeting.activity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -33,6 +34,7 @@ import java.util.Date;
 
 public class CheckLateActivity extends AppCompatActivity implements View.OnClickListener {
 
+    private ScheduleInfo postInfo;
     private int hour,minute;
     private Date calDate;
     private String scID;
@@ -67,8 +69,9 @@ public class CheckLateActivity extends AppCompatActivity implements View.OnClick
         tempCal = Calendar.getInstance();
 
         // 해당 일정의 ID를 통해 meetingDate를 찾아냄
-        ScheduleInfo scInfo = (ScheduleInfo) getIntent().getSerializableExtra("scheduleInfo");
-        scID=scInfo.getId();
+
+        postInfo = (ScheduleInfo) getIntent().getSerializableExtra("scheduleInfo");
+        scID=postInfo.getId();
         DocumentReference docRef = db.collection("schedule").document(scID);
 
         docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
@@ -103,7 +106,26 @@ public class CheckLateActivity extends AppCompatActivity implements View.OnClick
             public void handleMessage(Message msg){
                 Bundle bd = msg.getData( ) ;
                 String str = bd.getString("arg");
-                sendToast(str);
+                switch (str) {
+                    case "Late":
+                        Toast.makeText(getApplicationContext(),"약속 시간이 지나서 출석체크 할 수 없습니다.",Toast.LENGTH_SHORT).show();
+                        thread.stopThread();
+                        finish();
+                        break;
+                    case "TimeCheck":
+                        String date_text = new SimpleDateFormat(
+                                "hh시 mm분").format(calDate);
+                        System.out.println(date_text);
+                        thread.stopThread();
+                        myStartActivity(CurrentMapActivity.class, postInfo, hour, minute);
+                        break;
+
+                    case "NotNow":
+                        Toast.makeText(getApplicationContext(),"만남 5분 전부터 출석체크 가능합니다.",Toast.LENGTH_SHORT).show();
+                        thread.stopThread();
+                        finish();
+                        break;
+                }
             }
         };
 
@@ -135,25 +157,23 @@ public class CheckLateActivity extends AppCompatActivity implements View.OnClick
 
                 Log.d("my",current+" "+calDate);
 
-                // now > calDate : 현재 시간이 약속 시간을 지났을 때 약 1초 뒤에 창 종료됨
-                if(now.compareTo(calDate) == 1){
+                if(nowHour >= hour && nowMinute > minute){
                     // flag를 없애고 bundle로 값을 전달해줌
                     Bundle bd = new Bundle();
                     bd.putString("arg", "Late");
                     sendMessage(bd);
-                    stopThread();
                     break;
-                }else if(nowHour == hour && nowMinute >= minute-5 ){
+                }else if((nowHour == hour && nowMinute >= minute-5) ||
+                        (nowHour == hour+1 && nowMinute >= minute-5-60) ){
                     Bundle bd = new Bundle();
                     bd.putString("arg","TimeCheck");
                     sendMessage(bd);
-                    stopThread();
-
+                    break;
                 }else{
                     Bundle bd = new Bundle();
                     bd.putString("arg","NotNow");
                     sendMessage(bd);
-                    stopThread();
+                    break;
                 }
             }
 
@@ -169,28 +189,7 @@ public class CheckLateActivity extends AppCompatActivity implements View.OnClick
         msg.setData(bd);
         handler.sendMessage(msg);
     }
-    public void sendToast(String str){
 
-        switch (str) {
-            case "Late":
-                Toast.makeText(getApplicationContext(),"약속 시간이 지나서 출석체크 할 수 없습니다.",Toast.LENGTH_SHORT).show();
-                break;
-            case "TimeCheck":
-                String date_text = new SimpleDateFormat(
-                        "hh시 mm분").format(calDate);
-                System.out.println(date_text);
-                Toast.makeText(getApplicationContext(),"약속 시간 " + date_text+"을 잘 지키셨군요!", Toast.LENGTH_SHORT).show();
-
-                // 스케쥴 lateComer에 출첵한 사람 저장 -> 타이틀 변경 예정
-                DocumentReference docRef = db.collection("schedule").document(scID);
-                docRef.update("lateComer", FieldValue.arrayUnion(user.getUid()));
-                break;
-
-            case "NotNow":
-                Toast.makeText(getApplicationContext(),"만남 5분 전부터 출석체크 가능합니다.",Toast.LENGTH_SHORT).show();
-                break;
-        }
-    }
 
 
     public void onClick(View v) {
@@ -200,7 +199,6 @@ public class CheckLateActivity extends AppCompatActivity implements View.OnClick
                 // -> thread를 계속 실행하니까 flag값이 계속 바뀜
                 thread = new MyThread();
                 thread.start();
-                finish();
 
         }
     }
@@ -272,6 +270,14 @@ public class CheckLateActivity extends AppCompatActivity implements View.OnClick
         if(thread!=null){
             thread.stopThread();
         }
+    }
+
+    private void myStartActivity(Class c, ScheduleInfo postInfo, int hour, int minute) {
+        Intent intent = new Intent(this,c);
+        intent.putExtra("scheduleInfo", postInfo);
+        intent.putExtra("hour", hour);
+        intent.putExtra("minute", minute);
+        startActivityForResult(intent, 0);
     }
 
 

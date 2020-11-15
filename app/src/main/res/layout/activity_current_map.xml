@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/layout_current"
+    android:orientation="vertical"
+    tools:context=".activity.CurrentMapActivity" >
+
+    <fragment
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="9"
+        android:id="@+id/currentMap"
+        tools:context=".MapsActivity"
+        android:name="com.google.android.gms.maps.SupportMapFragment" />
+
+    <Button
+        android:id="@+id/currentButton"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="0.8"
+        android:textSize="15sp"
+        android:textColor="@android:color/holo_blue_dark"
+        android:background="@drawable/button_shape"
+        android:text="출석체크" />
+
+</LinearLayout>
