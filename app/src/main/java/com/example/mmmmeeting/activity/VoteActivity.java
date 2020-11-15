@@ -130,6 +130,7 @@ public class VoteActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) { // 종료 버튼 클릭
                 //일단 최다 득표
+                HashMap<String, Object> meetingPlace = new HashMap<>();//최종 장소
                 int count; // 장소별 투표수
                 int max; // 최대값
                 int check = 0; // 최다 득표가 여러개인지 체크
@@ -149,9 +150,13 @@ public class VoteActivity extends AppCompatActivity {
                 }
                 if (check == 1) { //최다 득표 장수가 하나면 바로 등록
                     votePlace = maxList.get(0);
+                    GeoPoint place = (GeoPoint) votePlace.get("latlng"); //위도, 경도
                     String name = (String) votePlace.get("name");
+                    meetingPlace.put("name", name);
+                    meetingPlace.put("latlng", place);
+
                     Toast.makeText(VoteActivity.this, "가장 많은 투표를 받은 장소는 " + name + "입니다.", Toast.LENGTH_SHORT).show();
-                    db.collection("schedule").document(scheduleId).update("meetingPlace", name); // db에 최종장소 올리기
+                    db.collection("schedule").document(scheduleId).update("meetingPlace", meetingPlace); // db에 최종장소 올리기
                     Toast.makeText(VoteActivity.this, name + "(으)로 약속장소가 설정되었습니다.", Toast.LENGTH_SHORT).show();
                 } else {
                     Toast.makeText(VoteActivity.this, "가장 많은 투표를 받은 장소가 " + check + "곳입니다." + "\n" + "최종 선택이 필요합니다.", Toast.LENGTH_SHORT).show();
