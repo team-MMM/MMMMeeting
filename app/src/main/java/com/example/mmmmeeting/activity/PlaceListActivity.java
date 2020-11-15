@@ -195,6 +195,8 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                progress = progress / 100;
+                progress = progress * 100;
                 radiustv.setText("검색 범위 : " + progress);
                 radius[0] =progress;
             }
