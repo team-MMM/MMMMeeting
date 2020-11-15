@@ -24,6 +24,7 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.RatingBar;
 import android.widget.RelativeLayout;
+import android.widget.SeekBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -42,9 +43,11 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.PolygonOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -87,8 +90,6 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
 
     GoogleMap mMap;
     LatLng midpoint = new LatLng(37.584114826538716, 127.05876976018965);
-
-
     LinearLayout fl_place_list,place_list_view;
 
     private String str_url = null;
@@ -109,12 +110,17 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
     Spinner spinner;
     ArrayAdapter<String> arrayAdapter;
 
+    TextView radiustv;
+    SeekBar seekBar;
+    String currentCategory;
+
     Handler mHandler = new Handler(){
         public void handleMessage(android.os.Message msg)
         {
             Bundle bd = msg.getData( ) ;            /// 전달 받은 메세지에서 번들을 받음
             ArrayList<String> categoryList = bd.getStringArrayList("arg");    /// 번들에 들어있는 값 꺼냄
             // Category 찾은 다음에 쓸 함수
+            getRadius();
             spinnerAdd(categoryList);
         } ;
     } ;
@@ -132,37 +138,16 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 
                 layoutclear();
+                currentCategory=categoryList.get(position);
 
-                switch (categoryList.get(position)) {
-                    case "shopping":
-                        //shopping_mall + department_store
-                        Log.d(Tag, "Shopping");
-                        showPlaceInformation("shopping_mall",2000);
-                        showPlaceInformation("department_store",2000);
-                        break;
-                    case "activity":
-                        // amusement_park + aquarium +art_gallery +stadium +zoo
-                        Log.d(Tag, "Activity");
-                        showPlaceInformation("amusement_park",2000);
-                        showPlaceInformation("aquarium",2000);
-                        showPlaceInformation("art_gallery",2000);
-                        showPlaceInformation("stadium",2000);
-                        showPlaceInformation("zoo",2000);
-                        break;
-                    case "cafe":
-                        Log.d(Tag, "Cafe");
-                        showPlaceInformation("cafe",1500);
-                        break;
-                    case "restaurant":
-                        Log.d(Tag, "restaurant");
-                        showPlaceInformation("restaurant",1500);
-                        break;
-                    case "park":
-                        Log.d(Tag, "park");
-                        showPlaceInformation("park",2000);
-                        break;
-                }
+                CircleOptions circle = new CircleOptions().center(midpoint)
+                        .radius(500)      //반지름 단위 : m
+                        .strokeWidth(0)
+                        .strokeColor(Color.parseColor("#4071cce7"))
+                        .fillColor(Color.parseColor("#4071cce7"));
+                mMap.addCircle(circle);
 
+                categoryItem(currentCategory,500);
             }
 
             @Override
@@ -170,6 +155,74 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
 
             }
         });
+    }
+
+    private void categoryItem(String category, int radius) {
+        switch (category) {
+            case "shopping":
+                //shopping_mall + department_store
+                Log.d(Tag, "Shopping");
+                showPlaceInformation("shopping_mall",radius);
+                showPlaceInformation("department_store",radius);
+                break;
+            case "activity":
+                // amusement_park + aquarium +art_gallery +stadium +zoo
+                Log.d(Tag, "Activity");
+                showPlaceInformation("amusement_park",radius);
+                showPlaceInformation("aquarium",radius);
+                showPlaceInformation("art_gallery",radius);
+                showPlaceInformation("stadium",radius);
+                showPlaceInformation("zoo",radius);
+                break;
+            case "cafe":
+                Log.d(Tag, "Cafe");
+                showPlaceInformation("cafe",radius);
+                break;
+            case "restaurant":
+                Log.d(Tag, "restaurant");
+                showPlaceInformation("restaurant",radius);
+                break;
+            case "park":
+                Log.d(Tag, "park");
+                showPlaceInformation("park",radius);
+                break;
+        }
+
+    }
+
+    private void getRadius() {
+        final int[] radius = {0};
+        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                radiustv.setText("검색 범위 : " + progress);
+                radius[0] =progress;
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                layoutclear();
+
+                CircleOptions circle = new CircleOptions().center(midpoint)
+                        .radius(radius[0])      //반지름 단위 : m
+                        .strokeWidth(0)
+                        .strokeColor(Color.parseColor("#4071cce7"))
+                        .fillColor(Color.parseColor("#4071cce7"));
+
+                int zoom = 15-radius[0]/900;
+                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(midpoint, zoom));
+
+                mMap.addCircle(circle);
+
+                categoryItem(currentCategory, radius[0]);
+            }
+        });
+
     }
 
     private void layoutclear() {
@@ -183,6 +236,7 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
                 .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
         mMap.addMarker(marker);
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(midpoint, 15));
+
         Log.d(Tag, "Clear");
     }
 
@@ -208,6 +262,8 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
 
         place_list_view = findViewById(R.id.place_list_view);
         spinner = findViewById(R.id.categoryList);
+        radiustv = findViewById(R.id.radiusText);
+        seekBar = findViewById(R.id.radiusBar);
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.place_map);
@@ -282,6 +338,14 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
                 .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
         mMap.addMarker(marker);
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(midpoint, 15));
+
+        CircleOptions circle = new CircleOptions().center(midpoint)
+                .radius(500)      //반지름 단위 : m
+                .strokeWidth(0)
+                .strokeColor(Color.parseColor("#4071cce7"))
+                .fillColor(Color.parseColor("#4071cce7"));
+        mMap.addCircle(circle);
+
         //mMap.clear();
     }
 
