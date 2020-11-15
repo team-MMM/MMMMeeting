@@ -94,6 +94,7 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
 
     private String str_url = null;
     private String placeInfo;
+    private int preferNum;
 
     private String Tag = "category Test";
     String name;
@@ -118,10 +119,14 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
         public void handleMessage(android.os.Message msg)
         {
             Bundle bd = msg.getData( ) ;            /// 전달 받은 메세지에서 번들을 받음
-            ArrayList<String> categoryList = bd.getStringArrayList("arg");    /// 번들에 들어있는 값 꺼냄
-            // Category 찾은 다음에 쓸 함수
-            getRadius();
-            spinnerAdd(categoryList);
+            if(bd.getStringArrayList("arg")!=null) {
+                ArrayList<String> categoryList = bd.getStringArrayList("arg");    /// 번들에 들어있는 값 꺼냄
+                getRadius();
+                // Category 찾은 다음에 쓸 함수
+                spinnerAdd(categoryList);
+            }else {
+                preferNum = bd.getInt("num");
+            }
         } ;
     } ;
     Handler delayHandler = new Handler();
@@ -139,6 +144,7 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
 
                 layoutclear();
                 currentCategory=categoryList.get(position);
+                sendPosition(position);
 
                 CircleOptions circle = new CircleOptions().center(midpoint)
                         .radius(500)      //반지름 단위 : m
@@ -189,6 +195,15 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
         }
 
     }
+
+    private void sendPosition(int position){
+        Bundle bd = new Bundle();      /// 번들 생성
+        bd.putInt("num",position);
+        Message msg = mHandler.obtainMessage();   /// 핸들에 전달할 메세지 구조체 받기
+        msg.setData(bd);                     /// 메세지에 번들 넣기
+        mHandler.handleMessage(msg);
+    }
+
 
     private void getRadius() {
         final int[] radius = {0};
@@ -649,7 +664,15 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
 
         System.out.println("sortRating start!");
 
-        int num = 5;
+        int num;
+        if(preferNum == 0){
+            num = 8;
+        }else if(preferNum == 1){
+            num = 5;
+        }else{
+            num = 3;
+        }
+
         str_url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location="
                 +midpoint.latitude+","+midpoint.longitude+
                 "&radius="+radius+"&types="+type+"&key=AIzaSyDZFlYs370FtbLuByL1cebdJdh8R-KF1xk&language=ko";
