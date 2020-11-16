@@ -510,11 +510,14 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
     // 1-3 맵 -> 배열로 변경 (계산 편리, 카테고리 정렬, 출석 점수 반영)
     private void MapToArray(Map<String, Float> rating, String userID) {
         Float[] temp = new Float[rating.size()];
-        int point=1;
+        float point=1;
 
         if(!best.isEmpty()&&best.containsKey(userID)){
-            point =  Integer.valueOf(String.valueOf(best.get(userID)));
+            point =  Float.valueOf(String.valueOf(best.get(userID)));
         }
+
+        point *= 0.1;
+        Log.d (Tag, userID + " Point is " + point);
 
         // 배열에 저장
         for (String key : rating.keySet()) {
