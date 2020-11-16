@@ -108,6 +108,7 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
     String state;
     boolean result = false; //투표리스트에 없음
 
+    HashMap<String, Integer> best;
     Spinner spinner;
     ArrayAdapter<String> arrayAdapter;
 
@@ -470,10 +471,13 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
                         // 모임 이름이 같은 경우 해당 모임의 코드를 텍스트뷰에 출력
                         if (document.get("name").toString().equals(name)) {
                             // 찾은 모임의 사용자 테이블로
+                            best= (HashMap<String, Integer>) document.get("best");
                             List<String> users = (List<String>) document.get("userID");
                             for (int i = 0; i < users.size(); i++) {
                                 userRating(users.get(i));
                             }
+
+                            Log.d(Tag, "Add check " + userRatings.toString());
                             break;
                         }
                     }
@@ -494,7 +498,7 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
                     DocumentSnapshot document = task.getResult();
                     if (document.exists()) {
                         MemberInfo user = document.toObject(MemberInfo.class);
-                        MapToArray(user.getRating());
+                        MapToArray(user.getRating(), userID);
                     }
                 } else {
                     Log.d(Tag, "Task Fail : " + task.getException());
@@ -503,32 +507,40 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
         });
     }
 
-    // 1-3 맵 -> 배열로 변경 (계산 편리, 카테고리 정렬)
-    private void MapToArray(Map<String, Float> rating) {
+    // 1-3 맵 -> 배열로 변경 (계산 편리, 카테고리 정렬, 출석 점수 반영)
+    private void MapToArray(Map<String, Float> rating, String userID) {
         Float[] temp = new Float[rating.size()];
+        int point=1;
+
+        if(!best.isEmpty()&&best.containsKey(userID)){
+            point =  Integer.valueOf(String.valueOf(best.get(userID)));
+        }
+
         // 배열에 저장
         for (String key : rating.keySet()) {
             switch (key){
                 case "restaurant":
-                    temp[0]=rating.get(key);
+                    temp[0]=rating.get(key)*point;
                     break;
                 case "cafe":
-                    temp[1]=rating.get(key);
+                    temp[1]=rating.get(key)*point;
                     break;
                 case "park":
-                    temp[2]=rating.get(key);
+                    temp[2]=rating.get(key)*point;
                     break;
                 case "shopping":
-                    temp[3]=rating.get(key);
+                    temp[3]=rating.get(key)*point;
                     break;
                 case "act":
-                    temp[4]=rating.get(key);
+                    temp[4]=rating.get(key)*point;
                     break;
             }
         }
+
         this.userRatings.add(temp);
 //        Log.d(Tag,"size is "+Arrays.toString(temp));
     }
+
 
     // 2-1 가중치 계산
     private void addWeight() {
@@ -753,14 +765,11 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
 
                 if(radius < 1000){
                     // rating 점수 + 거리 점수의 가중치를 [0.1:0.3]으로 환산한 최종 점수
-                    Log.d(Tag, "1000 Radius is " + radius);
                     ratingMap.put(j,(float)(0.1 * rat + 0.3 * distancePoint));
                 }
                 else if(radius < 2000){
-                    Log.d(Tag, "2000 Radius is " + radius);
                     ratingMap.put(j,(float)(0.1 * rat + 0.1 * distancePoint));
                 }else{
-                    Log.d(Tag, "3000 Radius is " + radius);
                     ratingMap.put(j,(float)(0.3 * rat + 0.1 * distancePoint));
                 }
 

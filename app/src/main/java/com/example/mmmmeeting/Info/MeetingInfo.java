@@ -1,6 +1,7 @@
 package com.example.mmmmeeting.Info;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 // 모임 정보 : 모임이름, 모임 설명, 모임원에 대한 정보 저장, 가져오기 가능
 public class MeetingInfo {
@@ -8,6 +9,7 @@ public class MeetingInfo {
     private String description;
     private String leader;
     private ArrayList<String> userID = new ArrayList<>();
+    private HashMap<String,Integer> best = new  HashMap<>();
 
     public MeetingInfo(String name, String description){
         this.meetingName = name;
@@ -45,4 +47,13 @@ public class MeetingInfo {
     public void setLeader(String leader){
         this.leader=leader;
     }
+
+    public HashMap<String, Integer> getBest() {
+        return best;
+    }
+
+    public void setBest(HashMap<String, Integer> best){
+        this.best=best;
+    }
+
 }
