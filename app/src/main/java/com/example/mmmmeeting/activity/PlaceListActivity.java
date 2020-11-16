@@ -210,8 +210,8 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                progress = progress / 100;
-                progress = progress * 100;
+                progress = progress / 500;
+                progress = progress * 500;
                 radiustv.setText("검색 범위 : " + progress);
                 radius[0] =progress;
             }
@@ -751,8 +751,19 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
                 //System.out.println(distancePoint);
                 float rat = ratingMap.get(j).floatValue();
 
-                // rating 점수 + 거리 점수의 가중치를 [0.1/0.1]으로 환산한 최종 점수
-                ratingMap.put(j,(float)(0.1 * rat + 0.1 * distancePoint));
+                if(radius < 1000){
+                    // rating 점수 + 거리 점수의 가중치를 [0.1:0.3]으로 환산한 최종 점수
+                    Log.d(Tag, "1000 Radius is " + radius);
+                    ratingMap.put(j,(float)(0.1 * rat + 0.3 * distancePoint));
+                }
+                else if(radius < 2000){
+                    Log.d(Tag, "2000 Radius is " + radius);
+                    ratingMap.put(j,(float)(0.1 * rat + 0.1 * distancePoint));
+                }else{
+                    Log.d(Tag, "3000 Radius is " + radius);
+                    ratingMap.put(j,(float)(0.3 * rat + 0.1 * distancePoint));
+                }
+
                 System.out.println(j + "번 최종 점수" + ratingMap.get(j));
             }
 
