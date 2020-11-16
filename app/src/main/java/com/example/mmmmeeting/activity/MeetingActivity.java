@@ -16,7 +16,7 @@ import androidx.fragment.app.FragmentTransaction;
 
 import com.example.mmmmeeting.R;
 import com.example.mmmmeeting.fragment.FragAccount;
-import com.example.mmmmeeting.fragment.FragAlarm;
+import com.example.mmmmeeting.fragment.FragAttend;
 import com.example.mmmmeeting.fragment.FragBoard;
 import com.example.mmmmeeting.fragment.FragCalendar;
 import com.example.mmmmeeting.fragment.FragChat;
@@ -41,7 +41,7 @@ public class MeetingActivity extends BasicActivity {
     private FragmentTransaction ft;
     private FragCalendar fragCalendar;
     private FragChat fragChat;
-    private FragAlarm fragAlarm;
+    private FragAttend fragAlarm;
     private FragAccount fragAccount;
     private Fragment fragment_ac;
     String getName;
@@ -100,7 +100,7 @@ public class MeetingActivity extends BasicActivity {
 
                         return true;
                     case R.id.menu_alarm:
-                        FragAlarm fragAlarm = new FragAlarm();
+                        FragAttend fragAlarm = new FragAttend();
                         bundle.putString("Name", getIntent().getExtras().getString("Name"));
                         fragAlarm.setArguments(bundle);
                         getSupportFragmentManager().beginTransaction()

@@ -1,5 +1,6 @@
 package com.example.mmmmeeting.fragment;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Gravity;
@@ -14,45 +15,37 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-import com.example.mmmmeeting.Info.ScheduleInfo;
 import com.example.mmmmeeting.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
-import org.w3c.dom.Text;
-
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class FragAlarm extends Fragment {
+public class FragAttend extends Fragment {
     private View view;
     private FirebaseFirestore db;
     private String meetingName;
-
     private List<Map.Entry<String,Integer>> list_entries;
-    private HashMap<String,Integer> latemap;
-    private ArrayList<ArrayList> latelist;
 
-    LinearLayout latecomer_show;
+    LinearLayout attend_show;
     TextView best_title;
 
+    String Tag = "attend test";
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        view = inflater.inflate(R.layout.frag_alarm,container,false);
-        latecomer_show = (LinearLayout)view.findViewById(R.id.latecomer_show);
-        best_title = (TextView)view.findViewById(R.id.best_title);
+        view = inflater.inflate(R.layout.frag_attend,container,false);
+        attend_show = view.findViewById(R.id.attend_show);
+        best_title = view.findViewById(R.id.best_title);
         db = FirebaseFirestore.getInstance();
 
         Bundle bundle = this.getArguments();
@@ -70,14 +63,8 @@ public class FragAlarm extends Fragment {
                         if (task.isSuccessful()) {
                             for (QueryDocumentSnapshot document : task.getResult()) {
                                 if (document.get("name").toString().equals(meetingName)) {
-
-                                    latelist = new ArrayList<>();
-                                    latemap = new HashMap<>();
-                                    latemap.clear();
-
-                                    System.out.println("미팅 이름 : "+meetingName);
-                                    System.out.println("여기 들어옴");
-                                    setLateComer(meetingName);
+                                    Log.d(Tag, "meeting find : " + document.get("name"));
+                                    setAttend(meetingName);
                                     return;
                                 }
                             }
@@ -88,91 +75,81 @@ public class FragAlarm extends Fragment {
         return view;
     }
 
-    public void setLateComer(String getid){
+    private void setAttend(String getId){
 
         db.collection("schedule").get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         if (task.isSuccessful()) {
+                            HashMap<String,Integer> attendMap = new HashMap<>();
+                            attendMap.clear();
+                            int count = 0;
+
                             for (QueryDocumentSnapshot document : task.getResult()) {
-                                System.out.println("latecomer id : "+document.getId());
-                                System.out.println("lateComer내의 meetingID : "+document.get("meetingID").toString());
-                                if(getid.equals(document.get("meetingID").toString())){
-                                    //latelist.add(Arrays.asList(document.get("lateComer")).toArray());
-                                    System.out.println("리스트에 지각자 저장");
-                                    latelist.add((ArrayList)document.get("lateComer"));
-                                    System.out.println("latelist출력 : "+latelist);
+                                // 위에서 부터 5개 약속만 점수로
+                                if(getId.equals(document.get("meetingID").toString())&&count++<5){
+                                    countAttend((ArrayList<String>)document.get("lateComer"),attendMap);
                                 }
                             }
-                            setList();
+
+                            mapSort(attendMap);
                         }
                     }
                 });
     }
 
-    public void setList(){
+    private void mapSort(HashMap<String,Integer> attendMap) {
 
-        if(latelist.size()==0){
-            TextView nultxt = new TextView(getContext());
-            nultxt.setText("아직 지각자 없음");
-            nultxt.setTextSize(20);
-            latecomer_show.addView(nultxt);
+        Log.d(Tag, "attender map is " + attendMap.toString());
+
+        if(attendMap.isEmpty()){
+            TextView nulltxt = new TextView(getContext());
+            nulltxt.setText("출석 기록이 없습니다.");
+            nulltxt.setTextSize(30);
+            nulltxt.setTextColor(Color.BLACK);
+            attend_show.addView(nulltxt);
+            return;
         }
 
-        for(int i=0;i<latelist.size();i++){
-            if(latelist.get(i)!=null){
-                System.out.println("latelist 출력 : "+latelist.get(i));
-                //String[] mlatelist = new String[latelist.get(i).size()];
-                //String[] mlatelist = Arrays.asList(latelist.get(i)).toArray(new String[latelist.get(i).size()]);
-                ArrayList<String> mlatelist = latelist.get(i);
-                System.out.println("mlatelist 출력 : "+mlatelist);
-                System.out.println("mlatelist의 사이즈 : "+mlatelist.size());
-
-                //지각자 점수 : 약속참여자들의 수만큼 점수 할당
-                int late_score = mlatelist.size();
-                System.out.println("late score : "+late_score);
-
-                //map에 참여자들의 id와 latescore를 같이 저장
-                for(int j=0;j<mlatelist.size();j++){
-                    String user=mlatelist.get(j);//HashMap의key
-                    System.out.println("uid출력 : "+user);
-
-                    if(latemap.get(user)==null){
-                        latemap.put(user,late_score);
-                    }else {
-                        latemap.put(user, latemap.get(user) + late_score);
-                        System.out.println("지각자 점수 출력 : " + latemap.get(user));
-                    }
-                    late_score--;
-                }
-            }else{
-                break;
-            }
-        }
-        System.out.println("latemap 출력 :"+latemap);
-
-        list_entries = new ArrayList<Map.Entry<String, Integer>>(latemap.entrySet());
+        list_entries = new ArrayList<>(attendMap.entrySet());
         // 비교함수 Comparator를 사용하여 내림 차순으로 정렬
         Collections.sort(list_entries, new Comparator<Map.Entry<String, Integer>>() {
             @Override
-            public int compare(Map.Entry<String, Integer> obj1, Map.Entry<String, Integer> obj2)
-            {
+            public int compare(Map.Entry<String, Integer> obj1, Map.Entry<String, Integer> obj2) {
                 // 내림 차순으로 정렬
                 return obj2.getValue().compareTo(obj1.getValue());
             }
         });
 
-        int i=0;
-        for (Map.Entry<String, Integer> entry : list_entries) {
-            best_title.setVisibility(view.VISIBLE);
-            setLayout(i+1,entry.getKey(),entry.getValue());
-            i++;
+        Log.d(Tag, "list_entries is " + list_entries.toString());
 
+        int i = 0;
+        for (Map.Entry<String, Integer> entry : list_entries) {
+            setLayout(i + 1, entry.getKey());
+            i++;
         }
+
     }
 
-    public void setLayout(int num,String user_id,int score){
+    private void countAttend(ArrayList<String> attender, HashMap<String,Integer> attendMap) {
+        if(attender==null){
+            return;
+        }
+
+        for(int i=0; i<attender.size(); i++){
+            if(attendMap.containsKey(attender.get(i))){
+                attendMap.put(attender.get(i),attendMap.get(attender.get(i))+1);
+            }
+            else {
+                attendMap.put(attender.get(i),1);
+            }
+        }
+
+        Log.d(Tag, "attender map is " + attendMap.toString());
+    }
+
+    public void setLayout(int num,String user_id){
 
         //db에서 모임원들 이름 가져오기
         db.collection("users").get()
@@ -181,13 +158,13 @@ public class FragAlarm extends Fragment {
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         if (task.isSuccessful()) {
                             for (QueryDocumentSnapshot document : task.getResult()) {
-                                if (user_id.toString().contains(document.getId())) {
+                                if (user_id.equals(document.getId())) {
                                     String user_name = document.get("name").toString();
 
-                                    System.out.println("지각자 출력");
                                     //LinearLayout 정의
                                     LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
                                             ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                                    params.setMargins(15,15,15,10);
 
                                     //LinearLayout 생성
                                     LinearLayout ly = new LinearLayout(getContext());
@@ -198,7 +175,8 @@ public class FragAlarm extends Fragment {
                                     TextView rank = new TextView(getContext());
                                     rank.setLayoutParams(params);
                                     rank.setText(num + "등");
-                                    rank.setTextSize(20);
+                                    rank.setTextSize(25);
+                                    rank.setTextColor(Color.BLACK);
                                     ly.addView(rank);
 
                                     //ImageView 생성
@@ -220,13 +198,7 @@ public class FragAlarm extends Fragment {
 
                                     ly.addView(ivly);
 
-                                    TextView lateInfo = new TextView(getContext());
-                                    lateInfo.setLayoutParams(params);
-                                    lateInfo.setText("( 점수 : " + score + " )");
-                                    ly.addView(lateInfo);
-                                    ly.setPadding(0, 0, 0, 30);
-
-                                    latecomer_show.addView(ly);
+                                    attend_show.addView(ly);
 
                                 }
                             }

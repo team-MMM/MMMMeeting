@@ -637,14 +637,7 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
                 case 1: this.category.add("cafe"); break;
                 case 2: this.category.add("park"); break;
                 case 3: this.category.add("shopping"); break;
-//                    this.category.add("shopping_mall"); this.category.add("department_store"); break;
                 case 4: this.category.add("activity"); break;
-//                    this.category.add("amusement_park");
-//                    this.category.add("aquarium");
-//                    this.category.add("art_gallery");
-//                    this.category.add("stadium");
-//                    this.category.add("zoo");
-//                    break;
             }
         }
     }
