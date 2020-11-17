@@ -26,11 +26,15 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.type.LatLng;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 
 public class CheckLateActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -45,6 +49,8 @@ public class CheckLateActivity extends AppCompatActivity implements View.OnClick
     Calendar tempCal;
     TextView meetingText;
     Button attendanceBtn;
+    Date meetingDate;
+    String place;
 
     MyThread thread;
     Handler handler;
@@ -80,8 +86,15 @@ public class CheckLateActivity extends AppCompatActivity implements View.OnClick
                 if (task.isSuccessful()) {
                     DocumentSnapshot document = task.getResult();
                     if (document.exists()) {
-                        Date meetingDate =  document.getDate("meetingDate");
+                        meetingDate =  document.getDate("meetingDate");
+                        Map<String, String> placeMap = (Map<String, String>) document.getData().get("meetingPlace");
+                        place = placeMap.get("name");
                         // 미팅 날짜를 get으로 편하게 받아오기 위해 캘린더 객체 생성
+                        if(meetingDate == null){
+                            meetingText.setText("약속 날짜가 정해지지 않았습니다.");
+                            return;
+                        }
+
                         calendar.setTime(meetingDate);
                         hour = calendar.get(Calendar.HOUR_OF_DAY);
                         minute = calendar.get(Calendar.MINUTE);
@@ -163,8 +176,15 @@ public class CheckLateActivity extends AppCompatActivity implements View.OnClick
                     bd.putString("arg", "Late");
                     sendMessage(bd);
                     break;
-                }else if((nowHour == hour && nowMinute >= minute-5) ||
-                        (nowHour == hour+1 && nowMinute >= minute-5-60) ){
+                // 약속 시간이 3:00과 같이 5분보다 작아서 시단위가 바뀌는 경우
+                }else if(minute<5){
+                    if(nowHour == hour -1 && nowMinute >= minute + 60 - 5){
+                        Bundle bd = new Bundle();
+                        bd.putString("arg","TimeCheck");
+                        sendMessage(bd);
+                        break;
+                    }
+                }else if(nowHour == hour && nowMinute >= minute-5){
                     Bundle bd = new Bundle();
                     bd.putString("arg","TimeCheck");
                     sendMessage(bd);
@@ -197,6 +217,11 @@ public class CheckLateActivity extends AppCompatActivity implements View.OnClick
             case R.id.checkAttendBtn:
                 // 버튼 누르면 thread 실행해서 시간 받아오고 바로 종료되게 함
                 // -> thread를 계속 실행하니까 flag값이 계속 바뀜
+                if(meetingDate == null || place == null){
+                    Toast.makeText(getApplicationContext(),"약속 시간 또는 장소가 정해지지 않았습니다.",Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
                 thread = new MyThread();
                 thread.start();
 
