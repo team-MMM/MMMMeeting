@@ -16,6 +16,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
+import com.example.mmmmeeting.Info.ScheduleInfo;
 import com.example.mmmmeeting.activity.NoticeActivity;
 
 import static android.content.Context.MODE_PRIVATE;
@@ -32,10 +33,11 @@ public class AlarmReceiver extends BroadcastReceiver {
                 | Intent.FLAG_ACTIVITY_SINGLE_TOP);
 
         int ind = intent.getIntExtra("index", 0);
+        String sc = intent.getStringExtra("scInfo");
+        String tt = intent.getStringExtra("time");
 
 
-        PendingIntent pendingI = PendingIntent.getActivity(context, ind,
-                notificationIntent, 0);
+        PendingIntent pendingI = PendingIntent.getActivity(context, ind, notificationIntent, 0);
 
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, "default");
@@ -47,8 +49,8 @@ public class AlarmReceiver extends BroadcastReceiver {
             builder.setSmallIcon(R.drawable.ic_launcher_foreground); //mipmap 사용시 Oreo 이상에서 시스템 UI 에러남
 
 
-            String channelName ="매일 알람 채널";
-            String description = "매일 정해진 시간에 알람합니다.";
+            String channelName ="약속 알람 채널";
+            String description = "약속 힌시간 전에 알람합니다.";
             int importance = NotificationManager.IMPORTANCE_HIGH; //소리와 알림메시지를 같이 보여줌
 
             NotificationChannel channel = new NotificationChannel("default", channelName, importance);
@@ -60,14 +62,16 @@ public class AlarmReceiver extends BroadcastReceiver {
             }
         }else builder.setSmallIcon(R.mipmap.ic_launcher); // Oreo 이하에서 mipmap 사용하지 않으면 Couldn't create icon: StatusBarIcon 에러남
 
+        Calendar notifyTime = Calendar.getInstance();
+        String hour = String.valueOf(notifyTime.get(Calendar.HOUR_OF_DAY));
+        String min = String.valueOf(notifyTime.get(Calendar.MINUTE));
 
         builder.setAutoCancel(true)
                 .setDefaults(NotificationCompat.DEFAULT_ALL)
                 .setWhen(System.currentTimeMillis())
-
                 .setTicker("{Time to watch some cool stuff!}")
                 .setContentTitle("약속 예정 알림")
-                .setContentText("한시간 후에 약속이 있습니다.")
+                .setContentText("오늘 " + tt + "에 [" + sc + "]모임의 약속이 있습니다.")
                 .setContentInfo("INFO")
                 .setContentIntent(pendingI);
 
