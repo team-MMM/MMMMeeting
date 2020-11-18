@@ -1,23 +1,34 @@
 package com.example.mmmmeeting.fragment;
 
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.text.SpannableString;
+import android.text.style.ForegroundColorSpan;
+import android.text.style.RelativeSizeSpan;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 
 import com.example.mmmmeeting.R;
+import com.example.mmmmeeting.activity.MiddlePlaceActivity;
+import com.example.mmmmeeting.activity.PlaceListActivity;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -41,11 +52,13 @@ public class FragAttend extends Fragment {
 
     String meetingCode;
     LinearLayout attend_show;
-    TextView best_title;
+    TextView best_title,resetDatetv;
+    Button reset;
 
+    int resetDate;
+    boolean isLeader=false;
 
-    String thisMonth;
-    SimpleDateFormat sdf = new SimpleDateFormat("YYYYMM");
+    SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
 
     String Tag = "attend test";
 
@@ -55,13 +68,12 @@ public class FragAttend extends Fragment {
         view = inflater.inflate(R.layout.frag_attend, container, false);
         attend_show = view.findViewById(R.id.attend_show);
         best_title = view.findViewById(R.id.best_title);
+        resetDatetv = view.findViewById(R.id.resetDatetv);
         db = FirebaseFirestore.getInstance();
+        reset = view.findViewById(R.id.resetBtn);
+        String today = sdf.format(new Date());
 
-        Date today = new Date();
-        thisMonth = sdf.format(today);
-
-        best_title.setText(new SimpleDateFormat("YYYY").format(today)+"년 "
-                            +new SimpleDateFormat("MM").format(today)+ "월의 출석 Rank");
+        best_title.setText("출석 Rank");
 
         Bundle bundle = this.getArguments();
 
@@ -79,6 +91,22 @@ public class FragAttend extends Fragment {
                                 if (document.get("name").toString().equals(meetingName)) {
                                     Log.d(Tag, "meeting find : " + document.get("name"));
                                     meetingCode = document.getId();
+                                    String getDate = document.get("resetDate").toString();
+                                    resetDate = Integer.valueOf(getDate);
+
+                                    String year = getDate.substring(0,4);
+                                    String month = getDate.substring(4,6);
+                                    String date = getDate.substring(6,8);
+                                    resetDatetv.setText(year+"년 "+month + "월 " +date + "일 ~ ");
+
+                                    Log.d(Tag,"get reset Date : " + resetDate);
+
+                                    FirebaseAuth mAuth = FirebaseAuth.getInstance();
+                                    if (document.get("leader").toString().equals(mAuth.getUid())){
+                                        isLeader=true;
+                                    }
+
+                                    setResetBtn(today);
                                     setAttend(meetingName);
                                     return;
                                 }
@@ -88,6 +116,60 @@ public class FragAttend extends Fragment {
                 });
 
         return view;
+    }
+
+    private void setResetBtn(String today) {
+        reset.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(view.getContext());
+                //제목
+                alertDialogBuilder.setTitle("출석점수 초기화");
+
+                //AlertDialog 세팅
+                SpannableString s = new SpannableString("출석점수를 초기화하시겠습니까?\n" +
+                                                "초기화시 지금까지의 점수가 사라지고 되돌릴 수 없습니다.");
+                s.setSpan(new RelativeSizeSpan(0.5f),22,22,0);
+                s.setSpan(new ForegroundColorSpan(Color.parseColor("#62ABD9")),22,22,0);
+                alertDialogBuilder.setMessage(s)
+                        .setCancelable(false)
+                        .setPositiveButton("아니오", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                            }
+                        }).setNegativeButton("네", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+
+                        db.collection("meetings").document(meetingCode).update("resetDate", today);
+                        db.collection("meetings").document(meetingCode).update("best", new HashMap<String, Integer>());
+
+                        attend_show.removeAllViews();
+                        reset.setVisibility(View.INVISIBLE);
+
+                        Toast.makeText(view.getContext(), "출석점수를 초기화했습니다.", Toast.LENGTH_SHORT).show();
+
+                        String year = today.substring(0,4);
+                        String month = today.substring(4,6);
+                        String date = today.substring(6,8);
+
+                        resetDatetv.setText(year+"년 "+month + "월 " +date + "일 ~ ");
+
+                        TextView nulltxt = new TextView(getContext());
+                        nulltxt.setText("출석 기록이 없습니다.");
+                        nulltxt.setTextSize(30);
+                        nulltxt.setTextColor(Color.BLACK);
+                        attend_show.addView(nulltxt);
+                    }
+                });
+
+                //다이얼로그 생성
+                AlertDialog alertDialog = alertDialogBuilder.create();
+
+                //다이얼로그 보여주기
+                alertDialog.show();
+            }
+        });
     }
 
     private void setAttend(String getId) {
@@ -116,13 +198,14 @@ public class FragAttend extends Fragment {
     }
 
     private boolean getMonth(Date month) {
-        String scheduleMonth = "";
-
+        int scheduleDate=0;
         if (month != null) {
-            scheduleMonth = sdf.format(month);
+            scheduleDate = Integer.parseInt(sdf.format(month));
         }
 
-        if (scheduleMonth.equals(thisMonth)) {
+        if (scheduleDate > resetDate) {
+            Log.d(Tag, "scheduleDate : " + scheduleDate + "/ resetDate" +resetDate);
+
             return true;
         }
 
@@ -159,35 +242,8 @@ public class FragAttend extends Fragment {
             setLayout(i + 1, entry.getKey());
             i++;
         }
-        updateMeetingBest(attendMap);
+        db.collection("meetings").document(meetingCode).update("best", attendMap);
     }
-
-    private void updateMeetingBest(HashMap<String, Integer> attendMap) {
-        DocumentReference docRef = db.collection("meetings").document(meetingCode);
-
-        docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                if (task.isSuccessful()) {
-                    DocumentSnapshot document = task.getResult();
-                    if (document.exists()) {
-                        // 해당 문서가 존재하는 경우
-                        docRef.update("best", attendMap);
-
-                        Log.d("Attend", "Data is : " + document.getId());
-                    } else {
-                        // 존재하지 않는 문서
-                        Log.d("Attend", "No Document");
-                    }
-                } else {
-                    Log.d("Attend", "Task Fail : " + task.getException());
-                }
-            }
-
-        });
-
-    }
-
 
     private void countAttend(ArrayList<String> attender, HashMap<String, Integer> attendMap) {
         if (attender == null) {
@@ -206,7 +262,6 @@ public class FragAttend extends Fragment {
     }
 
     public void setLayout(int num, String user_id) {
-
         //db에서 모임원들 이름 가져오기
         db.collection("users").get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
@@ -258,11 +313,13 @@ public class FragAttend extends Fragment {
 
                                 }
                             }
+
+                            if(isLeader){
+                                reset.setVisibility(View.VISIBLE);
+                            }
                         }
                     }
                 });
-
     }
-
 }
 

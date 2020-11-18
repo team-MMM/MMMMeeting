@@ -16,6 +16,15 @@
         android:layout_height="wrap_content"
         android:textSize="25dp"
         android:textColor="@android:color/black"
+        android:layout_margin="10sp"
+        android:layout_centerHorizontal="true"
+        android:layout_above="@+id/resetDatetv"/>
+
+    <TextView
+        android:id="@+id/resetDatetv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="20dp"
         android:paddingBottom="30dp"
         android:layout_margin="10sp"
         android:layout_centerHorizontal="true"
@@ -28,6 +37,21 @@
         android:layout_centerInParent="true"
         android:orientation="vertical">
     </LinearLayout>
+
+    <Button
+        android:id="@+id/resetBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/attend_show"
+        android:layout_centerInParent="true"
+        android:background="@drawable/button_shape"
+        android:text="RESET"
+        android:textColor="@android:color/black"
+        android:textSize="15sp"
+        android:padding="15sp"
+        android:layout_marginTop="40sp"
+        android:visibility="invisible"
+        />
 
 
 </RelativeLayout>

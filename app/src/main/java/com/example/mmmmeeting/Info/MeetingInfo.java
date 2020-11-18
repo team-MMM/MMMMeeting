@@ -1,6 +1,8 @@
 package com.example.mmmmeeting.Info;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 
 // 모임 정보 : 모임이름, 모임 설명, 모임원에 대한 정보 저장, 가져오기 가능
@@ -10,6 +12,7 @@ public class MeetingInfo {
     private String leader;
     private ArrayList<String> userID = new ArrayList<>();
     private HashMap<String,Integer> best = new  HashMap<>();
+    private String resetDate=new SimpleDateFormat("yyyyMMdd").format(new Date());
 
     public MeetingInfo(String name, String description){
         this.meetingName = name;
@@ -56,4 +59,7 @@ public class MeetingInfo {
         this.best=best;
     }
 
+    public String getResetDate() { return resetDate; }
+
+    public void setResetDate(String resetDate) { this.resetDate = resetDate; }
 }
