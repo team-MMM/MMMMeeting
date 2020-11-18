@@ -405,11 +405,11 @@ public class CalendarActivity extends AppCompatActivity {
 
     public void removeDeco(){
         materialCalendarView.removeDecorators();    // 모든 데코 지우기
-        selectDayDeco(); //확정 날짜 이벤트 표시
         materialCalendarView.addDecorators( //모든 데코 표시
                 new SundayDecorator(),
                 new SaturdayDecorator(),
                 new OneDayDecorator(CalendarActivity.this));
+        selectDayDeco(); //확정 날짜 이벤트 표시
         new ApiSimulator(result).executeOnExecutor(Executors.newSingleThreadExecutor()); // 데코 표시
     }
 }
