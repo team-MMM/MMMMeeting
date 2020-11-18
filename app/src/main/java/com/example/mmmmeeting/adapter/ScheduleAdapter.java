@@ -3,6 +3,8 @@
 package com.example.mmmmeeting.adapter;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -13,18 +15,26 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
+import android.view.View.OnLongClickListener;
+import android.content.Context;
+import android.os.Bundle;
+import androidx.appcompat.app.AppCompatActivity;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.mmmmeeting.activity.AlarmActivity;
 import com.example.mmmmeeting.Info.ScheduleInfo;
 import com.example.mmmmeeting.OnScheduleListener;
 import com.example.mmmmeeting.R;
 import com.example.mmmmeeting.ScheduleDeleter;
+import com.example.mmmmeeting.activity.CalendarActivity;
 import com.example.mmmmeeting.activity.MakeScheduleActivity;
 import com.example.mmmmeeting.activity.ContentScheduleActivity;
+import com.example.mmmmeeting.activity.NoticeActivity;
 import com.example.mmmmeeting.view.ReadScheduleView;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 
@@ -80,12 +90,59 @@ public class ScheduleAdapter extends RecyclerView.Adapter<ScheduleAdapter.MainVi
             }
         });
 
+        cardView.setOnLongClickListener(new OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                ScheduleInfo scInfo = mDataset.get(mainViewHolder.getAdapterPosition());
+
+                if(scInfo.getMeetingDate()!=null){
+                    Date meetingDate =  scInfo.getMeetingDate();
+                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy년 MM월 dd일 a hh시 mm분");
+
+                    AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+                    builder.setTitle("알림 설정")        // 제목
+                            .setMessage("약속 날짜는 " + sdf.format(meetingDate)+ "입니다." + "\n" + "약속 미리 알림을 받으시겠습니까?")        // 메세지
+                            .setPositiveButton("확인", new DialogInterface.OnClickListener(){
+                                // 확인 버튼 클릭시 설정, 오른쪽 버튼입니다.
+                                public void onClick(DialogInterface dialog, int whichButton){//약속 날짜를 확정 //db로 해당 날짜 올리기
+                                    Calendar cal = Calendar.getInstance();
+                                    cal.setTime(meetingDate);
+                                    Intent intent = new Intent(activity, AlarmActivity.class);
+                                    intent.putExtra("alarm", cal);
+                                    intent.putExtra("date", scInfo.getMeetingID());
+                                    activity.startActivityForResult(intent, 0);
+                                    Toast.makeText(activity.getApplicationContext(), sdf.format(meetingDate) + "에 설정되었습니다.", Toast.LENGTH_SHORT).show();
+                                }
+                            })
+                            .setNegativeButton("취소", new DialogInterface.OnClickListener(){// 취소 버튼 클릭시
+                                public void onClick(DialogInterface dialog, int whichButton){//취소 이벤트...
+                                }
+                            });
+                    AlertDialog dialog = builder.create();    // 알림창 객체 생성
+                    dialog.show();    // 알림창 띄우기
+
+                }else {
+                    Toast.makeText(activity.getApplicationContext(), "아직 모임 날짜가 없습니다.", Toast.LENGTH_SHORT).show();
+                }
+
+
+                // 오랫동안 눌렀을 때 이벤트가 발생됨
+                //Toast.makeText(getApplicationContext(), "롱클릭", Toast.LENGTH_SHORT).show();
+                // 리턴값이 있다
+                // 이메서드에서 이벤트에대한 처리를 끝냈음
+                //    그래서 다른데서는 처리할 필요없음 true
+                // 여기서 이벤트 처리를 못했을 경우는 false
+                return true;
+            }
+        });
         cardView.findViewById(R.id.menu).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 showPopup(v, mainViewHolder.getAdapterPosition());
             }
         });
+
+
 
         return mainViewHolder;
     }
