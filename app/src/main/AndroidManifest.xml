@@ -49,6 +49,7 @@
         <activity android:name=".activity.NoticeActivity"/>
         <activity android:name=".activity.VoteActivity"/>
         <activity android:name=".activity.CurrentMapActivity"/>
+        <activity android:name=".activity.AlarmActivity"/>
 
         <receiver android:name=".DeviceBootReceiver"
             android:enabled="false">
