@@ -53,6 +53,7 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.GeoPoint;
 import com.google.maps.android.SphericalUtil;
 
 import java.io.IOException;
@@ -61,8 +62,9 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
-public class CurrentMapActivity extends AppCompatActivity
+  public class CurrentMapActivity extends AppCompatActivity
         implements OnMapReadyCallback,
         ActivityCompat.OnRequestPermissionsResultCallback{
 
@@ -174,9 +176,11 @@ public class CurrentMapActivity extends AppCompatActivity
                     DocumentSnapshot document = task.getResult();
                     if (document.exists()) {
                         // 약속 장소 위도, 경도 가져옴
-                        place = document.getString("meetingPlace");
-                        double lat = document.getGeoPoint("latlng").getLatitude();
-                        double lng = document.getGeoPoint("latlng").getLongitude();
+                        Map<String, String> placeMap = (Map<String, String>) document.getData().get("meetingPlace");
+                        Map<String, GeoPoint> latlngMap = (Map<String, GeoPoint>) document.getData().get("meetingPlace");
+                        place = placeMap.get("name");
+                        double lat = latlngMap.get("latlng").getLatitude();
+                        double lng = latlngMap.get("latlng").getLongitude();
                         placeLatLng = new LatLng(lat,lng);
                         System.out.println(placeLatLng);
 
