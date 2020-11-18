@@ -99,9 +99,15 @@ public class NoticeActivity extends AppCompatActivity {
                         am_pm="AM";
                     }
 
-                    Intent intent = getIntent();
+                    Calendar da = (Calendar) getIntent().getSerializableExtra("alarm");
+                    if(da!=null){
+                        diaryNotification(da);
+                    }
+
+                  //  Intent intent = getIntent();
                     int day[] = new int[2];
                     day = (int[]) getIntent().getSerializableExtra("meetingdate");
+
                     // 현재 지정된 시간으로 알람 시간 설정
                     Calendar calendar = Calendar.getInstance();
                     calendar.setTimeInMillis(System.currentTimeMillis());
@@ -126,7 +132,6 @@ public class NoticeActivity extends AppCompatActivity {
                     SharedPreferences.Editor editor = getSharedPreferences("daily alarm", MODE_PRIVATE).edit();
                     editor.putLong("nextNotifyTime", (long)calendar.getTimeInMillis());
                     editor.apply();
-
 
                     diaryNotification(calendar);
 
@@ -153,38 +158,42 @@ public class NoticeActivity extends AppCompatActivity {
 //        Boolean dailyNotify = sharedPref.getBoolean(SettingsActivity.KEY_PREF_DAILY_NOTIFICATION, true);
         Boolean dailyNotify = true; // 무조건 알람을 사용
 
+        String schedule = (String) getIntent().getSerializableExtra("scInfo");
+
+        System.out.println("확인확인     " + schedule);
+
         String y =  String.valueOf(calendar.get(Calendar.YEAR));
         String m =  String.valueOf(calendar.get(Calendar.MONTH));
         String d =  String.valueOf(calendar.get(Calendar.DAY_OF_MONTH));
         String h =  String.valueOf(calendar.get(Calendar.HOUR_OF_DAY));
         String s =  String.valueOf(calendar.get(Calendar.MINUTE));
 
+        String hh =  String.valueOf(calendar.get(Calendar.HOUR_OF_DAY)+1); //원래 시간
+
         String one = y + m;
         String two = d + h + s;
         int in1 = Integer.parseInt(one);
         int in2 = Integer.parseInt(two);
         int index = in1 - in2; //약속 id로
+        String time = hh + "시 " + s + "분";
 
         PackageManager pm = this.getPackageManager();
         ComponentName receiver = new ComponentName(this, DeviceBootReceiver.class);
         Intent alarmIntent = new Intent(this, AlarmReceiver.class);
+
+        alarmIntent.putExtra("index", index);
+        alarmIntent.putExtra("scInfo", schedule);
+        alarmIntent.putExtra("time", time);
+
         PendingIntent pendingIntent = PendingIntent.getBroadcast(this, index, alarmIntent, 0);
         AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
 
-    //    ArrayList<PendingIntent> intentArray = new ArrayList<PendingIntent>();
 
-
-        alarmIntent.putExtra("index", index);
-        //intentArray.add(pendingIntent);
 
         // 사용자가 매일 알람을 허용했다면
         if (dailyNotify) {
-
-
             if (alarmManager != null) {
-
-                alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
-                        AlarmManager.INTERVAL_DAY, pendingIntent);
+                alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY, pendingIntent);
 
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                     alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
