@@ -24,9 +24,11 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -35,21 +37,31 @@ public class FragAttend extends Fragment {
     private View view;
     private FirebaseFirestore db;
     private String meetingName;
-    private List<Map.Entry<String,Integer>> list_entries;
+    private List<Map.Entry<String, Integer>> list_entries;
 
     String meetingCode;
     LinearLayout attend_show;
     TextView best_title;
+
+
+    String thisMonth;
+    SimpleDateFormat sdf = new SimpleDateFormat("MM");
 
     String Tag = "attend test";
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        view = inflater.inflate(R.layout.frag_attend,container,false);
+        view = inflater.inflate(R.layout.frag_attend, container, false);
         attend_show = view.findViewById(R.id.attend_show);
         best_title = view.findViewById(R.id.best_title);
         db = FirebaseFirestore.getInstance();
+
+        Date today = new Date();
+        thisMonth = sdf.format(today);
+
+        best_title.setText(new SimpleDateFormat("YYYY").format(today)+"년 "
+                            +thisMonth + "월의 출석 Rank");
 
         Bundle bundle = this.getArguments();
 
@@ -78,22 +90,22 @@ public class FragAttend extends Fragment {
         return view;
     }
 
-    private void setAttend(String getId){
+    private void setAttend(String getId) {
 
         db.collection("schedule").get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         if (task.isSuccessful()) {
-                            HashMap<String,Integer> attendMap = new HashMap<>();
+                            HashMap<String, Integer> attendMap = new HashMap<>();
                             attendMap.clear();
-//                            int count = 0;
 
                             for (QueryDocumentSnapshot document : task.getResult()) {
-//                                 위에서 부터 5개 약속만 점수로
-//                                if(getId.equals(document.get("meetingID").toString())&&count++<5){
-                                if(getId.equals(document.get("meetingID").toString())){
-                                    countAttend((ArrayList<String>)document.get("lateComer"),attendMap);
+                                boolean meetingIDCheck = getId.equals(document.get("meetingID").toString());
+                                boolean meetingMonthCheck = getMonth(document.getDate("meetingDate"));
+                                Log.d(Tag, "check val : " + meetingIDCheck + "/" +meetingMonthCheck);
+                                if (meetingIDCheck && meetingMonthCheck) {
+                                    countAttend((ArrayList<String>) document.get("lateComer"), attendMap);
                                 }
                             }
 
@@ -103,11 +115,25 @@ public class FragAttend extends Fragment {
                 });
     }
 
-    private void mapSort(HashMap<String,Integer> attendMap) {
+    private boolean getMonth(Date month) {
+        String scheduleMonth = "";
+
+        if (month != null) {
+            scheduleMonth = sdf.format(month);
+        }
+
+        if (scheduleMonth.equals(thisMonth)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    private void mapSort(HashMap<String, Integer> attendMap) {
 
         Log.d(Tag, "attender map is " + attendMap.toString());
 
-        if(attendMap.isEmpty()){
+        if (attendMap.isEmpty()) {
             TextView nulltxt = new TextView(getContext());
             nulltxt.setText("출석 기록이 없습니다.");
             nulltxt.setTextSize(30);
@@ -136,7 +162,7 @@ public class FragAttend extends Fragment {
         updateMeetingBest(attendMap);
     }
 
-    private void updateMeetingBest(HashMap<String,Integer> attendMap) {
+    private void updateMeetingBest(HashMap<String, Integer> attendMap) {
         DocumentReference docRef = db.collection("meetings").document(meetingCode);
 
         docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
@@ -146,7 +172,7 @@ public class FragAttend extends Fragment {
                     DocumentSnapshot document = task.getResult();
                     if (document.exists()) {
                         // 해당 문서가 존재하는 경우
-                        docRef.update("best",attendMap);
+                        docRef.update("best", attendMap);
 
                         Log.d("Attend", "Data is : " + document.getId());
                     } else {
@@ -163,24 +189,23 @@ public class FragAttend extends Fragment {
     }
 
 
-    private void countAttend(ArrayList<String> attender, HashMap<String,Integer> attendMap) {
-        if(attender==null){
+    private void countAttend(ArrayList<String> attender, HashMap<String, Integer> attendMap) {
+        if (attender == null) {
             return;
         }
 
-        for(int i=0; i<attender.size(); i++){
-            if(attendMap.containsKey(attender.get(i))){
-                attendMap.put(attender.get(i),attendMap.get(attender.get(i))+1);
-            }
-            else {
-                attendMap.put(attender.get(i),1);
+        for (int i = 0; i < attender.size(); i++) {
+            if (attendMap.containsKey(attender.get(i))) {
+                attendMap.put(attender.get(i), attendMap.get(attender.get(i)) + 1);
+            } else {
+                attendMap.put(attender.get(i), 1);
             }
         }
 
         Log.d(Tag, "attender map is " + attendMap.toString());
     }
 
-    public void setLayout(int num,String user_id){
+    public void setLayout(int num, String user_id) {
 
         //db에서 모임원들 이름 가져오기
         db.collection("users").get()
@@ -195,7 +220,7 @@ public class FragAttend extends Fragment {
                                     //LinearLayout 정의
                                     LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
                                             ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-                                    params.setMargins(15,15,15,10);
+                                    params.setMargins(15, 15, 15, 10);
 
                                     //LinearLayout 생성
                                     LinearLayout ly = new LinearLayout(getContext());
