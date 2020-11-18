@@ -45,7 +45,7 @@ public class FragAttend extends Fragment {
 
 
     String thisMonth;
-    SimpleDateFormat sdf = new SimpleDateFormat("MM");
+    SimpleDateFormat sdf = new SimpleDateFormat("YYYYMM");
 
     String Tag = "attend test";
 
@@ -61,7 +61,7 @@ public class FragAttend extends Fragment {
         thisMonth = sdf.format(today);
 
         best_title.setText(new SimpleDateFormat("YYYY").format(today)+"년 "
-                            +thisMonth + "월의 출석 Rank");
+                            +new SimpleDateFormat("MM").format(today)+ "월의 출석 Rank");
 
         Bundle bundle = this.getArguments();
 
