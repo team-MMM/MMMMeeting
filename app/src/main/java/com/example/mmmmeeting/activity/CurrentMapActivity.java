@@ -60,6 +60,7 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -102,6 +103,7 @@ import java.util.Map;
     private LatLng placeLatLng;
     private Date calDate;
     private int hour, minute;
+    private double timePoint;
 
     private String scID;
     FirebaseUser user;
@@ -176,11 +178,11 @@ import java.util.Map;
                     DocumentSnapshot document = task.getResult();
                     if (document.exists()) {
                         // 약속 장소 위도, 경도 가져옴
-                        Map<String, String> placeMap = (Map<String, String>) document.getData().get("meetingPlace");
-                        Map<String, GeoPoint> latlngMap = (Map<String, GeoPoint>) document.getData().get("meetingPlace");
-                        place = placeMap.get("name");
-                        double lat = latlngMap.get("latlng").getLatitude();
-                        double lng = latlngMap.get("latlng").getLongitude();
+                        Map<String, Object> placeMap = (Map<String, Object>) document.getData().get("meetingPlace");
+                        place = (String) placeMap.get("name");
+                        GeoPoint latLng = (GeoPoint) placeMap.get("latlng");
+                        double lat = latLng.getLatitude();
+                        double lng = latLng.getLongitude();
                         placeLatLng = new LatLng(lat,lng);
                         System.out.println(placeLatLng);
 
@@ -219,19 +221,35 @@ import java.util.Map;
                     // 현재 시간 받아오기
                     int nowHour = cal.get(Calendar.HOUR_OF_DAY);
                     int nowMinute = cal.get(Calendar.MINUTE);
+                    int lateMinute = nowMinute - minute;
+                    HashMap<String, Double> timePointMap = new HashMap<String, Double>();
                     // 출석 시간이 지난 경우
-                    if(nowHour == hour && nowMinute > minute) {
-                        Toast.makeText(getApplicationContext(), "약속 시간이 지났습니다!", Toast.LENGTH_SHORT).show();
+                    if(nowHour > hour || (nowHour == hour && nowMinute > minute)) {
+                        Toast.makeText(getApplicationContext(), "약속 시간이 지났습니다.", Toast.LENGTH_SHORT).show();
+                        // 시단위가 바뀐 경우
+                        if(nowHour > hour){
+                            lateMinute = nowMinute + 60 * (nowHour - hour) - minute;
+                        }else{
+                            lateMinute = nowMinute - minute;
+                        }
+                        timePoint = -1.0 * (double)lateMinute * 0.2;
+                        Toast.makeText(getApplicationContext(), "포인트 "+ -1 * timePoint + "점 차감!", Toast.LENGTH_SHORT).show();
+                        timePointMap.put(user.getUid(),timePoint);
+                        db.collection("schedule").document(scID).update("timePoint", timePointMap);
+
                         mFusedLocationClient.removeLocationUpdates(locationCallback);
                         finish();
-                    }else{
-                        // 출석 시간 이내
+                    }else if((minute<10 && nowHour == hour -1 && nowMinute >= minute + 60 - 10)||
+                            (nowHour == hour && nowMinute >= minute-10)){
                         String str = bd.getString("check");
                         // 500m 이내 확인
                         if(str.equals("ok")) {
                             Toast.makeText(getApplicationContext(), "약속 시간을 잘 지키셨군요!", Toast.LENGTH_SHORT).show();
-                            DocumentReference docRef = db.collection("schedule").document(scID);
-                            docRef.update("lateComer", FieldValue.arrayUnion(user.getUid()));
+                            Toast.makeText(getApplicationContext(), "포인트 5점 획득!", Toast.LENGTH_SHORT).show();
+                            timePoint = 5;
+                            timePointMap.put(user.getUid(),timePoint);
+                            db.collection("schedule").document(scID).update("timePoint", timePointMap);
+
                             mFusedLocationClient.removeLocationUpdates(locationCallback);
                             finish();
                         // 500m 이내가 아님
@@ -255,7 +273,10 @@ import java.util.Map;
     private void setMarker(){
 
         markerOptions = new MarkerOptions();
-        markerOptions.position(placeLatLng);
+        //##markerOptions.position(placeLatLng);
+        //밑에 두줄 지우고 ##부분 주석 지우면 약속 장소 위도, 경도로 설정
+        LatLng latLng = new LatLng(37.42199, -122.08);
+        markerOptions.position(latLng);
         markerOptions.title("약속 장소");
         markerOptions.snippet(place);
         markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
@@ -342,7 +363,7 @@ import java.util.Map;
 
                 if (previousPosition == null) previousPosition = currentPosition;
 
-                if ( (addedMarker != null) && tracking == 1 ) {
+                if ( (addedMarker != null) && tracking == 1 && previousPosition!=currentPosition) {
                     double radius = 500; // 500m distance.
 
                     double distance = SphericalUtil.computeDistanceBetween(currentPosition, addedMarker.getPosition());

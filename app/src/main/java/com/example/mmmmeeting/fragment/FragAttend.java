@@ -4,6 +4,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Message;
 import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.RelativeSizeSpan;
@@ -15,6 +16,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -24,31 +26,39 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 
 import com.example.mmmmeeting.R;
+import com.example.mmmmeeting.activity.MainActivity;
 import com.example.mmmmeeting.activity.MiddlePlaceActivity;
 import com.example.mmmmeeting.activity.PlaceListActivity;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.GeoPoint;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
+import java.lang.reflect.Array;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class FragAttend extends Fragment {
     private View view;
     private FirebaseFirestore db;
     private String meetingName;
-    private List<Map.Entry<String, Integer>> list_entries;
+    private List<Map.Entry<String, Double>> list_entries;
+    private HashMap<String, Double> attendMap = new HashMap<>();
 
     String meetingCode;
     LinearLayout attend_show;
@@ -73,7 +83,7 @@ public class FragAttend extends Fragment {
         reset = view.findViewById(R.id.resetBtn);
         String today = sdf.format(new Date());
 
-        best_title.setText("출석 Rank");
+
 
         Bundle bundle = this.getArguments();
 
@@ -179,7 +189,6 @@ public class FragAttend extends Fragment {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         if (task.isSuccessful()) {
-                            HashMap<String, Integer> attendMap = new HashMap<>();
                             attendMap.clear();
 
                             for (QueryDocumentSnapshot document : task.getResult()) {
@@ -187,11 +196,11 @@ public class FragAttend extends Fragment {
                                 boolean meetingMonthCheck = getMonth(document.getDate("meetingDate"));
                                 Log.d(Tag, "check val : " + meetingIDCheck + "/" +meetingMonthCheck);
                                 if (meetingIDCheck && meetingMonthCheck) {
-                                    countAttend((ArrayList<String>) document.get("lateComer"), attendMap);
+                                    HashMap<String, Double> attender = (HashMap<String, Double>) document.get("timePoint");
+                                    countAttend(attender, attendMap);
                                 }
                             }
 
-                            mapSort(attendMap);
                         }
                     }
                 });
@@ -212,7 +221,7 @@ public class FragAttend extends Fragment {
         return false;
     }
 
-    private void mapSort(HashMap<String, Integer> attendMap) {
+    private void mapSort(HashMap<String, Double> attendMap) {
 
         Log.d(Tag, "attender map is " + attendMap.toString());
 
@@ -227,9 +236,9 @@ public class FragAttend extends Fragment {
 
         list_entries = new ArrayList<>(attendMap.entrySet());
         // 비교함수 Comparator를 사용하여 내림 차순으로 정렬
-        Collections.sort(list_entries, new Comparator<Map.Entry<String, Integer>>() {
+        Collections.sort(list_entries, new Comparator<Map.Entry<String, Double>>() {
             @Override
-            public int compare(Map.Entry<String, Integer> obj1, Map.Entry<String, Integer> obj2) {
+            public int compare(Map.Entry<String, Double> obj1, Map.Entry<String, Double> obj2) {
                 // 내림 차순으로 정렬
                 return obj2.getValue().compareTo(obj1.getValue());
             }
@@ -237,28 +246,64 @@ public class FragAttend extends Fragment {
 
         Log.d(Tag, "list_entries is " + list_entries.toString());
 
-        int i = 0;
-        for (Map.Entry<String, Integer> entry : list_entries) {
-            setLayout(i + 1, entry.getKey());
-            i++;
+
+        int same = 1;
+        int rank = 1;
+
+        for(int i=0;i<list_entries.size();i++){
+            if(i!=0){
+                if(list_entries.get(i-1).getValue().equals(list_entries.get(i).getValue())){
+                    same++;
+                }else{
+                    rank += same;
+                    same = 1;
+                }
+            }
+            setLayout(rank,list_entries.get(i).getKey());
         }
+
         db.collection("meetings").document(meetingCode).update("best", attendMap);
     }
 
-    private void countAttend(ArrayList<String> attender, HashMap<String, Integer> attendMap) {
+    private void countAttend(HashMap<String, Double> attender, HashMap<String, Double> attendMap) {
         if (attender == null) {
             return;
         }
 
-        for (int i = 0; i < attender.size(); i++) {
-            if (attendMap.containsKey(attender.get(i))) {
-                attendMap.put(attender.get(i), attendMap.get(attender.get(i)) + 1);
-            } else {
-                attendMap.put(attender.get(i), 1);
-            }
-        }
+        Set attenderSet = attender.keySet();
 
-        Log.d(Tag, "attender map is " + attendMap.toString());
+        db.collection("meetings").document(meetingCode).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    if (document.exists()) {
+                        List<String> user = (List<String>) document.get("userID");
+                        System.out.println(meetingCode);
+
+                        for(int i=0; i<user.size();i++) {
+                            Iterator iter = attenderSet.iterator();
+                            while (iter.hasNext()) {
+                                String checkUser = (String) iter.next();
+                                System.out.println("checkuser: "+checkUser);
+                                if (user.get(i).equals(checkUser)) {
+                                    System.out.println("user: "+user.get(i));
+                                    attendMap.put(user.get(i), Double.parseDouble(String.valueOf(attender.get(user.get(i)))));
+                                    break;
+                                } else {
+                                    attendMap.put(user.get(i), -12.0);
+                                }
+                            }
+                        }
+                        System.out.println("attendMap:"+attendMap);
+                        mapSort(attendMap);
+
+                    }
+                }
+            }
+
+        });
+
     }
 
     public void setLayout(int num, String user_id) {
@@ -308,6 +353,12 @@ public class FragAttend extends Fragment {
                                     ivly.addView(tiv);
 
                                     ly.addView(ivly);
+
+                                    TextView point = new TextView(getContext());
+                                    point.setLayoutParams(params);
+                                    point.setText("("+attendMap.get(user_id).doubleValue() + "점)");
+                                    rank.setTextColor(Color.BLACK);
+                                    ly.addView(point);
 
                                     attend_show.addView(ly);
 

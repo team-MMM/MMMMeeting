@@ -14,42 +14,46 @@
         android:id="@+id/best_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="25dp"
-        android:textColor="@android:color/black"
+        android:textSize="20sp"
+        android:text="약속시간을 잘 지켰나요?"
+        android:layout_below="@+id/toolbar"
+        android:textColor="@color/fui_bgFacebook"
+        android:textStyle="bold"
+        android:paddingTop="5dp"
         android:layout_margin="10sp"
-        android:layout_centerHorizontal="true"
-        android:layout_above="@+id/resetDatetv"/>
+        android:layout_centerHorizontal="true"/>
 
     <TextView
         android:id="@+id/resetDatetv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="20dp"
-        android:paddingBottom="30dp"
-        android:layout_margin="10sp"
+        android:textSize="18dp"
+        android:layout_margin="5sp"
         android:layout_centerHorizontal="true"
-        android:layout_above="@+id/attend_show"/>
+        android:layout_below="@id/best_title"/>
 
     <LinearLayout
         android:id="@+id/attend_show"
+        android:layout_below="@id/resetDatetv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
+        android:layout_centerVertical="true"
         android:orientation="vertical">
     </LinearLayout>
 
     <Button
         android:id="@+id/resetBtn"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/attend_show"
-        android:layout_centerInParent="true"
+        android:layout_height="35dp"
+        android:layout_below="@+id/toolbar"
+        android:layout_toRightOf="@+id/best_title"
+        android:layout_marginRight="5dp"
         android:background="@drawable/button_shape"
         android:text="RESET"
         android:textColor="@android:color/black"
         android:textSize="15sp"
-        android:padding="15sp"
-        android:layout_marginTop="40sp"
+        android:layout_marginTop="10sp"
         android:visibility="invisible"
         />
 
