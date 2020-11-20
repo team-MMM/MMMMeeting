@@ -39,7 +39,7 @@ import java.util.Set;
 public class CheckLateActivity extends AppCompatActivity implements View.OnClickListener {
 
     private ScheduleInfo postInfo;
-    private int hour,minute;
+    private int hour,minute,month,day;
     private Date calDate;
     private String scID;
     FirebaseUser user;
@@ -100,6 +100,8 @@ public class CheckLateActivity extends AppCompatActivity implements View.OnClick
                         calendar.setTime(meetingDate);
                         hour = calendar.get(Calendar.HOUR_OF_DAY);
                         minute = calendar.get(Calendar.MINUTE);
+                        month = calendar.get(Calendar.MONTH);
+                        day = calendar.get(Calendar.DAY_OF_MONTH);
                         calDate = calendar.getTime();
 
                         SimpleDateFormat sdf = new SimpleDateFormat("yyyy년 MM월 dd일 a hh : mm");
@@ -115,66 +117,58 @@ public class CheckLateActivity extends AppCompatActivity implements View.OnClick
 
         });
 
-    }
-/*
-    class MyThread extends Thread{
-        boolean isRun = true;
-
-        @Override
-        public void run() {
-            while(isRun){
-                // 1초 간격으로 시간 갱신 -> 실제 시간 받아올 수 있음(정확한지는 모르겠음)
-                try {
-                    thread.sleep(1000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-
-                // 확인용 String 생성
-                SimpleDateFormat sdf = new SimpleDateFormat("hh:mm:ss");
-                Date now = new Date();
-                String current = sdf.format(now);
-
-                // 약속 시간 5분전인지 알기 위해 시, 분 받아옴
-                tempCal.setTime(now);
-                int nowHour = tempCal.get(Calendar.HOUR_OF_DAY);
-                int nowMinute = tempCal.get(Calendar.MINUTE);
-
-                Log.d("my",current+" "+calDate);
-
-                if(nowHour >= hour && nowMinute > minute){
-                    // flag를 없애고 bundle로 값을 전달해줌
-                    Bundle bd = new Bundle();
-                    bd.putString("arg", "TimeCheck");
-                    sendMessage(bd);
-                    break;
-                // 약속 시간이 3:00과 같이 5분보다 작아서 시단위가 바뀌는 경우
-                }else if(minute<5){
-                    if(nowHour == hour -1 && nowMinute >= minute + 60 - 5){
-                        Bundle bd = new Bundle();
-                        bd.putString("arg","TimeCheck");
-                        sendMessage(bd);
+        handler =new Handler(){
+            @Override
+            public void handleMessage(Message msg){
+                Bundle bd = msg.getData( ) ;
+                String str = bd.getString("arg");
+                switch (str) {
+                    case "Late":
+                        Toast.makeText(getApplicationContext(),"약속시간이 지나서 출석체크 할 수 없습니다.",Toast.LENGTH_SHORT).show();
+                        finish();
                         break;
-                    }
-                }else if(nowHour == hour && nowMinute >= minute-5){
-                    Bundle bd = new Bundle();
-                    bd.putString("arg","TimeCheck");
-                    sendMessage(bd);
-                    break;
-                }else{
-                    Bundle bd = new Bundle();
-                    bd.putString("arg","TimeCheck");
-                    sendMessage(bd);
-                    break;
+                    case "TimeCheck":
+                        myStartActivity(CurrentMapActivity.class, postInfo, hour, minute);
+
+
                 }
             }
+        };
 
-        }
 
-        void stopThread(){
-            isRun = false;
-        }
     }
+
+    private void timeCheck(){
+        Date now = new Date();
+        Calendar temcal = Calendar.getInstance();
+        temcal.setTime(now);
+        // 현재 시간 받아오기
+        int nowHour = temcal.get(Calendar.HOUR_OF_DAY);
+        int nowMinute = temcal.get(Calendar.MINUTE);
+        int nowMonth = temcal.get(Calendar.MONTH);
+        int nowDay = temcal.get(Calendar.DAY_OF_MONTH);
+
+        // 당일의 경우 시간 체크
+        if(nowMonth==month && nowDay == day){
+            if(nowHour >= hour + 1 && nowMinute >= minute || nowHour >= hour + 2) {
+                // flag를 없애고 bundle로 값을 전달해줌
+                Bundle bd = new Bundle();
+                bd.putString("arg", "Late");
+                sendMessage(bd);
+            }else{
+                Bundle bd = new Bundle();
+                bd.putString("arg", "TimeCheck");
+                sendMessage(bd);
+            }
+        }else{
+            Bundle bd = new Bundle();
+            bd.putString("arg", "Late");
+            sendMessage(bd);
+        }
+
+
+    }
+
 
     private void sendMessage(Bundle bd){
         Message msg = handler.obtainMessage();
@@ -182,7 +176,7 @@ public class CheckLateActivity extends AppCompatActivity implements View.OnClick
         handler.sendMessage(msg);
     }
 
-*/
+
 
     public void onClick(View v) {
         switch (v.getId()) {
@@ -193,8 +187,7 @@ public class CheckLateActivity extends AppCompatActivity implements View.OnClick
                     Toast.makeText(getApplicationContext(),"약속 시간 또는 장소가 정해지지 않았습니다.",Toast.LENGTH_SHORT).show();
                     return;
                 }
-                System.out.println("meetingID"+postInfo.getMeetingID());
-                myStartActivity(CurrentMapActivity.class, postInfo, hour, minute);
+                timeCheck();
 
         }
     }

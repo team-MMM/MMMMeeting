@@ -225,7 +225,7 @@ import java.util.Map;
                     HashMap<String, Double> timePointMap = new HashMap<String, Double>();
                     // 출석 시간이 지난 경우
                     if(nowHour > hour || (nowHour == hour && nowMinute > minute)) {
-                        Toast.makeText(getApplicationContext(), "약속 시간이 지났습니다.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getApplicationContext(), "약속시간이 지났습니다.", Toast.LENGTH_SHORT).show();
                         // 시단위가 바뀐 경우
                         if(nowHour > hour){
                             lateMinute = nowMinute + 60 * (nowHour - hour) - minute;
@@ -244,7 +244,7 @@ import java.util.Map;
                         String str = bd.getString("check");
                         // 500m 이내 확인
                         if(str.equals("ok")) {
-                            Toast.makeText(getApplicationContext(), "약속 시간을 잘 지키셨군요!", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getApplicationContext(), "약속시간을 잘 지키셨군요!", Toast.LENGTH_SHORT).show();
                             Toast.makeText(getApplicationContext(), "포인트 5점 획득!", Toast.LENGTH_SHORT).show();
                             timePoint = 5;
                             timePointMap.put(user.getUid(),timePoint);
@@ -260,6 +260,10 @@ import java.util.Map;
                             tracking = 0;
                         }
 
+                    }else{
+                        Toast.makeText(getApplicationContext(), "약속시간 10분전부터 출석체크 가능합니다.", Toast.LENGTH_SHORT).show();
+                        mFusedLocationClient.removeLocationUpdates(locationCallback);
+                        finish();
                     }
 
 
