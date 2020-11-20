@@ -4,6 +4,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.Message;
 import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
@@ -62,13 +63,13 @@ public class FragAttend extends Fragment {
 
     String meetingCode;
     LinearLayout attend_show;
-    TextView best_title,resetDatetv;
+    TextView best_title, resetDatetv, nullText;
     Button reset;
 
-    int resetDate;
-    boolean isLeader=false;
+    int resetDate, resetTime;
 
     SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+    SimpleDateFormat time = new SimpleDateFormat("HHmm");
 
     String Tag = "attend test";
 
@@ -79,11 +80,12 @@ public class FragAttend extends Fragment {
         attend_show = view.findViewById(R.id.attend_show);
         best_title = view.findViewById(R.id.best_title);
         resetDatetv = view.findViewById(R.id.resetDatetv);
+        nullText = view.findViewById(R.id.nullText);
+
         db = FirebaseFirestore.getInstance();
         reset = view.findViewById(R.id.resetBtn);
         String today = sdf.format(new Date());
-
-
+        String thisTime = time.format(new Date());
 
         Bundle bundle = this.getArguments();
 
@@ -102,21 +104,24 @@ public class FragAttend extends Fragment {
                                     Log.d(Tag, "meeting find : " + document.get("name"));
                                     meetingCode = document.getId();
                                     String getDate = document.get("resetDate").toString();
+                                    String getTime = document.get("resetTime").toString();
+
                                     resetDate = Integer.valueOf(getDate);
+                                    resetTime = Integer.valueOf(getTime);
 
-                                    String year = getDate.substring(0,4);
-                                    String month = getDate.substring(4,6);
-                                    String date = getDate.substring(6,8);
-                                    resetDatetv.setText(year+"년 "+month + "월 " +date + "일 ~ ");
+                                    String year = getDate.substring(0, 4);
+                                    String month = getDate.substring(4, 6);
+                                    String date = getDate.substring(6, 8);
+                                    resetDatetv.setText(year + "년 " + month + "월 " + date + "일 ~ ");
 
-                                    Log.d(Tag,"get reset Date : " + resetDate);
+                                    Log.d(Tag, "get reset Date : " + resetDate);
 
                                     FirebaseAuth mAuth = FirebaseAuth.getInstance();
-                                    if (document.get("leader").toString().equals(mAuth.getUid())){
-                                        isLeader=true;
+                                    if (document.get("leader").toString().equals(mAuth.getUid())) {
+                                        reset.setVisibility(View.VISIBLE);
                                     }
 
-                                    setResetBtn(today);
+                                    setResetBtn(today, thisTime);
                                     setAttend(meetingName);
                                     return;
                                 }
@@ -128,7 +133,7 @@ public class FragAttend extends Fragment {
         return view;
     }
 
-    private void setResetBtn(String today) {
+    private void setResetBtn(String today, String thisTime) {
         reset.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -138,9 +143,9 @@ public class FragAttend extends Fragment {
 
                 //AlertDialog 세팅
                 SpannableString s = new SpannableString("출석점수를 초기화하시겠습니까?\n" +
-                                                "초기화시 지금까지의 점수가 사라지고 되돌릴 수 없습니다.");
-                s.setSpan(new RelativeSizeSpan(0.5f),22,22,0);
-                s.setSpan(new ForegroundColorSpan(Color.parseColor("#62ABD9")),22,22,0);
+                        "초기화시 지금까지의 점수가 사라지고 되돌릴 수 없습니다.");
+                s.setSpan(new RelativeSizeSpan(0.5f), 22, 22, 0);
+                s.setSpan(new ForegroundColorSpan(Color.parseColor("#62ABD9")), 22, 22, 0);
                 alertDialogBuilder.setMessage(s)
                         .setCancelable(false)
                         .setPositiveButton("아니오", new DialogInterface.OnClickListener() {
@@ -152,24 +157,20 @@ public class FragAttend extends Fragment {
                     public void onClick(DialogInterface dialogInterface, int i) {
 
                         db.collection("meetings").document(meetingCode).update("resetDate", today);
+                        db.collection("meetings").document(meetingCode).update("resetTime", thisTime);
                         db.collection("meetings").document(meetingCode).update("best", new HashMap<String, Integer>());
 
                         attend_show.removeAllViews();
-                        reset.setVisibility(View.INVISIBLE);
 
                         Toast.makeText(view.getContext(), "출석점수를 초기화했습니다.", Toast.LENGTH_SHORT).show();
 
-                        String year = today.substring(0,4);
-                        String month = today.substring(4,6);
-                        String date = today.substring(6,8);
+                        String year = today.substring(0, 4);
+                        String month = today.substring(4, 6);
+                        String date = today.substring(6, 8);
 
-                        resetDatetv.setText(year+"년 "+month + "월 " +date + "일 ~ ");
+                        resetDatetv.setText(year + "년 " + month + "월 " + date + "일 ~ ");
+                        nullText.setVisibility(view.VISIBLE);
 
-                        TextView nulltxt = new TextView(getContext());
-                        nulltxt.setText("출석 기록이 없습니다.");
-                        nulltxt.setTextSize(30);
-                        nulltxt.setTextColor(Color.BLACK);
-                        attend_show.addView(nulltxt);
                     }
                 });
 
@@ -193,28 +194,41 @@ public class FragAttend extends Fragment {
 
                             for (QueryDocumentSnapshot document : task.getResult()) {
                                 boolean meetingIDCheck = getId.equals(document.get("meetingID").toString());
-                                boolean meetingMonthCheck = getMonth(document.getDate("meetingDate"));
-                                Log.d(Tag, "check val : " + meetingIDCheck + "/" +meetingMonthCheck);
+                                boolean meetingMonthCheck = getTime(document.getDate("meetingDate"));
+
+                                Log.d(Tag, "check val : " + meetingIDCheck + "/" + meetingMonthCheck);
                                 if (meetingIDCheck && meetingMonthCheck) {
                                     HashMap<String, Double> attender = (HashMap<String, Double>) document.get("timePoint");
                                     countAttend(attender, attendMap);
                                 }
                             }
 
+                            new Handler().postDelayed(new Runnable() {
+                                @Override
+                                public void run() {
+                                    if(attendMap.isEmpty()){
+                                        nullText.setVisibility(view.VISIBLE);
+                                    }
+                                }
+                            }, 300);
                         }
                     }
                 });
     }
 
-    private boolean getMonth(Date month) {
-        int scheduleDate=0;
-        if (month != null) {
-            scheduleDate = Integer.parseInt(sdf.format(month));
+    private boolean getTime(Date date) {
+        int scheduleDate = 0;
+        int scheduleTime = 0;
+        if (date != null) {
+            scheduleDate = Integer.parseInt(sdf.format(date));
+            scheduleTime = Integer.parseInt(time.format(date));
         }
 
-        if (scheduleDate > resetDate) {
-            Log.d(Tag, "scheduleDate : " + scheduleDate + "/ resetDate" +resetDate);
-
+        if (scheduleDate == resetDate && scheduleTime >= resetTime) {
+            Log.d(Tag, "scheduleTime : " + scheduleTime + "/ resetTime " + resetTime);
+            return true;
+        } else if (scheduleDate > resetDate) {
+            Log.d(Tag, "scheduleDate : " + scheduleDate + "/ resetDate" + resetDate);
             return true;
         }
 
@@ -226,11 +240,6 @@ public class FragAttend extends Fragment {
         Log.d(Tag, "attender map is " + attendMap.toString());
 
         if (attendMap.isEmpty()) {
-            TextView nulltxt = new TextView(getContext());
-            nulltxt.setText("출석 기록이 없습니다.");
-            nulltxt.setTextSize(30);
-            nulltxt.setTextColor(Color.BLACK);
-            attend_show.addView(nulltxt);
             return;
         }
 
@@ -246,20 +255,19 @@ public class FragAttend extends Fragment {
 
         Log.d(Tag, "list_entries is " + list_entries.toString());
 
-
         int same = 1;
         int rank = 1;
 
-        for(int i=0;i<list_entries.size();i++){
-            if(i!=0){
-                if(list_entries.get(i-1).getValue().equals(list_entries.get(i).getValue())){
+        for (int i = 0; i < list_entries.size(); i++) {
+            if (i != 0) {
+                if (list_entries.get(i - 1).getValue().equals(list_entries.get(i).getValue())) {
                     same++;
-                }else{
+                } else {
                     rank += same;
                     same = 1;
                 }
             }
-            setLayout(rank,list_entries.get(i).getKey());
+            setLayout(rank, list_entries.get(i).getKey());
         }
 
         db.collection("meetings").document(meetingCode).update("best", attendMap);
@@ -281,13 +289,13 @@ public class FragAttend extends Fragment {
                         List<String> user = (List<String>) document.get("userID");
                         System.out.println(meetingCode);
 
-                        for(int i=0; i<user.size();i++) {
+                        for (int i = 0; i < user.size(); i++) {
                             Iterator iter = attenderSet.iterator();
                             while (iter.hasNext()) {
                                 String checkUser = (String) iter.next();
-                                System.out.println("checkuser: "+checkUser);
+                                System.out.println("checkuser: " + checkUser);
                                 if (user.get(i).equals(checkUser)) {
-                                    System.out.println("user: "+user.get(i));
+                                    System.out.println("user: " + user.get(i));
                                     attendMap.put(user.get(i), Double.parseDouble(String.valueOf(attender.get(user.get(i)))));
                                     break;
                                 } else {
@@ -295,7 +303,7 @@ public class FragAttend extends Fragment {
                                 }
                             }
                         }
-                        System.out.println("attendMap:"+attendMap);
+                        System.out.println("attendMap:" + attendMap);
                         mapSort(attendMap);
 
                     }
@@ -307,14 +315,18 @@ public class FragAttend extends Fragment {
     }
 
     public void setLayout(int num, String user_id) {
+        Log.d(Tag, "Show layout");
         //db에서 모임원들 이름 가져오기
         db.collection("users").get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         if (task.isSuccessful()) {
+                            nullText.setVisibility(view.GONE);
+
                             for (QueryDocumentSnapshot document : task.getResult()) {
                                 if (user_id.equals(document.getId())) {
+
                                     String user_name = document.get("name").toString();
 
                                     //LinearLayout 정의
@@ -356,7 +368,7 @@ public class FragAttend extends Fragment {
 
                                     TextView point = new TextView(getContext());
                                     point.setLayoutParams(params);
-                                    point.setText("("+attendMap.get(user_id).doubleValue() + "점)");
+                                    point.setText("(" + attendMap.get(user_id).doubleValue() + "점)");
                                     rank.setTextColor(Color.BLACK);
                                     ly.addView(point);
 
@@ -365,9 +377,6 @@ public class FragAttend extends Fragment {
                                 }
                             }
 
-                            if(isLeader){
-                                reset.setVisibility(View.VISIBLE);
-                            }
                         }
                     }
                 });

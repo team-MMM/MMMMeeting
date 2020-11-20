@@ -13,6 +13,7 @@ public class MeetingInfo {
     private ArrayList<String> userID = new ArrayList<>();
     private HashMap<String,Integer> best = new  HashMap<>();
     private String resetDate=new SimpleDateFormat("yyyyMMdd").format(new Date());
+    private String resetTime=new SimpleDateFormat("HHmm").format(new Date());
 
     public MeetingInfo(String name, String description){
         this.meetingName = name;
@@ -62,4 +63,12 @@ public class MeetingInfo {
     public String getResetDate() { return resetDate; }
 
     public void setResetDate(String resetDate) { this.resetDate = resetDate; }
+
+    public String getResetTime() {
+        return resetTime;
+    }
+
+    public void setResetTime(String resetTime) {
+        this.resetTime = resetTime;
+    }
 }
