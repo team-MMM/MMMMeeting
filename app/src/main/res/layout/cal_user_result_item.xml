@@ -4,10 +4,11 @@
     android:layout_height="match_parent"
     xmlns:tools="http://schemas.android.com/tools"
     android:orientation="horizontal"
-    android:id="@+id/calUserItem"
+    android:id="@+id/calUserResultItem"
     tools:context=".Info.CalUserItems"
     android:gravity="center"
-    android:layout_gravity="center">
+    android:layout_gravity="center"
+    >
 
     <LinearLayout
         android:orientation="vertical"
@@ -23,7 +24,7 @@
             />
 
         <TextView
-            android:id="@+id/userName"
+            android:id="@+id/name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical|center_horizontal"
@@ -31,19 +32,13 @@
 
     </LinearLayout>
 
-    <EditText
-        android:id="@+id/calMoney"
-        android:layout_width="150dp"
+    <TextView
+        android:id="@+id/money"
+        android:layout_width="200dp"
         android:layout_height="60dp"
         android:layout_margin="10dp"
-        android:text="0"
-        android:textAlignment="textEnd"
+        android:textSize="18sp"
+        android:paddingTop="15dp"
         />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="25sp"
-        android:text="원"/>
 
 </LinearLayout>
