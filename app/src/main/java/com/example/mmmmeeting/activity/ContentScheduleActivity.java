@@ -80,6 +80,7 @@ public class ContentScheduleActivity extends BasicActivity implements View.OnCli
             case 0:
                 if (resultCode == Activity.RESULT_OK) {
                     postInfo = (ScheduleInfo)data.getSerializableExtra("scheduleInfo");
+                    System.out.println("I'mback");
                     contentsLayout.removeAllViews();
                     uiUpdate();
                 }

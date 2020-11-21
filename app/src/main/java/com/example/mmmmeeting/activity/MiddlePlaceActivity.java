@@ -217,7 +217,7 @@ public class MiddlePlaceActivity extends AppCompatActivity implements OnMapReady
             getPointFromGeoCoder(str, points);
         }
         for (int k = 0; k < points.length; k++) {
-            mMap.addMarker(new MarkerOptions().position(new LatLng(points[k].getX(), points[k].getY())).title(name[k]).icon(BitmapDescriptorFactory.fromBitmap(UserMarker)));
+           // mMap.addMarker(new MarkerOptions().position(new LatLng(points[k].getX(), points[k].getY())).title(name[k]).icon(BitmapDescriptorFactory.fromBitmap(UserMarker)));
         }
         Point[] hull = GrahamScan.convexHull(points);
 
@@ -225,9 +225,11 @@ public class MiddlePlaceActivity extends AppCompatActivity implements OnMapReady
         PolygonCenter(hull);
         curPoint = new LatLng(center.x, center.y);
         //중간지점 찾기 (사용자 위치들과 무게중심 좌표 넘겨주기)
-        findMidPoint(hull, curPoint);
+        //findMidPoint(hull, curPoint);
+        FindMid();
 
         String midAdr = getCurrentAddress(midP);
+        mMap.addMarker(new MarkerOptions().position(new LatLng(midP.latitude,midP.longitude)).title("중간 지점"));
         //##
         //String midAdr = "서울특별시 상계8동 동일로 1545";
 
@@ -790,5 +792,109 @@ public class MiddlePlaceActivity extends AppCompatActivity implements OnMapReady
             e.printStackTrace();
         }
         return resultText;
+    }
+
+    LatLng seoul = new LatLng(37.565806, 126.975194); // cluster 1: 덕수궁 (서울 3명)
+    LatLng daejeon = new LatLng(36.335362, 127.458708); // cluster 2: 대전대학교 (대전 1명)
+    LatLng busan = new LatLng(35.233539, 129.080973); // cluster 3: 부산대학교 (부산 1명)
+    LatLng[] cluster = {seoul,daejeon,busan};
+    int[] size = {3,1,1};
+    // 인원수에 비례하여 평균점 계산
+    double latitude = (seoul.latitude*3+daejeon.latitude+busan.latitude)/5;
+    double longtitude = (seoul.longitude*3+daejeon.longitude+busan.longitude)/5;
+    LatLng mid = new LatLng(latitude,longtitude);// 현재 중간지점
+    LatLng tem = mid; // 이전 중간지점
+    int temp = 1000; // 이전 평균 이동시간
+    public void FindMid(){
+        int num = 5; // 모임원 수
+
+        for(int i =0; i< cluster.length; i++) {
+            mMap.addMarker(new MarkerOptions().position(new LatLng(cluster[i].latitude,cluster[i].longitude)).title("centroid "+i).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
+        }
+        System.out.println(" 처음 좌표: "+ mid);
+        //이동시간 저장할 공간
+        userTime = new double[3];
+
+        latVector = 0;
+        lonVector = 0;
+        avgTime = 0; // 현재 평균 이동시간
+
+        //유저들 이동시간 받아오기
+        for (int i = 0; i < cluster.length; i++) {
+            //이동시간 받기
+            double time = getPathTime(mid, cluster[i]);
+            //이동시간 저장
+            userTime[i] = time;
+
+            System.out.println("현재 position부터 중간점까지의 이동시간 : " + time);
+
+            // 총 이동시간의 합
+            avgTime += (time*size[i]);
+        }
+
+        //이동시간의 평균
+        avgTime /= cluster.length;
+        System.out.println(" 평균 시간 : "+ avgTime);
+
+        for(int i = 0; i<cluster.length; i++) {
+            //중간지점부터 사용자 위치까지의 단위벡터 구하기
+            Point unitVector = getUnitVector(mid, cluster[i]);
+
+            double t = (userTime[i]*size[i])-avgTime;
+
+            System.out.println(i+ " 가중치 시간 : "+ t);
+
+            //시간가중치와 단위벡터의 곱
+            latVector += unitVector.getX() * t;
+            lonVector += unitVector.getY() * t;
+
+        }
+
+        //가중치와 단위벡터의 곱의 합을 클러스터 수로 나눈다.
+        latVector /= (avgTime*cluster.length);
+        lonVector /= (avgTime*cluster.length);
+
+        System.out.println(" 시간벡터 : "+ latVector+","+lonVector);
+
+        //최적의 경로인지 확인하기 위함
+        boolean isOptimized = false;
+
+        //새로운 점이 최적인가?
+        for (int i = 0; i < userTime.length; i++) {
+            //임의로 최적의 경로 확인
+            System.out.println(i + "차이 : " + Math.abs(userTime[i]*size[i] - avgTime));
+        }
+        // 현재 평균시간이 이전 평균시간보다 크면 그 전이 최적!
+        if(temp < avgTime) {
+            isOptimized = true;
+        }
+        //최적이라면 => 중간지점 출력(midPoint)
+        if(isOptimized==true){
+            midP = tem;
+        }
+
+
+        boolean check = true;
+        //최적이 아니라면, 새로운 위치로 바꾸기
+        if (isOptimized == false) {
+            tem = mid;
+            temp = avgTime;
+            mid = new LatLng(mid.latitude + latVector ,
+                    mid.longitude + lonVector );
+
+            countTry++;
+            System.out.println("중간지점 count : " + countTry);
+            System.out.println("중간지점은 여기! : " + tem);
+            for (int i = 0; i < userTime.length; i++) {
+                System.out.println("사용자들로부터 중간지점까지의 이동시간은 : " + userTime[i]);
+            }
+            // 최대 3번 FindMid 실행
+            if (countTry < 4) {
+                FindMid();
+            }else{
+                midP=tem;
+            }
+        }
+        System.out.println("update Check : " + check);
     }
 }
