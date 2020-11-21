@@ -170,6 +170,8 @@ public class FragAccount extends Fragment {
                                     }
                                 }
                             });
+
+                            btn_calculate.setVisibility(View.VISIBLE);
                         } else {
                             Log.d("Document Read", "Error getting documents: ", task.getException());
                         }

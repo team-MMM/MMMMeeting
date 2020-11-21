@@ -26,6 +26,8 @@
         android:layout_height="50dp"
         android:layout_marginBottom="50dp"
         android:layout_gravity="center_horizontal"
-        android:text="정산!"/>
+        android:text="정산!"
+        android:visibility="invisible"
+        />
 
 </LinearLayout>
