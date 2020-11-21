@@ -1,34 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
     <include
         layout="@layout/view_toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
-    <LinearLayout
+    <ListView
+        android:id="@+id/caluser"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:orientation="vertical">
+        android:layout_height="500sp"
+        android:layout_margin="40sp"
+        android:horizontalSpacing="20sp"
+        android:verticalSpacing="20sp"
+        />
 
-        <LinearLayout
-            android:id="@+id/layout_input_money"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:orientation="vertical"/>
-        <Button
-            android:id="@+id/btn_calculate"
-            android:layout_width="100dp"
-            android:layout_height="50dp"
-            android:layout_marginBottom="50dp"
-            android:layout_gravity="center_horizontal"
-            android:text="정산!"/>
-    </LinearLayout>
+    <Button
+        android:id="@+id/btn_calculate"
+        android:background="@drawable/button_shape"
+        android:layout_width="100dp"
+        android:layout_height="50dp"
+        android:layout_marginBottom="50dp"
+        android:layout_gravity="center_horizontal"
+        android:text="정산!"/>
 
-
-</RelativeLayout>
+</LinearLayout>
