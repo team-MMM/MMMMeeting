@@ -91,7 +91,7 @@
 
         <com.example.mmmmeeting.view.ReadScheduleView
             android:id="@+id/readScheduleView"
-            android:layout_width="376dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="5sp">
 
