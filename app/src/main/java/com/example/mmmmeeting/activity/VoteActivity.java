@@ -44,10 +44,11 @@ import java.util.Locale;
 import java.util.Collections;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
-public class VoteActivity extends AppCompatActivity {
+public class VoteActivity extends BasicActivity {
     ScheduleInfo schedule;
     String id = null; //vote id
     String scheduleId;
@@ -66,6 +67,8 @@ public class VoteActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_vote);
+        setToolbarTitle("장소 투표") ;
+
         place_list_view = findViewById(R.id.place_list_view);
 
         start_Btn = findViewById(R.id.start_Btn);
@@ -107,6 +110,7 @@ public class VoteActivity extends AppCompatActivity {
                             if (id == null) { //만들어진 투표 리스트가 없으면
                                 Toast.makeText(VoteActivity.this, "생성한 투표 목록이 없습니다.", Toast.LENGTH_SHORT).show();
                                 com_Btn.setVisibility(View.INVISIBLE);
+                                finish();
                             }
                         } else {
                             Log.d("Document Read", "Error getting documents: ", task.getException());
@@ -185,6 +189,7 @@ public class VoteActivity extends AppCompatActivity {
                         if (document.get("state").equals("done")) { //종료된 투표
                             com_Btn.setVisibility(View.INVISIBLE);
                             Toast.makeText(VoteActivity.this, "이미 종료된 투표입니다.", Toast.LENGTH_SHORT).show();
+                            finish();
                         } else {
                             createList(list);//투표목록 생성
                             if (document.get("state").equals("valid")) { //시작안한 상태
