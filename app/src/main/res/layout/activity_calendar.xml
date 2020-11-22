@@ -5,20 +5,34 @@
 
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="match_parent"
     android:background="#ffffff"
     android:orientation="vertical" >
 
+    <include
+        layout="@layout/view_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        />
 
     <com.prolificinteractive.materialcalendarview.MaterialCalendarView
         android:id="@+id/calendarView"
         android:layout_width="match_parent"
-        android:layout_height="400dp"
+        android:layout_height="wrap_content"
         app:mcv_selectionColor="#a9dbf0cb"
         app:mcv_showOtherDates="defaults"
-        tools:layout_editor_absoluteX="108dp"
-        tools:layout_editor_absoluteY="-53dp"
-        tools:ignore="MissingConstraints" />
+        tools:ignore="MissingConstraints"
+        app:layout_constraintTop_toBottomOf="@+id/toolbar"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:layout_editor_absoluteX="0dp"
+        tools:layout_editor_absoluteY="0dp"></com.prolificinteractive.materialcalendarview.MaterialCalendarView>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="3px"
+        android:background="#858282"
+        app:layout_constraintBottom_toBottomOf="@+id/calendarView" />
 
     <TextView
         android:id="@+id/diaryTextView"
@@ -68,12 +82,11 @@
 
     <Button
         android:id="@+id/cha_Btn"
-        android:layout_width="100dp"
-        android:layout_height="wrap_content"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
-        android:background="@drawable/back_name"
-        android:text="수정"
+        android:background="@drawable/modify"
         android:visibility="invisible"
         app:layout_constraintBaseline_toBaselineOf="@+id/save_Btn"
         app:layout_constraintEnd_toStartOf="@+id/del_Btn"
@@ -82,36 +95,32 @@
 
     <Button
         android:id="@+id/del_Btn"
-        android:layout_width="100dp"
-        android:layout_height="wrap_content"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
         android:layout_marginEnd="8dp"
-        android:background="@drawable/back_name"
-        android:text="삭제"
+        android:background="@drawable/trash"
         android:visibility="invisible"
         app:layout_constraintBaseline_toBaselineOf="@+id/cha_Btn"
-        app:layout_constraintEnd_toEndOf="@+id/save_Btn"></Button>
+        app:layout_constraintEnd_toEndOf="parent"></Button>
 
     <Button
         android:id="@+id/save_Btn"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
-        android:background="@drawable/back_name"
-        android:text="저장"
+        android:background="@drawable/save"
         android:visibility="invisible"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/contextEditText" />
 
     <Button
         android:id="@+id/sel_Btn"
-        android:layout_width="100dp"
-        android:layout_height="48dp"
-        android:background="@drawable/back_name"
-        android:text="선택"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:background="@drawable/selected"
         android:visibility="invisible"
         app:layout_constraintBaseline_toBaselineOf="@+id/save_Btn"
         app:layout_constraintEnd_toEndOf="@+id/cha_Btn"
