@@ -147,14 +147,21 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
                 currentCategory=categoryList.get(position);
                 sendPosition(position);
 
+                int radius = seekBar.getProgress();
+                radius = radius / 500;
+                radius = radius * 500;
+
                 CircleOptions circle = new CircleOptions().center(midpoint)
-                        .radius(500)      //반지름 단위 : m
+                        .radius(radius)      //반지름 단위 : m
                         .strokeWidth(0)
                         .strokeColor(Color.parseColor("#4071cce7"))
                         .fillColor(Color.parseColor("#4071cce7"));
                 mMap.addCircle(circle);
 
-                categoryItem(currentCategory,500);
+                int zoom = 15- radius/900;
+                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(midpoint, zoom));
+                categoryItem(currentCategory, radius);
+
             }
 
             @Override
@@ -166,13 +173,13 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
 
     private void categoryItem(String category, int radius) {
         switch (category) {
-            case "shopping":
+            case "쇼핑몰":
                 //shopping_mall + department_store
                 Log.d(Tag, "Shopping");
                 showPlaceInformation("shopping_mall",radius);
                 showPlaceInformation("department_store",radius);
                 break;
-            case "activity":
+            case "액티비티":
                 // amusement_park + aquarium +art_gallery +stadium +zoo
                 Log.d(Tag, "Activity");
                 showPlaceInformation("amusement_park",radius);
@@ -181,15 +188,15 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
                 showPlaceInformation("stadium",radius);
                 showPlaceInformation("zoo",radius);
                 break;
-            case "cafe":
+            case "카페":
                 Log.d(Tag, "Cafe");
                 showPlaceInformation("cafe",radius);
                 break;
-            case "restaurant":
+            case "식당":
                 Log.d(Tag, "restaurant");
                 showPlaceInformation("restaurant",radius);
                 break;
-            case "park":
+            case "공원":
                 Log.d(Tag, "park");
                 showPlaceInformation("park",radius);
                 break;
@@ -213,7 +220,7 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 progress = progress / 500;
                 progress = progress * 500;
-                radiustv.setText("검색 범위 : " + progress);
+                radiustv.setText("검색 범위 : " + progress + "m");
                 radius[0] =progress;
             }
 
@@ -282,6 +289,8 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
         spinner = findViewById(R.id.categoryList);
         radiustv = findViewById(R.id.radiusText);
         seekBar = findViewById(R.id.radiusBar);
+        seekBar.setProgress(500);
+        radiustv.setText("검색 범위 : " + seekBar.getProgress() + "m");
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.place_map);
@@ -512,9 +521,9 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
         Float[] temp = new Float[rating.size()];
         float point=1;
 
-        if(!best.isEmpty()&&best.containsKey(userID)){
-            point =  Float.valueOf(String.valueOf(best.get(userID)));
-        }
+//        if(!best.isEmpty()&&best.containsKey(userID)){
+//            point =  Float.valueOf(String.valueOf(best.get(userID)));
+//        }
 
         point *= 0.1;
         Log.d (Tag, userID + " Point is " + point);
@@ -595,7 +604,7 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
 
         variance /= rating.length;  // 3. 분산
         double std = Math.sqrt(variance); // +) 표준 편차
-//        Log.d(Tag, "variance: " + variance + ",  standard deviation: " + std);
+        Log.d(Tag, "variance: " + variance + ",  standard deviation: " + std);
         return std;
     }
 
@@ -648,12 +657,13 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
 
         for (int i =0 ; i< index.size(); i++) {
             switch (index.get(i)) {
-                case 0: this.category.add("restaurant"); break;
-                case 1: this.category.add("cafe"); break;
-                case 2: this.category.add("park"); break;
-                case 3: this.category.add("shopping"); break;
-                case 4: this.category.add("activity"); break;
+                case 0: this.category.add("식당"); break;
+                case 1: this.category.add("카페"); break;
+                case 2: this.category.add("공원"); break;
+                case 3: this.category.add("쇼핑몰"); break;
+                case 4: this.category.add("액티비티"); break;
             }
+            Log.d (Tag, index.get(i) + " is added");
         }
     }
 
@@ -676,10 +686,10 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
         // 1위
         if(preferNum == 0){
             num = 8;
-        // 2위
+            // 2위
         }else if(preferNum == 1){
             num = 5;
-        // 3위
+            // 3위
         }else{
             num = 3;
         }
