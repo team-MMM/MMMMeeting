@@ -15,6 +15,7 @@ import android.text.style.ForegroundColorSpan;
 import android.text.style.RelativeSizeSpan;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
@@ -102,6 +103,7 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
     String id = null;
     ArrayList<String> category=new ArrayList<>();
     ArrayList<Float[]> userRatings =new ArrayList<>();
+    ArrayList<Float> attendPoint = new ArrayList<>();
     FirebaseFirestore db = FirebaseFirestore.getInstance();
     int count; //success
     int size;
@@ -112,7 +114,7 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
     Spinner spinner;
     ArrayAdapter<String> arrayAdapter;
 
-    TextView radiustv;
+    TextView radiustv, search_result;
     SeekBar seekBar;
     String currentCategory;
 
@@ -485,8 +487,6 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
                             for (int i = 0; i < users.size(); i++) {
                                 userRating(users.get(i));
                             }
-
-                            Log.d(Tag, "Add check " + userRatings.toString());
                             break;
                         }
                     }
@@ -519,73 +519,102 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
     // 1-3 맵 -> 배열로 변경 (계산 편리, 카테고리 정렬, 출석 점수 반영)
     private void MapToArray(Map<String, Float> rating, String userID) {
         Float[] temp = new Float[rating.size()];
-        float point=1;
 
-//        if(!best.isEmpty()&&best.containsKey(userID)){
-//            point =  Float.valueOf(String.valueOf(best.get(userID)));
-//        }
+        if(!best.isEmpty()&&best.containsKey(userID)){
+            float point =  Float.valueOf(String.valueOf(best.get(userID)));
 
-        point *= 0.1;
-        Log.d (Tag, userID + " Point is " + point);
+            if(point == 0 ){
+                point=0.07f;
+            }
+            else if(point == -1){
+                point = 0.03f;
+            }
+            else if(point<0){
+                point = 1/Math.abs(point);
+                point *= 0.1;
+            }
+            else{
+                point *= 0.1;
+            }
+
+            attendPoint.add(point);
+        }
 
         // 배열에 저장
         for (String key : rating.keySet()) {
             switch (key){
                 case "restaurant":
-                    temp[0]=rating.get(key)*point;
+                    temp[0]=rating.get(key);
                     break;
                 case "cafe":
-                    temp[1]=rating.get(key)*point;
+                    temp[1]=rating.get(key);
                     break;
                 case "park":
-                    temp[2]=rating.get(key)*point;
+                    temp[2]=rating.get(key);
                     break;
                 case "shopping":
-                    temp[3]=rating.get(key)*point;
+                    temp[3]=rating.get(key);
                     break;
                 case "act":
-                    temp[4]=rating.get(key)*point;
+                    temp[4]=rating.get(key);
                     break;
             }
         }
 
         this.userRatings.add(temp);
-//        Log.d(Tag,"size is "+Arrays.toString(temp));
     }
 
 
-    // 2-1 가중치 계산
+    // 2. 가중치 계산
     private void addWeight() {
         double[] variance = new double[userRatings.size()];
         for(int i=0; i< userRatings.size(); i++){
-            // 2. 분산 구하기
+            // 2-1. 분산 구하기
             variance[i]= calVariance(userRatings.get(i));
         }
 
-        Arrays.sort(variance); //오름차순
-        Log.d(Tag, Arrays.toString(variance));
+        double[] temp=variance.clone();
 
-        int n = variance.length;
-        double m=0;
+        Arrays.sort(temp); //오름차순
+
+        Log.d(Tag, "original variance" + Arrays.toString(variance));
+        Log.d(Tag, "sort variance" + Arrays.toString(temp));
+
+        int n = temp.length;
+        double m;
 
         if(n%2==0){ //짝수
-            m= (variance[n/2] + variance[(n/2)+1])/2;
+            n=n-1;
+            m= (temp[n/2] + temp[(n/2)+1])/2;
         }else {
-            m=variance[(n+1)/2];
+            n=n-1;
+            m=temp[(n+1)/2];
         }
 
         //가중치 적용
         for(int i=0; i< userRatings.size(); i++){
-            double temp = calVariance(userRatings.get(i));
-            if (temp > m) { // 사용자 분산이 분산의 중앙값보다 크면
+            // 호불호 업데이트
+            if (variance[i] > m) { // 사용자 분산이 분산의 중앙값보다 크면
                 // 사용자 별점 업데이트
-                this.userRatings.set(i,ratingUpdate(userRatings.get(i)));
+                Log.d(Tag, "variance update user is " + i);
+                userRatings.set(i,ratingUpdate(userRatings.get(i)));
             }
+
+            Log.d(Tag, "~~ variance update " + Arrays.toString(userRatings.get(i)));
+
+            // 출석점수 업데이트
+            if(!attendPoint.isEmpty()){
+                Float[] rating = userRatings.get(i);
+                for (int j = 0; j < rating.length; j++) {
+                    rating[j] = rating[j]*attendPoint.get(i);
+                }
+                userRatings.set(i,rating);
+            }
+            Log.d(Tag, "~~ attend update " + Arrays.toString(userRatings.get(i)));
         }
 
     }
-
-    // 2-1. 분산 계산 -> 표준편차 계산
+    // 2-1. 분산 계산
     private double calVariance(Float[] rating) {
         // 분산 = 편차 제곱의 합 / 변량의 수  => (편차 = 값- 평균)
         double avg = 0;
@@ -603,29 +632,43 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
         }
 
         variance /= rating.length;  // 3. 분산
-        double std = Math.sqrt(variance); // +) 표준 편차
-        Log.d(Tag, "variance: " + variance + ",  standard deviation: " + std);
-        return std;
+        return variance;
     }
 
     // 2-2. 가중치 설정
     private Float[] ratingUpdate(Float[] rating) {
 
-        for (int i = 0; i < rating.length; i++) {
-            if (rating[i]>3) {
+        int n =rating.length;
+        double m;
+
+        if(n%2==0){ //짝수
+            n=n-1;
+            m= (rating[n/2] + rating[(n/2)+1])/2;
+        }else {
+            n=n-1;
+            m=rating[(n+1)/2];
+        }
+
+        for (int i = 0; i < n; i++) {
+            if (rating[i]>m) {
                 rating[i] = rating[i] * 1.5f;
             }else{
                 rating[i] = rating[i] * 0.5f;
             }
         }
-        // 가장 좋아하는 카테고리 점수에 가산점, 싫어하는건 감점
-        Log.d(Tag, "After update rating is " + Arrays.toString(rating));
 
         return rating;
     }
 
     // 3-2 최고값
     private void getHighest() {
+
+//        Log.d(Tag, "Start rating is update " + Arrays.toString(userRatings.get(0)));
+//        Log.d(Tag, "Start rating is update " + Arrays.toString(userRatings.get(1)));
+//        Log.d(Tag, "Start rating is update " + Arrays.toString(userRatings.get(2)));
+//        Log.d(Tag, "Start rating is update " + Arrays.toString(userRatings.get(3)));
+//        Log.d(Tag, "Start rating is update " + Arrays.toString(userRatings.get(4)));
+
         Float[] avgRating = new Float[userRatings.get(0).length];
         for(int i=0; i<userRatings.get(0).length; i++){ // 카테고리마다
             Float sum=0f;
@@ -634,7 +677,8 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
             }
             avgRating[i]=sum/userRatings.size();
         }
-        Log.d(Tag, Arrays.toString(avgRating));
+
+        Log.d(Tag, "user average Rating Val " + Arrays.toString(avgRating));
 
         ArrayList<Integer> index= new ArrayList<>();
 
@@ -649,9 +693,12 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
                 }
             }
 
+            Log.d (Tag, avgRating[tempIndex] + "is highest val / "+ tempIndex + " is added");
+
             avgRating[tempIndex]=0f;
             index.add(tempIndex);
         }
+
         // 0=식당 , 1=카페, 2=공원, 3=쇼핑몰, 4=액티비티
         this.category.clear();
 
@@ -663,7 +710,6 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
                 case 3: this.category.add("쇼핑몰"); break;
                 case 4: this.category.add("액티비티"); break;
             }
-            Log.d (Tag, index.get(i) + " is added");
         }
     }
 
@@ -1020,6 +1066,9 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
 
         } catch (JSONException e) {
             e.printStackTrace();
+            System.out.println("No Result");
+            Toast.makeText(this, "현재 범위 내에 검색 결과가 없습니다.", Toast.LENGTH_SHORT).show();
+
         }catch(NullPointerException e){
             e.printStackTrace();
         }
