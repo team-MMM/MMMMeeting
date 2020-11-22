@@ -8,8 +8,15 @@
     tools:context=".activity.VoteActivity"
     android:background="@android:color/white">
 
+    <include
+        layout="@layout/view_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        />
+
     <LinearLayout
         android:id="@+id/place_list_view"
+        android:layout_below="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
