@@ -3,6 +3,7 @@ package com.example.mmmmeeting.view;
 import android.content.Context;
 import android.net.Uri;
 import android.util.AttributeSet;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -80,6 +81,7 @@ public class ReadScheduleView extends LinearLayout {
 
             TextView textView = (TextView) layoutInflater.inflate(R.layout.view_contents_text, this, false);
             textView.setText(contents);
+            textView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 18);
             contentsLayout.addView(textView);
 
         }
