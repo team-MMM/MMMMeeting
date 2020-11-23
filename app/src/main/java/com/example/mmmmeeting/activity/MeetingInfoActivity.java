@@ -32,15 +32,16 @@ public class MeetingInfoActivity extends AppCompatActivity {
 
     TextView name, description, code, user, leadertv;
     Button invite,changeLeader;
-    String meetingname;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_meeting_info);
 
         Intent intent = getIntent();
-        meetingname = intent.getExtras().getString("Name");
+        String meetingname = intent.getExtras().getString("Name");
         String meetingdescription = intent.getExtras().getString("Description");
+        String meetingCode = intent.getExtras().getString("Code");
         boolean isLeader = intent.getExtras().getBoolean("isLeader");
 
         name = findViewById(R.id.meetingName);
@@ -53,12 +54,13 @@ public class MeetingInfoActivity extends AppCompatActivity {
 
         name.setText(meetingname);
         description.setText(meetingdescription);
-
-        codeFind(meetingname);
+        code.setText(meetingCode);
 
         if(isLeader){
             changeLeader.setVisibility(View.VISIBLE);
         }
+
+        readmeeting(meetingCode);
 
         // 초대 버튼 클릭시 -> inviteActivity 넘어가서 초대문자 보내기
         invite.setOnClickListener(new View.OnClickListener() {
@@ -67,7 +69,7 @@ public class MeetingInfoActivity extends AppCompatActivity {
                 Intent intent = new Intent(MeetingInfoActivity.this, inviteActivity.class);
                 intent.addFlags(intent.FLAG_ACTIVITY_CLEAR_TOP);
                 intent.putExtra("Name", meetingname);
-                intent.putExtra("Code", code.getText().toString());
+                intent.putExtra("Code", meetingCode);
                 startActivity(intent);
             }
         });
@@ -77,7 +79,7 @@ public class MeetingInfoActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent intent = new Intent(MeetingInfoActivity.this, newLeaderActivity.class);
                 intent.addFlags(intent.FLAG_ACTIVITY_CLEAR_TOP);
-                intent.putExtra("Code", code.getText().toString());
+                intent.putExtra("Code", meetingCode);
                 startActivity(intent);
                 finish();
             }
@@ -100,40 +102,43 @@ public class MeetingInfoActivity extends AppCompatActivity {
 
     }
 
-    // 모임코드 출력 위해 현재 모임 이름에 해당하는 모임 코드 찾기
-    private void codeFind(String meetingname) {
+    // 모임 정보 출력 (사용자, 방장)
+    private void readmeeting(String code) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-        db.collection("meetings").get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (task.isSuccessful()) {
-                            //모든 document 출력 (dou id + data arr { : , ... ,  })
-                            for (QueryDocumentSnapshot document : task.getResult()) {
-                                // 모임 이름이 같은 경우 해당 모임의 코드를 텍스트뷰에 출력
-                                if (document.get("name").toString().equals(meetingname)) {
-                                    code.setText(document.getId());
-                                    // 찾은 모임의 사용자 확인
-                                    userFind(document.getData().get("userID"));
+        DocumentReference docRef = db.collection("meetings").document(code);
 
-                                    // 모임장 확인
-                                    if(document.getData().get("leader").toString().length()==0){
-                                        newLeader(document.getData().get("userID"),document.getId());
-                                    }
-                                    else {leaderFind(document.getData().get("leader").toString());}
+        docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    if (document.exists()) {
+                        // 해당 문서가 존재하는 경우
+                        Log.d("Attend", "Data is : " + document.getId());
 
-                                    Log.d("Document Read", document.getId() + " => " + document.getData());
-                                    return;
-                                } else {
-                                    Log.d("Document Snapshot", "No Document");
-                                }
-                            }
-                        } else {
-                            Log.d("Document Read", "Error getting documents: ", task.getException());
+                        // 찾은 모임의 사용자 확인
+                        userFind(document.getData().get("userID"));
+
+                        // 모임장 확인
+                        if(document.getData().get("leader").toString().length()==0){
+                            newLeader(document.getData().get("userID"),document.getId());
                         }
+                        else {leaderFind(document.getData().get("leader").toString());}
+
+                        Log.d("Document Read", document.getId() + " => " + document.getData());
+                        return;
+                    } else {
+                        // 존재하지 않는 문서
+                        Log.d("Attend", "No Document");
                     }
-                });
+                } else {
+                    Log.d("Attend", "Task Fail : " + task.getException());
+                }
+            }
+
+        });
+
     }
 
     private void leaderFind(String leader) {

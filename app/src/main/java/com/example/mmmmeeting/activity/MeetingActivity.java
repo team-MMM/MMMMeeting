@@ -25,6 +25,8 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -33,9 +35,6 @@ public class MeetingActivity extends BasicActivity {
 
     private BottomNavigationView bottomNavigationView;
     private Bundle bundle = new Bundle();
-    TextView name, description;
-    Button invite;
-
 
     private FragmentManager fm;
     private FragmentTransaction ft;
@@ -44,7 +43,7 @@ public class MeetingActivity extends BasicActivity {
     private FragAttend fragAlarm;
     private FragAccount fragAccount;
     private Fragment fragment_ac;
-    String getName;
+    String meetingCode;
 
     private boolean fr_check = false;
 
@@ -53,8 +52,11 @@ public class MeetingActivity extends BasicActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.frag_default);
-        getName = getIntent().getExtras().getString("Name");
+        String getName = getIntent().getExtras().getString("Name");
         setToolbarTitle(getName);
+
+        // 현재 모임의 코드 찾기
+        getCode(getName,getIntent().getExtras().getString("Description"));
 
         FragHome fragHome = new FragHome();
         bundle.putString("Name", getIntent().getExtras().getString("Name"));
@@ -128,6 +130,33 @@ public class MeetingActivity extends BasicActivity {
             }
         });
 
+    }
+
+    private void getCode(String meetingname, String meetingdescription) {
+
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+        db.collection("meetings").get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            //모든 document 출력 (dou id + data arr { : , ... ,  })
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                // 모임 이름이 같은 경우 해당 모임의 코드 출력
+                                if (document.get("name").toString().equals(meetingname) && document.get("description").toString().equals(meetingdescription)) {
+                                    meetingCode = document.getId();
+                                    Log.d("Document Read", document.getId() + " => " + meetingCode);
+                                    return;
+                                } else {
+                                    Log.d("Document Snapshot", "No Document");
+                                }
+                            }
+                        } else {
+                            Log.d("Document Read", "Error getting documents: ", task.getException());
+                        }
+                    }
+                });
 
     }
 
@@ -159,47 +188,55 @@ public class MeetingActivity extends BasicActivity {
         switch (item.getItemId()) {
             case R.id.meetingInfo:
                 // 리더인지 확인
-                checkLeader(getName);
+                checkLeader();
                 return true;
         }
 
         return super.onOptionsItemSelected(item);
     }
-    //
 
-    private void checkLeader(String getName) {
+    private void checkLeader() {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         FirebaseAuth mAuth = FirebaseAuth.getInstance();
-        db.collection("meetings").get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (task.isSuccessful()) {
-                            //모든 document 확인
-                            for (QueryDocumentSnapshot document : task.getResult()) {
-                                // 모임 이름이 같은 경우 해당 모임의 리더 확인
-                                if (document.get("name").toString().equals(getName) && document.get("leader").toString().equals(mAuth.getUid())) {
-                                    Log.d("Document Read", document.getId() + " => " + document.getData());
-                                    Intent intent = new Intent(MeetingActivity.this, MeetingInfoActivity.class);
-                                    intent.addFlags(intent.FLAG_ACTIVITY_CLEAR_TOP);
-                                    intent.putExtra("Name", getIntent().getExtras().getString("Name"));
-                                    intent.putExtra("Description", getIntent().getExtras().getString("Description"));
-                                    intent.putExtra("isLeader",true);
-                                    startActivity(intent);
-                                    return;
-                                }
-                            }
-                            Intent intent = new Intent(MeetingActivity.this, MeetingInfoActivity.class);
-                            intent.addFlags(intent.FLAG_ACTIVITY_CLEAR_TOP);
-                            intent.putExtra("Name", getIntent().getExtras().getString("Name"));
-                            intent.putExtra("Description", getIntent().getExtras().getString("Description"));
+
+        DocumentReference docRef = db.collection("meetings").document(meetingCode);
+
+        docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    if (document.exists()) {
+                        // 해당 문서가 존재하는 경우
+                        Log.d("Document Read", document.getId() + " => " + document.getData());
+
+                        Intent intent = new Intent(MeetingActivity.this, MeetingInfoActivity.class);
+                        intent.addFlags(intent.FLAG_ACTIVITY_CLEAR_TOP);
+                        intent.putExtra("Name", getIntent().getExtras().getString("Name"));
+                        intent.putExtra("Description", getIntent().getExtras().getString("Description"));
+                        intent.putExtra("Code", meetingCode);
+
+                        // 해당 모임의 리더 확인
+                        if (document.get("leader").toString().equals(mAuth.getUid())) {
+                            intent.putExtra("isLeader",true);
+                            startActivity(intent);
+                            return;
+                        }
+                        else{
                             intent.putExtra("isLeader",false);
                             startActivity(intent);
-
-                        } else {
-                            Log.d("Document Read", "Error getting documents: ", task.getException());
                         }
+
+                        Log.d("Attend", "Data is : " + document.getId());
+                    } else {
+                        // 존재하지 않는 문서
+                        Log.d("Attend", "No Document");
                     }
-                });
+                } else {
+                    Log.d("Attend", "Task Fail : " + task.getException());
+                }
+            }
+
+        });
     }
 }
