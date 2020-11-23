@@ -31,7 +31,7 @@ import java.util.Arrays;
 public class MeetingInfoActivity extends AppCompatActivity {
 
     TextView name, description, code, user, leadertv;
-    Button invite;
+    Button invite,changeLeader;
     String meetingname;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,6 +41,7 @@ public class MeetingInfoActivity extends AppCompatActivity {
         Intent intent = getIntent();
         meetingname = intent.getExtras().getString("Name");
         String meetingdescription = intent.getExtras().getString("Description");
+        boolean isLeader = intent.getExtras().getBoolean("isLeader");
 
         name = findViewById(R.id.meetingName);
         description = findViewById(R.id.meetingDescription);
@@ -48,9 +49,16 @@ public class MeetingInfoActivity extends AppCompatActivity {
         user = findViewById(R.id.meetingUsers);
         invite = findViewById(R.id.inviteBtn);
         leadertv = findViewById(R.id.meetingLeader);
+        changeLeader = findViewById(R.id.newLeader);
 
         name.setText(meetingname);
         description.setText(meetingdescription);
+
+        codeFind(meetingname);
+
+        if(isLeader){
+            changeLeader.setVisibility(View.VISIBLE);
+        }
 
         // 초대 버튼 클릭시 -> inviteActivity 넘어가서 초대문자 보내기
         invite.setOnClickListener(new View.OnClickListener() {
@@ -64,7 +72,16 @@ public class MeetingInfoActivity extends AppCompatActivity {
             }
         });
 
-        codeFind(meetingname);
+        changeLeader.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MeetingInfoActivity.this, newLeaderActivity.class);
+                intent.addFlags(intent.FLAG_ACTIVITY_CLEAR_TOP);
+                intent.putExtra("Code", code.getText().toString());
+                startActivity(intent);
+                finish();
+            }
+        });
 
         // 코드가 출력되는 TextView 클릭시 -> 코드 클립보드에 복사되도록
         code.setOnTouchListener(new View.OnTouchListener(){ //터치 이벤트 리스너 등록(누를때)

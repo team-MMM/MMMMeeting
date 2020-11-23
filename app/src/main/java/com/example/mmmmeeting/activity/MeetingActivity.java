@@ -180,10 +180,11 @@ public class MeetingActivity extends BasicActivity {
                                 // 모임 이름이 같은 경우 해당 모임의 리더 확인
                                 if (document.get("name").toString().equals(getName) && document.get("leader").toString().equals(mAuth.getUid())) {
                                     Log.d("Document Read", document.getId() + " => " + document.getData());
-                                    Intent intent = new Intent(MeetingActivity.this, MeetingInfoLeaderActivity.class);
+                                    Intent intent = new Intent(MeetingActivity.this, MeetingInfoActivity.class);
                                     intent.addFlags(intent.FLAG_ACTIVITY_CLEAR_TOP);
                                     intent.putExtra("Name", getIntent().getExtras().getString("Name"));
                                     intent.putExtra("Description", getIntent().getExtras().getString("Description"));
+                                    intent.putExtra("isLeader",true);
                                     startActivity(intent);
                                     return;
                                 }
@@ -192,6 +193,7 @@ public class MeetingActivity extends BasicActivity {
                             intent.addFlags(intent.FLAG_ACTIVITY_CLEAR_TOP);
                             intent.putExtra("Name", getIntent().getExtras().getString("Name"));
                             intent.putExtra("Description", getIntent().getExtras().getString("Description"));
+                            intent.putExtra("isLeader",false);
                             startActivity(intent);
 
                         } else {
