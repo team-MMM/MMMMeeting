@@ -17,6 +17,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -26,10 +27,12 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 
+import com.example.mmmmeeting.Info.CalUserItems;
 import com.example.mmmmeeting.R;
 import com.example.mmmmeeting.activity.MainActivity;
 import com.example.mmmmeeting.activity.MiddlePlaceActivity;
 import com.example.mmmmeeting.activity.PlaceListActivity;
+import com.example.mmmmeeting.adapter.CalUserResultAdapter;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -43,6 +46,7 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.lang.reflect.Array;
+import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -60,6 +64,11 @@ public class FragAttend extends Fragment {
     private String meetingName;
     private List<Map.Entry<String, Double>> list_entries;
     private HashMap<String, Double> attendMap = new HashMap<>();
+    private ArrayList<String> userList = new ArrayList<>();
+    private HashMap<String, Integer> userRank = new HashMap<>();
+
+    ListView listView;
+    CalUserResultAdapter adapter;
 
     String meetingCode;
     LinearLayout attend_show;
@@ -77,10 +86,13 @@ public class FragAttend extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.frag_attend, container, false);
-        attend_show = view.findViewById(R.id.attend_show);
+        //attend_show = view.findViewById(R.id.attend_show);
         best_title = view.findViewById(R.id.best_title);
         resetDatetv = view.findViewById(R.id.resetDatetv);
         nullText = view.findViewById(R.id.nullText);
+        listView = view.findViewById(R.id.attend_show);
+        adapter = new CalUserResultAdapter();
+
 
         db = FirebaseFirestore.getInstance();
         reset = view.findViewById(R.id.resetBtn);
@@ -105,6 +117,8 @@ public class FragAttend extends Fragment {
                                     meetingCode = document.getId();
                                     String getDate = document.get("resetDate").toString();
                                     String getTime = document.get("resetTime").toString();
+                                    userList = (ArrayList<String>) document.get("userID");
+                                    System.out.println("userList: "+userList);
 
                                     resetDate = Integer.valueOf(getDate);
                                     resetTime = Integer.valueOf(getTime);
@@ -194,11 +208,15 @@ public class FragAttend extends Fragment {
 
                             for (QueryDocumentSnapshot document : task.getResult()) {
                                 boolean meetingIDCheck = getId.equals(document.get("meetingID").toString());
-                                boolean meetingMonthCheck = getTime(document.getDate("meetingDate"));
+                                Date now = new Date();
+                                Date meetingDate = document.getDate("meetingDate");
+                                // 날짜 지난 것만 지각 포인트 체크
+                                boolean meetingMonthCheck = now.compareTo(meetingDate) == 1 ? true : false;
 
                                 Log.d(Tag, "check val : " + meetingIDCheck + "/" + meetingMonthCheck);
                                 if (meetingIDCheck && meetingMonthCheck) {
                                     HashMap<String, Double> attender = (HashMap<String, Double>) document.get("timePoint");
+
                                     countAttend(attender, attendMap);
                                 }
                             }
@@ -248,8 +266,8 @@ public class FragAttend extends Fragment {
         Collections.sort(list_entries, new Comparator<Map.Entry<String, Double>>() {
             @Override
             public int compare(Map.Entry<String, Double> obj1, Map.Entry<String, Double> obj2) {
-                // 내림 차순으로 정렬
-                return obj2.getValue().compareTo(obj1.getValue());
+                // 오름 차순으로 정렬
+                return obj1.getValue().compareTo(obj2.getValue());
             }
         });
 
@@ -258,7 +276,9 @@ public class FragAttend extends Fragment {
         int same = 1;
         int rank = 1;
 
-        for (int i = 0; i < list_entries.size(); i++) {
+        int size = list_entries.size() < 5 ? list_entries.size() : 5;
+
+        for (int i = 0; i < size; i++) {
             if (i != 0) {
                 if (list_entries.get(i - 1).getValue().equals(list_entries.get(i).getValue())) {
                     same++;
@@ -267,6 +287,7 @@ public class FragAttend extends Fragment {
                     same = 1;
                 }
             }
+
             setLayout(rank, list_entries.get(i).getKey());
         }
 
@@ -280,37 +301,50 @@ public class FragAttend extends Fragment {
 
         Set attenderSet = attender.keySet();
 
-        db.collection("meetings").document(meetingCode).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                if (task.isSuccessful()) {
-                    DocumentSnapshot document = task.getResult();
-                    if (document.exists()) {
-                        List<String> user = (List<String>) document.get("userID");
-                        System.out.println(meetingCode);
+        HashMap<String, Double> tempMap = new HashMap<>();
 
-                        for (int i = 0; i < user.size(); i++) {
-                            Iterator iter = attenderSet.iterator();
-                            while (iter.hasNext()) {
-                                String checkUser = (String) iter.next();
-                                System.out.println("checkuser: " + checkUser);
-                                if (user.get(i).equals(checkUser)) {
-                                    System.out.println("user: " + user.get(i));
-                                    attendMap.put(user.get(i), Double.parseDouble(String.valueOf(attender.get(user.get(i)))));
-                                    break;
-                                } else {
-                                    attendMap.put(user.get(i), -12.0);
-                                }
-                            }
-                        }
-                        System.out.println("attendMap:" + attendMap);
-                        mapSort(attendMap);
+        // 출첵 점수 저장
+        for(int i=0;i<userList.size();i++) {
+            String userName = userList.get(i);
+            System.out.println("지금유저: "+userName);
 
-                    }
+            Iterator iter = attenderSet.iterator();
+            while (iter.hasNext()) {
+                String checkUser = (String) iter.next();
+                System.out.println("출첵한사람: " + checkUser);
+                if (userName.equals(checkUser)) {
+                    Double point = Double.parseDouble(String.valueOf(attender.get(checkUser)));
+                    System.out.println("내출첵포인트:" + point);
+                    tempMap.put(userName, point);
+                    break;
+                } else {
+                    tempMap.put(userName, -12.0);
                 }
             }
+        }
+        System.out.println(tempMap);
 
-        });
+        // 기존 점수와 합침
+        Set tempSet = tempMap.keySet();
+        Iterator iter = tempSet.iterator();
+
+        while (iter.hasNext()) {
+            String user = (String) iter.next();
+            Double now = tempMap.get(user).doubleValue();
+            System.out.println("지금유저: "+user + "포인트: "+now);
+            if(attendMap.get(user)!=null) {
+                Double old = attendMap.get(user).doubleValue();
+                System.out.println("지금유저: "+user + "old포인트: "+old);
+                now += old;
+            }
+
+            attendMap.put(user,now);
+        }
+
+
+
+        System.out.println("attendMap:" + attendMap);
+        mapSort(attendMap);
 
     }
 
@@ -323,16 +357,30 @@ public class FragAttend extends Fragment {
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         if (task.isSuccessful()) {
                             nullText.setVisibility(view.GONE);
+                            SpannableString s;
 
                             for (QueryDocumentSnapshot document : task.getResult()) {
                                 if (user_id.equals(document.getId())) {
 
                                     String user_name = document.get("name").toString();
 
+
+                                    s = new SpannableString(num+"등 ("+attendMap.get(user_id).doubleValue()+"점)");
+                                    s.setSpan(new RelativeSizeSpan(1.2f),0,s.length()-8,0);
+                                    s.setSpan(new ForegroundColorSpan(Color.BLACK),0,s.length()-8,0);
+                                    CalUserItems item = new CalUserItems(user_name);
+                                    item.setMoney(s.toString());
+                                    adapter.addItem(item);
+
+
+                                    /*
                                     //LinearLayout 정의
                                     LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
                                             ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
                                     params.setMargins(15, 15, 15, 10);
+
+
+
 
                                     //LinearLayout 생성
                                     LinearLayout ly = new LinearLayout(getContext());
@@ -374,8 +422,11 @@ public class FragAttend extends Fragment {
 
                                     attend_show.addView(ly);
 
+                                     */
+
                                 }
                             }
+                            listView.setAdapter(adapter);
 
                         }
                     }

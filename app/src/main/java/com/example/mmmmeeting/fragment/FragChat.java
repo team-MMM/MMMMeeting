@@ -18,10 +18,14 @@ import androidx.fragment.app.Fragment;
 import com.example.mmmmeeting.Info.ChatItem;
 import com.example.mmmmeeting.Info.MemberInfo;
 import com.example.mmmmeeting.Info.ScheduleInfo;
+import com.example.mmmmeeting.Info.VoteInfo;
 import com.example.mmmmeeting.R;
 import com.example.mmmmeeting.adapter.ChatAdapter;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.ChildEventListener;
@@ -29,7 +33,10 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.firestore.Query;
+import com.google.firebase.database.Query;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
@@ -58,7 +65,21 @@ public class FragChat extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.frag_chat, container, false);
         final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        userName = user.getDisplayName();
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        String userId = user.getUid();
+
+        db.collection("users").document(userId).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    if (document.exists()) {
+                        userName = document.get("name").toString();
+                    }
+                }
+            }
+        });
+
 
         et=view.findViewById(R.id.et);
         listView=view.findViewById(R.id.listview);
@@ -71,13 +92,14 @@ public class FragChat extends Fragment {
 
         // meetingName 기준으로 분리함
         firebaseDatabase= FirebaseDatabase.getInstance();
-        chatRef= firebaseDatabase.getReference("chat").child(meetingName);
+        chatRef= (DatabaseReference) firebaseDatabase.getReference("chat").child(meetingName);
+        Query chatQuery = chatRef.orderByChild("timestamp");
 
 
         //RealtimeDB에서 채팅 메세지들 실시간 읽어오기..
         //'chat'노드에 저장되어 있는 데이터들을 읽어오기
         //chatRef에 데이터가 변경되는 것을 듣는 리스너 추가
-        chatRef.addChildEventListener(new ChildEventListener() {
+        chatQuery.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
 
@@ -139,9 +161,11 @@ public class FragChat extends Fragment {
         //메세지 작성 시간 문자열로
         Calendar calendar= Calendar.getInstance();
         String time = timeFormat.format(calendar.getTime());
+        Date now = new Date();
+        Long timestamp = now.getTime();
 
         //DB에 저장할 값들(닉네임, 메세지, 시간)
-        ChatItem messageItem= new ChatItem(nickName,message,time);
+        ChatItem messageItem= new ChatItem(nickName,message,time,timestamp);
         chatRef.push().setValue(messageItem);
 
         //EditText에 있는 글씨 지우기

@@ -40,7 +40,7 @@
             android:id="@+id/msgBtn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="send"
+            android:text="전송"
             android:backgroundTint="@android:color/white"
             android:clickable="true"
             android:layout_marginLeft="8dp"/>

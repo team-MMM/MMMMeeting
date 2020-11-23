@@ -3,6 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:layout_centerHorizontal="true"
     android:orientation="vertical">
 
     <include
@@ -15,12 +16,11 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="20sp"
-        android:text="약속시간을 잘 지켰나요?"
+        android:text="우리 모임 지각왕"
         android:layout_below="@+id/toolbar"
         android:textColor="@color/fui_bgFacebook"
         android:textStyle="bold"
         android:paddingTop="10dp"
-        android:layout_margin="20sp"
         android:layout_centerHorizontal="true"/>
 
     <TextView
@@ -28,6 +28,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="18dp"
+        android:text="날짜"
         android:layout_margin="15sp"
         android:layout_centerHorizontal="true"
         android:layout_below="@id/best_title"/>
@@ -44,30 +45,26 @@
         android:visibility="gone"
         />
 
-    <LinearLayout
+    <ListView
         android:id="@+id/attend_show"
-        android:layout_below="@id/resetDatetv"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_below="@id/resetDatetv"
         android:layout_centerInParent="true"
-        android:layout_centerVertical="true"
-        android:orientation="vertical">
-    </LinearLayout>
+        android:layout_height="match_parent"
+        android:layout_margin="30dp"
+        />
 
     <Button
         android:id="@+id/resetBtn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
         android:layout_below="@+id/toolbar"
         android:layout_toRightOf="@+id/best_title"
-        android:layout_marginTop="23sp"
-        android:layout_marginRight="5sp"
+        android:layout_marginTop="5sp"
+        android:layout_marginLeft="40sp"
         android:padding="10sp"
-        android:background="@drawable/button_shape"
-        android:text="RESET"
-        android:textColor="@android:color/black"
-        android:textSize="12sp"
-        android:visibility="invisible"
+        android:background="@drawable/reset"
+
 
         />
 
