@@ -25,8 +25,7 @@ import com.google.firebase.firestore.QuerySnapshot;
 
 public class MakeMeetingActivity extends BasicActivity {
     Button makeMeeting;
-    EditText meetingName;
-    boolean check;
+    EditText meetingName,meetingDesc;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -34,20 +33,34 @@ public class MakeMeetingActivity extends BasicActivity {
         setContentView(R.layout.activity_make_meeting);
         makeMeeting = findViewById(R.id.makeMeetingBtn);
         meetingName = findViewById(R.id.makeMeetingText);
+        meetingDesc = findViewById(R.id.meetingDesc);
 
         makeMeeting.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // 모임 이름이 이미 존재하는지 확인
-                checkMeetingName();
+                String name = meetingName.getText().toString();
+                String description = meetingDesc.getText().toString();
+
+                if(!nullCheck(name,description)){
+                    // 모임 이름이 이미 존재하는지 확인
+                    checkMeetingName(name,description);
+                }
             }
         });
     }
 
-    private void checkMeetingName() {
+    private boolean nullCheck(String name, String description) {
+        if(name.length()==0 || description.length()==0){
+            Toast.makeText(this, "이름과 설명을 모두 입력해주세요", Toast.LENGTH_SHORT).show();
+            return true;
+        }
+
+        else return false;
+    }
+
+    private void checkMeetingName(String name, String description) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
-        String name = ((EditText) findViewById(R.id.makeMeetingText)).getText().toString();
-        check = false;
+
         db.collection("meetings").get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
@@ -55,10 +68,9 @@ public class MakeMeetingActivity extends BasicActivity {
                         if (task.isSuccessful()) {
                             //모든 document 확인
                             for (QueryDocumentSnapshot document : task.getResult()) {
-                                if (document.getData().get("name").toString().equals(name)) {
-                                    // 입력한 이름이 이미 존재하는 경우
-                                    Toast.makeText(MakeMeetingActivity.this, "이미 존재하는 모임 이름입니다.", Toast.LENGTH_SHORT).show();
-                                    ((EditText) findViewById(R.id.makeMeetingText)).setText(null);
+                                if (document.getData().get("name").toString().equals(name) && document.getData().get("description").toString().equals(description)) {
+                                    //  이름과 설명이 모두 같으면 실패
+                                    Toast.makeText(MakeMeetingActivity.this, "이름과 설명이 모두 같은 모임이 이미 존재합니다.", Toast.LENGTH_SHORT).show();
                                     Log.d("Document Read", name);
                                     return;
                                 }
@@ -76,38 +88,32 @@ public class MakeMeetingActivity extends BasicActivity {
         String name = ((EditText) findViewById(R.id.makeMeetingText)).getText().toString();
         String description = ((EditText) findViewById(R.id.meetingDesc)).getText().toString();
 
-        // 모임 이름의 길이가 0이 아닌 경우 = 모임의 이름이 입력된 경우
-        if (name.length() != 0) {
-            final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-            FirebaseFirestore db = FirebaseFirestore.getInstance();
+        final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-            // db에 저장할 모임 정보 객체 생성
-            MeetingInfo info = new MeetingInfo(name, description);
-            info.setUserID(user.getUid());
-            info.setLeader(user.getUid());
+        // db에 저장할 모임 정보 객체 생성
+        MeetingInfo info = new MeetingInfo(name, description);
+        info.setUserID(user.getUid());
+        info.setLeader(user.getUid());
 
-            if (user != null) {
-                // meeting table에 미팅 정보 저장
-                db.collection("meetings").document().set(info)
-                        .addOnSuccessListener(new OnSuccessListener<Void>() {
-                            @Override
-                            public void onSuccess(Void aVoid) {
-                                // 미팅 정보 저장 = 메시지 출력 후 메인으로 복귀
-                                startToast("미팅 생성에 성공하였습니다.");
-                                myStartActivity(MainActivity.class);
-                                finish();
-                            }
-                        })
-                        .addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception e) {
-                                startToast("미팅 생성에 실패하였습니다.");
-                            }
-                        });
-            } else {
-                startToast("모임정보를 입력해주세요.");
-            }
-        }
+            // meeting table에 미팅 정보 저장
+        db.collection("meetings").document().set(info)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        // 미팅 정보 저장 = 메시지 출력 후 메인으로 복귀
+                        startToast("미팅 생성에 성공하였습니다.");
+                        myStartActivity(MainActivity.class);
+                        finish();
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        startToast("미팅 생성에 실패하였습니다.");
+                    }
+                });
+
     }
 
     private void startToast(String msg) {
