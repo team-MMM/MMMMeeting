@@ -29,12 +29,14 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.Arrays;
+import java.util.List;
 
 public class MeetingInfoActivity extends AppCompatActivity implements View.OnClickListener{
 
     TextView name, description, code, user, leadertv;
-    Button invite, delete;
+    Button invite, delete, changeLeader;
     String meetingname;
+    int num;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,6 +47,7 @@ public class MeetingInfoActivity extends AppCompatActivity implements View.OnCli
         meetingname = intent.getExtras().getString("Name");
         String meetingdescription = intent.getExtras().getString("Description");
         String meetingCode = intent.getExtras().getString("Code");
+        boolean isLeader = intent.getExtras().getBoolean("isLeader");
 
         name = findViewById(R.id.meetingName);
         description = findViewById(R.id.meetingDescription);
@@ -52,10 +55,16 @@ public class MeetingInfoActivity extends AppCompatActivity implements View.OnCli
         user = findViewById(R.id.meetingUsers);
         invite = findViewById(R.id.inviteBtn);
         delete = findViewById(R.id.deleteBtn);
+        changeLeader = findViewById(R.id.newLeader);
         leadertv = findViewById(R.id.meetingLeader);
+
+        if(isLeader){
+            changeLeader.setVisibility(View.VISIBLE);
+        }
 
         invite.setOnClickListener(this);
         delete.setOnClickListener(this);
+        changeLeader.setOnClickListener(this);
 
         name.setText(meetingname);
         description.setText(meetingdescription);
@@ -94,6 +103,9 @@ public class MeetingInfoActivity extends AppCompatActivity implements View.OnCli
                     if (document.exists()) {
                         // 해당 문서가 존재하는 경우
                         // 찾은 모임의 사용자 확인
+                        List list = (List) document.getData().get("userID");
+                        num = list.size();
+
                         userFind(document.getData().get("userID"));
 
                         // 모임장 확인
@@ -211,6 +223,14 @@ public class MeetingInfoActivity extends AppCompatActivity implements View.OnCli
         switch (v.getId()){
             case (R.id.inviteBtn):
                 myStartActivity(inviteActivity.class, meetingname, code);
+                break;
+            case (R.id.newLeader):
+                if(num == 1){
+                    Toast.makeText(this,"양도할 사람이 없습니다.",Toast.LENGTH_SHORT).show();
+                }else {
+                    myStartActivity(newLeaderActivity.class, code);
+                    finish();
+                }
                 break;
             case(R.id.deleteBtn):
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
