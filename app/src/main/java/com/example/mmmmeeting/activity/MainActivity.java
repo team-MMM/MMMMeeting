@@ -32,7 +32,6 @@ public class MainActivity extends BasicActivity implements View.OnClickListener 
     private FirebaseAuth mAuth;
     private FirebaseFirestore db;
     Button addMeeting;
-    Button deleteMeeting;
     Button attendMeeting;
 
     @Override
@@ -42,11 +41,9 @@ public class MainActivity extends BasicActivity implements View.OnClickListener 
         setToolbarTitle("우리 지금 만나");
 
         addMeeting = findViewById(R.id.meetingAdd);
-        deleteMeeting = findViewById(R.id.meetingDelete);
         attendMeeting = findViewById(R.id.meetingAttend);
 
         addMeeting.setOnClickListener(this);
-        deleteMeeting.setOnClickListener(this);
         attendMeeting.setOnClickListener(this);
 
     }
@@ -228,9 +225,6 @@ public class MainActivity extends BasicActivity implements View.OnClickListener 
         switch (v.getId()){
             case (R.id.meetingAdd):
                 myStartActivity(MakeMeetingActivity.class);
-                break;
-            case(R.id.meetingDelete):
-                myStartActivity(MeetingDeleteActivity.class);
                 break;
             case(R.id.meetingAttend):
                 myStartActivity(MeetingAttendActivity.class);
