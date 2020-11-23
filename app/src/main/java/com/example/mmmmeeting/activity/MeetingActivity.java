@@ -53,10 +53,10 @@ public class MeetingActivity extends BasicActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.frag_default);
         String getName = getIntent().getExtras().getString("Name");
-        setToolbarTitle(getName);
+        meetingCode = getIntent().getExtras().getString("Code");
 
-        // 현재 모임의 코드 찾기
-        getCode(getName,getIntent().getExtras().getString("Description"));
+        Log.d("Grid send code ", "meetingCode is " + meetingCode);
+        setToolbarTitle(getName);
 
         FragHome fragHome = new FragHome();
         bundle.putString("Name", getIntent().getExtras().getString("Name"));
@@ -132,33 +132,7 @@ public class MeetingActivity extends BasicActivity {
 
     }
 
-    private void getCode(String meetingname, String meetingdescription) {
 
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-
-        db.collection("meetings").get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (task.isSuccessful()) {
-                            //모든 document 출력 (dou id + data arr { : , ... ,  })
-                            for (QueryDocumentSnapshot document : task.getResult()) {
-                                // 모임 이름이 같은 경우 해당 모임의 코드 출력
-                                if (document.get("name").toString().equals(meetingname) && document.get("description").toString().equals(meetingdescription)) {
-                                    meetingCode = document.getId();
-                                    Log.d("Document Read", document.getId() + " => " + meetingCode);
-                                    return;
-                                } else {
-                                    Log.d("Document Snapshot", "No Document");
-                                }
-                            }
-                        } else {
-                            Log.d("Document Read", "Error getting documents: ", task.getException());
-                        }
-                    }
-                });
-
-    }
 
     //Fragment fragment,
     public void replaceFragment(Fragment fragment, boolean check) {

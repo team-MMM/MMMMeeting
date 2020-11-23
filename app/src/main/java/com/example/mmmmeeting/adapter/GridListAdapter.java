@@ -2,6 +2,7 @@ package com.example.mmmmeeting.adapter;
 
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,12 +13,20 @@ import android.widget.TextView;
 import com.example.mmmmeeting.R;
 import com.example.mmmmeeting.Info.GridItems;
 import com.example.mmmmeeting.activity.MeetingActivity;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
+
+import androidx.annotation.NonNull;
 
 public class GridListAdapter extends BaseAdapter {
     ArrayList<GridItems> items = new ArrayList<GridItems>();
     Context context; // activity 정보 저장
+    String code;
 
     // 아이템 추가
     public  void addItem(GridItems item) {
@@ -74,7 +83,31 @@ public class GridListAdapter extends BaseAdapter {
                 Intent intent = new Intent(context, MeetingActivity.class);
                 intent.putExtra("Name",listItem.getName());
                 intent.putExtra("Description",listItem.getDescription());
-                context.startActivity(intent);
+
+                FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+                db.collection("meetings").get()
+                        .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                            @Override
+                            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                if (task.isSuccessful()) {
+                                    //모든 document 출력 (dou id + data arr { : , ... ,  })
+                                    for (QueryDocumentSnapshot document : task.getResult()) {
+                                        // 모임 이름이 같은 경우 해당 모임의 코드 출력
+                                        if (document.get("name").toString().equals(listItem.getName()) && document.get("description").toString().equals(listItem.getDescription())) {
+                                            intent.putExtra("Code",document.getId());
+                                            Log.d("Grid send", document.getId() );
+                                            context.startActivity(intent);
+                                            return;
+                                        } else {
+                                            Log.d("Document Snapshot", "No Document");
+                                        }
+                                    }
+                                } else {
+                                    Log.d("Document Read", "Error getting documents: ", task.getException());
+                                }
+                            }
+                        });
             }
         });
 
