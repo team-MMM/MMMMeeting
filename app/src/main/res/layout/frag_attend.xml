@@ -64,6 +64,7 @@
         android:layout_marginLeft="40sp"
         android:padding="10sp"
         android:background="@drawable/reset"
+        android:visibility="gone"
 
 
         />

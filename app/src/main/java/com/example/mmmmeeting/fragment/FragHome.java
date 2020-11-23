@@ -43,7 +43,7 @@ public class FragHome extends Fragment {
     private boolean updating;
     private boolean topScrolled;
     private TextView name;
-    private String meetingName;
+    private String meetingCode;
 
     public FragHome() { }
 
@@ -58,9 +58,9 @@ public class FragHome extends Fragment {
         Bundle bundle = this.getArguments();
         if(bundle != null) {
             bundle = getArguments();
-            meetingName = bundle.getString("Name");
+            meetingCode = bundle.getString("Code");
         }
-        Log.d("get Name Test: ", meetingName);
+        Log.d("get Name Test: ", meetingCode);
 
         firebaseFirestore = FirebaseFirestore.getInstance();
         postList = new ArrayList<>();
@@ -156,7 +156,6 @@ public class FragHome extends Fragment {
 
         @Override
         public void onModify() {
-
             Log.e("로그: ","수정 성공");
         }
     };
@@ -176,8 +175,8 @@ public class FragHome extends Fragment {
                             }
                             for (QueryDocumentSnapshot document : task.getResult()) {
                                 Log.d(TAG, document.getId() + " => " + document.getData());
-                                if(document.getData().get("meetingID").toString().equals(meetingName)){
-                                    Log.d("update Test", meetingName);
+                                if(document.getData().get("meetingID").toString().equals(meetingCode)){
+                                    Log.d("update Test", meetingCode);
                                     ScheduleInfo temp = new ScheduleInfo(
                                             document.getData().get("title").toString(),
                                             document.getData().get("meetingID").toString(),
@@ -209,7 +208,7 @@ public class FragHome extends Fragment {
 
     private void myStartActivity(Class c) {
         Intent intent = new Intent(getActivity(), c);
-        intent.putExtra("Name",meetingName);
+        intent.putExtra("Name",meetingCode);
         startActivityForResult(intent, 0);
     }
 }

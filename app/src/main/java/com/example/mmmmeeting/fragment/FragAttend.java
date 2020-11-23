@@ -1,24 +1,19 @@
 package com.example.mmmmeeting.fragment;
 
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Message;
 import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.RelativeSizeSpan;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -29,24 +24,16 @@ import androidx.fragment.app.Fragment;
 
 import com.example.mmmmeeting.Info.CalUserItems;
 import com.example.mmmmeeting.R;
-import com.example.mmmmeeting.activity.MainActivity;
-import com.example.mmmmeeting.activity.MiddlePlaceActivity;
-import com.example.mmmmeeting.activity.PlaceListActivity;
 import com.example.mmmmeeting.adapter.CalUserResultAdapter;
-import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.GeoPoint;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
-import java.lang.reflect.Array;
-import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -61,7 +48,7 @@ import java.util.Set;
 public class FragAttend extends Fragment {
     private View view;
     private FirebaseFirestore db;
-    private String meetingName;
+    private String meetingCode;
     private List<Map.Entry<String, Double>> list_entries;
     private HashMap<String, Double> attendMap = new HashMap<>();
     private ArrayList<String> userList = new ArrayList<>();
@@ -70,7 +57,6 @@ public class FragAttend extends Fragment {
     ListView listView;
     CalUserResultAdapter adapter;
 
-    String meetingCode;
     LinearLayout attend_show;
     TextView best_title, resetDatetv, nullText;
     Button reset;
@@ -103,46 +89,54 @@ public class FragAttend extends Fragment {
 
         if (bundle != null) {
             bundle = getArguments();
-            meetingName = bundle.getString("Name");
+            meetingCode = bundle.getString("Code");
         }
 
-        db.collection("meetings").get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (task.isSuccessful()) {
-                            for (QueryDocumentSnapshot document : task.getResult()) {
-                                if (document.get("name").toString().equals(meetingName)) {
-                                    Log.d(Tag, "meeting find : " + document.get("name"));
-                                    meetingCode = document.getId();
-                                    String getDate = document.get("resetDate").toString();
-                                    String getTime = document.get("resetTime").toString();
-                                    userList = (ArrayList<String>) document.get("userID");
-                                    System.out.println("userList: "+userList);
 
-                                    resetDate = Integer.valueOf(getDate);
-                                    resetTime = Integer.valueOf(getTime);
+        DocumentReference docRef = db.collection("meetings").document(meetingCode);
 
-                                    String year = getDate.substring(0, 4);
-                                    String month = getDate.substring(4, 6);
-                                    String date = getDate.substring(6, 8);
-                                    resetDatetv.setText(year + "년 " + month + "월 " + date + "일 ~ ");
+        docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    if (document.exists()) {
+                        // 해당 문서가 존재하는 경우
+                        Log.d(Tag, "meeting find : " + document.get("name"));
+                        String getDate = document.get("resetDate").toString();
+                        String getTime = document.get("resetTime").toString();
+                        userList = (ArrayList<String>) document.get("userID");
+                        System.out.println("userList: "+userList);
 
-                                    Log.d(Tag, "get reset Date : " + resetDate);
+                        resetDate = Integer.valueOf(getDate);
+                        resetTime = Integer.valueOf(getTime);
 
-                                    FirebaseAuth mAuth = FirebaseAuth.getInstance();
-                                    if (document.get("leader").toString().equals(mAuth.getUid())) {
-                                        reset.setVisibility(View.VISIBLE);
-                                    }
+                        String year = getDate.substring(0, 4);
+                        String month = getDate.substring(4, 6);
+                        String date = getDate.substring(6, 8);
+                        resetDatetv.setText(year + "년 " + month + "월 " + date + "일 ~ ");
 
-                                    setResetBtn(today, thisTime);
-                                    setAttend(meetingName);
-                                    return;
-                                }
-                            }
+                        Log.d(Tag, "get reset Date : " + resetDate);
+
+                        FirebaseAuth mAuth = FirebaseAuth.getInstance();
+
+                        if (document.get("leader").toString().equals(mAuth.getUid())) {
+                            reset.setVisibility(View.VISIBLE);
                         }
+
+                        setResetBtn(today, thisTime);
+                        setAttend(meetingCode);
+                        return;
+                    } else {
+                        // 존재하지 않는 문서
+                        Log.d("Attend", "No Document");
                     }
-                });
+                } else {
+                    Log.d("Attend", "Task Fail : " + task.getException());
+                }
+            }
+
+        });
 
         return view;
     }
@@ -174,7 +168,8 @@ public class FragAttend extends Fragment {
                         db.collection("meetings").document(meetingCode).update("resetTime", thisTime);
                         db.collection("meetings").document(meetingCode).update("best", new HashMap<String, Integer>());
 
-                        attend_show.removeAllViews();
+                        adapter = new CalUserResultAdapter();
+                        listView.setAdapter(adapter);
 
                         Toast.makeText(view.getContext(), "출석점수를 초기화했습니다.", Toast.LENGTH_SHORT).show();
 
@@ -208,13 +203,17 @@ public class FragAttend extends Fragment {
 
                             for (QueryDocumentSnapshot document : task.getResult()) {
                                 boolean meetingIDCheck = getId.equals(document.get("meetingID").toString());
-                                Date now = new Date();
-                                Date meetingDate = document.getDate("meetingDate");
-                                // 날짜 지난 것만 지각 포인트 체크
-                                boolean meetingMonthCheck = now.compareTo(meetingDate) == 1 ? true : false;
 
-                                Log.d(Tag, "check val : " + meetingIDCheck + "/" + meetingMonthCheck);
-                                if (meetingIDCheck && meetingMonthCheck) {
+                                Date meetingDate = document.getDate("meetingDate");
+                                // 날짜 지난 것만 지각 포인트 체크 -> 리셋 날 기준으로 날짜 확인
+                                boolean meetingTimeCheck = checkTime(meetingDate);
+
+//                                Date now = new Date();// 날짜 지난 것만 지각 포인트 체크
+//                                Date meetingDate = document.getDate("meetingDate");
+//                                boolean meetingMonthCheck = now.compareTo(meetingDate) == 1 ? true : false;
+
+                                Log.d(Tag, "check val : " + meetingIDCheck + "/" + meetingTimeCheck);
+                                if (meetingIDCheck && meetingTimeCheck) {
                                     HashMap<String, Double> attender = (HashMap<String, Double>) document.get("timePoint");
 
                                     countAttend(attender, attendMap);
@@ -234,7 +233,7 @@ public class FragAttend extends Fragment {
                 });
     }
 
-    private boolean getTime(Date date) {
+    private boolean checkTime(Date date) {
         int scheduleDate = 0;
         int scheduleTime = 0;
         if (date != null) {

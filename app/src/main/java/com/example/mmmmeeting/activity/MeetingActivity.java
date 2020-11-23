@@ -59,7 +59,7 @@ public class MeetingActivity extends BasicActivity {
         setToolbarTitle(getName);
 
         FragHome fragHome = new FragHome();
-        bundle.putString("Name", getIntent().getExtras().getString("Name"));
+        bundle.putString("Code", meetingCode);
         fragHome.setArguments(bundle);
 
         getSupportFragmentManager().beginTransaction()
@@ -77,7 +77,7 @@ public class MeetingActivity extends BasicActivity {
                     // 홈 화면(약속 목록)으로 이동
                     case R.id.menu_home:
                         FragHome fragHome = new FragHome();
-                        bundle.putString("Name", getIntent().getExtras().getString("Name"));
+                        bundle.putString("Code", meetingCode);;
                         fragHome.setArguments(bundle);
 
                         getSupportFragmentManager().beginTransaction()
@@ -86,7 +86,7 @@ public class MeetingActivity extends BasicActivity {
                         return true;
                     case R.id.menu_chat:
                         FragChat fragChat = new FragChat();
-                        bundle.putString("Name", getIntent().getExtras().getString("Name"));
+                        bundle.putString("Code", meetingCode);;
                         fragChat.setArguments(bundle);
                         getSupportFragmentManager().beginTransaction()
                                 .replace(R.id.main_frame, fragChat)
@@ -94,7 +94,7 @@ public class MeetingActivity extends BasicActivity {
                         return true;
                     case R.id.menu_board:
                         FragBoard fragBoard = new FragBoard();
-                        bundle.putString("Name", getIntent().getExtras().getString("Name"));
+                        bundle.putString("Code", meetingCode);;
                         fragBoard.setArguments(bundle);
                         getSupportFragmentManager().beginTransaction()
                                 .replace(R.id.main_frame, fragBoard)
@@ -103,7 +103,7 @@ public class MeetingActivity extends BasicActivity {
                         return true;
                     case R.id.menu_alarm:
                         FragAttend fragAlarm = new FragAttend();
-                        bundle.putString("Name", getIntent().getExtras().getString("Name"));
+                        bundle.putString("Code", meetingCode);;
                         fragAlarm.setArguments(bundle);
                         getSupportFragmentManager().beginTransaction()
                                 .replace(R.id.main_frame, fragAlarm)
@@ -111,7 +111,7 @@ public class MeetingActivity extends BasicActivity {
                         return true;
                     case R.id.menu_account:
                         fragAccount = new FragAccount();
-                        bundle.putString("Name", getIntent().getExtras().getString("Name"));
+                        bundle.putString("Code", meetingCode);;
                         fragAccount.setArguments(bundle);
 
                         if (fr_check == false) {
@@ -142,7 +142,7 @@ public class MeetingActivity extends BasicActivity {
         }
         if (check == false) {
             fragAccount = new FragAccount();
-            bundle.putString("Name", getIntent().getExtras().getString("Name"));
+            bundle.putString("Code", meetingCode);
             fragAccount.setArguments(bundle);
             getSupportFragmentManager().beginTransaction().replace(R.id.main_frame, fragAccount).commit();
         }

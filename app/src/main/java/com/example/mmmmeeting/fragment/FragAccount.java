@@ -31,6 +31,8 @@ import com.example.mmmmeeting.adapter.GridListAdapter;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.snackbar.Snackbar;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -43,7 +45,7 @@ public class FragAccount extends Fragment {
     private int sum = 0;
     private int[] money;
     private Button btn_calculate;
-    private String meetingName;
+    private String meetingCode;
 
     public static FragAccount newInstance() {
         return new FragAccount();
@@ -67,25 +69,30 @@ public class FragAccount extends Fragment {
 
         if (bundle != null) {
             bundle = getArguments();
-            meetingName = bundle.getString("Name");
+            meetingCode = bundle.getString("Code");
         }
 
-        db.collection("meetings").get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (task.isSuccessful()) {
-                            for (QueryDocumentSnapshot document : task.getResult()) {
-                                if (document.get("name").toString().equals(meetingName)) {
-                                    System.out.println("여기 들어옴");
-                                    setLayoutOfAccount(document.getData().get("userID"));
-                                    return;
-                                }
-                            }
-                        }
-                    }
-                });
+        DocumentReference docRef = db.collection("meetings").document(meetingCode);
 
+        docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    if (document.exists()) {
+                        // 해당 문서가 존재하는 경우
+                        setLayoutOfAccount(document.getData().get("userID"));
+                        Log.d("Attend", "Data is : " + document.getId());
+                    } else {
+                        // 존재하지 않는 문서
+                        Log.d("Attend", "No Document");
+                    }
+                } else {
+                    Log.d("Attend", "Task Fail : " + task.getException());
+                }
+            }
+
+        });
 
         return view;
     }

@@ -2,7 +2,6 @@ package com.example.mmmmeeting.fragment;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,15 +16,10 @@ import androidx.fragment.app.Fragment;
 
 import com.example.mmmmeeting.Info.ChatItem;
 import com.example.mmmmeeting.Info.MemberInfo;
-import com.example.mmmmeeting.Info.ScheduleInfo;
-import com.example.mmmmeeting.Info.VoteInfo;
 import com.example.mmmmeeting.R;
 import com.example.mmmmeeting.adapter.ChatAdapter;
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.ChildEventListener;
@@ -34,11 +28,8 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
-import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -56,7 +47,7 @@ public class FragChat extends Fragment {
 
     private ArrayList<ChatItem> messageItems=new ArrayList<>();
     private ChatAdapter adapter;
-    private String meetingName;
+    private String meetingCode;
 
     public FragChat(){}
 
@@ -87,12 +78,12 @@ public class FragChat extends Fragment {
         Bundle bundle = this.getArguments();
         if(bundle != null) {
             bundle = getArguments();
-            meetingName = bundle.getString("Name");
+            meetingCode = bundle.getString("Code");
         }
 
         // meetingName 기준으로 분리함
         firebaseDatabase= FirebaseDatabase.getInstance();
-        chatRef= (DatabaseReference) firebaseDatabase.getReference("chat").child(meetingName);
+        chatRef= (DatabaseReference) firebaseDatabase.getReference("chat").child(meetingCode);
         Query chatQuery = chatRef.orderByChild("timestamp");
 
 

@@ -122,20 +122,26 @@ public class CalendarActivity extends AppCompatActivity {
         scID=scInfo.getId(); // schedule ID 가져오기
         userId = user.getUid(); // 현재 user id
 
-        db.collection("meetings").whereEqualTo("name", scInfo.getMeetingID()).get() //meeting 정보 받아오기
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull com.google.android.gms.tasks.Task<QuerySnapshot> task) {
-                        if (task.isSuccessful()) {
-                            for (QueryDocumentSnapshot document : task.getResult()) {
-                                leaderId=document.getData().get("leader").toString();
-                                //    leaderId=(String)document.getDate().get("leader"); // 모임 방장 id 받아오기
-                            }
-                        } else {
-                            Log.d("Document Read", "Error getting documents: ", task.getException());
-                        }
+        db.collection("meetings").document(scInfo.getMeetingID()).get()
+                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    if (document.exists()) {
+                        // 해당 문서가 존재하는 경우
+                        leaderId=document.getData().get("leader").toString();
+                        Log.d("Attend", "Data is : " + document.getId());
+                    } else {
+                        // 존재하지 않는 문서
+                        Log.d("Attend", "No Document");
                     }
-                });
+                } else {
+                    Log.d("Attend", "Task Fail : " + task.getException());
+                }
+            }
+
+        });
 
         DocumentReference docRef = db.collection("schedule").document(scID);
         docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() { //schedule에 저장된 calendarText 받아오기
