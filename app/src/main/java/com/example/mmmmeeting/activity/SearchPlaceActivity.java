@@ -17,7 +17,6 @@ import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Toast;
 
@@ -42,7 +41,6 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.model.Place;
-import com.google.android.libraries.places.api.net.PlacesClient;
 import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
 import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
 import com.google.android.material.snackbar.Snackbar;
@@ -58,14 +56,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
-
-import noman.googleplaces.NRPlaces;
-import noman.googleplaces.PlaceType;
-import noman.googleplaces.PlacesException;
-import noman.googleplaces.PlacesListener;
 
 
 public class SearchPlaceActivity extends AppCompatActivity
@@ -102,7 +94,7 @@ public class SearchPlaceActivity extends AppCompatActivity
             "all","atm","bank","beauty_salon","cafe","church","gas_station","restaurant"
     };
 
-    private ScheduleInfo postInfo;
+    private ScheduleInfo scheduleInfo;
     private String scheduleId;
     FirebaseFirestore db = FirebaseFirestore.getInstance();
     private String id=null;
@@ -133,8 +125,8 @@ public class SearchPlaceActivity extends AppCompatActivity
         btn_vote.setOnClickListener(this);
         btn_delete.setOnClickListener(this);
 
-        postInfo = (ScheduleInfo) getIntent().getSerializableExtra("scheduleInfo");
-        scheduleId = postInfo.getId();
+        scheduleInfo = (ScheduleInfo) getIntent().getSerializableExtra("scheduleInfo");
+        scheduleId = scheduleInfo.getId();
 
         if (!Places.isInitialized()) {
             Places.initialize(getApplicationContext(), apiKey);

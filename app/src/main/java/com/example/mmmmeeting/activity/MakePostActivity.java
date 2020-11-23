@@ -57,7 +57,7 @@ public class MakePostActivity extends BasicActivity {
     private EditText titleEditText;
     private PostInfo postInfo;
     private int pathCount, successCount;
-    private String meetingName;
+    private String meetingcode;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -94,20 +94,20 @@ public class MakePostActivity extends BasicActivity {
         Bundle bundle = getIntent().getExtras();
 
         // 새로 작성한 경우 FragBoard에서 bundle로 미팅 이름 받아옴
-        if (bundle != null && meetingName != null) {
-            meetingName = bundle.getString("Name");
-            Log.d("update Test2", meetingName);
+        if (bundle != null && meetingcode != null) {
+            meetingcode = bundle.getString("Code");
+            Log.d("update Test2", meetingcode);
 
             // 수정하는 경우 ContentBoardAct에서 수정할 Post의 미팅 이름 받아옴
         }else if (getIntent().getSerializableExtra("postInfo")!=null) {
             postInfo = (PostInfo) getIntent().getSerializableExtra("postInfo");
             if (postInfo.getMeetingID() != null) {
-                meetingName = postInfo.getMeetingID();
+                meetingcode = postInfo.getMeetingID();
             }
         }else{
             // 글 작성 후에는 외부에서 받아온 미팅 이름이 없어져서 MakePost 자체에서 다시 미팅 이름 전달한거 받음
             // storeUpload->onSuccess
-            meetingName = getIntent().getExtras().getString("Name");
+            meetingcode = getIntent().getExtras().getString("Code");
         }
         postInit();
     }
@@ -269,7 +269,7 @@ public class MakePostActivity extends BasicActivity {
                                             successCount--;
                                             contentsList.set(index, uri.toString());
                                             if (successCount == 0) {
-                                                PostInfo postInfo = new PostInfo(title, meetingName, contentsList, formatList, user.getUid(), date);
+                                                PostInfo postInfo = new PostInfo(title, meetingcode, contentsList, formatList, user.getUid(), date);
                                                 storeUpload(documentReference, postInfo);
                                             }
                                         }
@@ -284,7 +284,7 @@ public class MakePostActivity extends BasicActivity {
                 }
             }
             if (successCount == 0) {
-                storeUpload(documentReference, new PostInfo(title, meetingName, contentsList, formatList, user.getUid(), date));
+                storeUpload(documentReference, new PostInfo(title, meetingcode, contentsList, formatList, user.getUid(), date));
             }
         } else {
             showToast(MakePostActivity.this, "제목을 입력해주세요.");
@@ -302,7 +302,7 @@ public class MakePostActivity extends BasicActivity {
                         Intent resultIntent = new Intent();
                         resultIntent.putExtra("postinfo", postInfo);
                         // 글 작성 후 다시 MakePost로 돌아오면 meetingName이 사라져서 다시 전달함
-                        resultIntent.putExtra("Name",meetingName);
+                        resultIntent.putExtra("Code",meetingcode);
                         setResult(RESULT_OK, resultIntent);
                         finish();
                     }

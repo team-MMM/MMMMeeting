@@ -208,7 +208,7 @@ public class FragHome extends Fragment {
 
     private void myStartActivity(Class c) {
         Intent intent = new Intent(getActivity(), c);
-        intent.putExtra("Name",meetingCode);
+        intent.putExtra("Code",meetingCode);
         startActivityForResult(intent, 0);
     }
 }

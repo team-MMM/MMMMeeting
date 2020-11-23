@@ -84,20 +84,27 @@ public class VoteActivity extends BasicActivity {
 
         userId = user.getUid(); // 현재 user id
 
-        db.collection("meetings").whereEqualTo("name", schedule.getMeetingID()).get() //meeting 정보 받아오기
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull com.google.android.gms.tasks.Task<QuerySnapshot> task) {
-                        if (task.isSuccessful()) {
-                            for (QueryDocumentSnapshot document : task.getResult()) {
-                                leaderId = document.getData().get("leader").toString();
-                            }
-                        } else {
-                            Log.d("Document Read", "Error getting documents: ", task.getException());
-                        }
-                    }
-                });
+        DocumentReference docRef = db.collection("meetings").document(schedule.getMeetingID());
 
+        docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    if (document.exists()) {
+                        // 해당 문서가 존재하는 경우
+                        leaderId = document.getData().get("leader").toString();
+                    } else {
+                        // 존재하지 않는 문서
+                        Log.d("Attend", "No Document");
+                    }
+                } else {
+                    Log.d("Attend", "Task Fail : " + task.getException());
+                }
+            }
+
+        });
+        
         db.collection("vote").whereEqualTo("scheduleID", scheduleId).get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override

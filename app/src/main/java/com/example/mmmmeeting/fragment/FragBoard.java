@@ -132,12 +132,6 @@ public class FragBoard extends Fragment {
         @Override
         public void onClick(View v) {
             switch (v.getId()) {
-                /*
-                case R.id.logoutButton:
-                    FirebaseAuth.getInstance().signOut();
-                    myStartActivity(SignUpActivity.class);
-                    break;
-                */
                 case R.id.write_post:
                     myStartActivity(MakePostActivity.class);
                     break;
@@ -199,7 +193,7 @@ public class FragBoard extends Fragment {
 
     private void myStartActivity(Class c) {
         Intent intent = new Intent(getActivity(), c);
-        intent.putExtra("Name", meetingCode);
+        intent.putExtra("Code", meetingCode);
         startActivityForResult(intent, 0);
     }
 }

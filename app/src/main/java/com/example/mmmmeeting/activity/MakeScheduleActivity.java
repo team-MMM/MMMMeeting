@@ -57,7 +57,7 @@ public class MakeScheduleActivity extends AppCompatActivity {
     private EditText titleEditText;
     private ScheduleInfo scheduleInfo;
     private int pathCount, successCount;
-    private String meetingName;
+    private String meetingCode;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,20 +71,20 @@ public class MakeScheduleActivity extends AppCompatActivity {
         Bundle bundle = getIntent().getExtras();
 
         // 새로 작성한 경우 FragHome에서 bundle로 미팅 이름 받아옴
-        if (bundle != null && meetingName != null) {
-            meetingName = bundle.getString("Name");
-            Log.d("update Test2", meetingName);
+        if (bundle != null && meetingCode != null) {
+            meetingCode = bundle.getString("Code");
+            Log.d("update Test2", meetingCode);
 
             // 수정하는 경우 ContentSceduleAct에서 수정할 Post의 미팅 이름 받아옴
         }else if (getIntent().getSerializableExtra("scheduleInfo")!=null) {
             scheduleInfo = (ScheduleInfo) getIntent().getSerializableExtra("scheduleInfo");
             if (scheduleInfo.getMeetingID() != null) {
-                meetingName = scheduleInfo.getMeetingID();
+                meetingCode = scheduleInfo.getMeetingID();
             }
         }else{
             // 글 작성 후에는 외부에서 받아온 미팅 이름이 없어져서 MakeSchedule 자체에서 다시 미팅 이름 전달한거 받음
             // storeUpload->onSuccess
-            meetingName = getIntent().getExtras().getString("Name");
+            meetingCode = getIntent().getExtras().getString("Code");
         }
 
         findViewById(R.id.check).setOnClickListener(onClickListener);
@@ -203,7 +203,7 @@ public class MakeScheduleActivity extends AppCompatActivity {
                 scheduleInfo.setContents(contentsList);
                 Intent resultIntent = new Intent();
                 resultIntent.putExtra("scheduleInfo", scheduleInfo);
-                resultIntent.putExtra("Name",meetingName);
+                resultIntent.putExtra("Code",meetingCode);
                 setResult(RESULT_OK, resultIntent);
                 finish();
 
@@ -271,7 +271,7 @@ public class MakeScheduleActivity extends AppCompatActivity {
                                             successCount--;
                                             contentsList.set(index, uri.toString());
                                             if (successCount == 0) {
-                                                ScheduleInfo scheduleInfo = new ScheduleInfo(title, meetingName, contentsList, date, user.getUid());
+                                                ScheduleInfo scheduleInfo = new ScheduleInfo(title, meetingCode, contentsList, date, user.getUid());
                                                 storeUpload(documentReference, scheduleInfo);
                                             }
                                         }
@@ -286,7 +286,7 @@ public class MakeScheduleActivity extends AppCompatActivity {
                 }
             }
             if (successCount == 0) {
-                storeUpload(documentReference, new ScheduleInfo(title, meetingName, contentsList, date, user.getUid()));
+                storeUpload(documentReference, new ScheduleInfo(title, meetingCode, contentsList, date, user.getUid()));
             }
         } else {
             showToast(MakeScheduleActivity.this, "제목을 입력해주세요.");
@@ -303,7 +303,7 @@ public class MakeScheduleActivity extends AppCompatActivity {
                         Intent resultIntent = new Intent();
                         resultIntent.putExtra("scheduleInfo", scheduleInfo);
                         // 글 작성 후 다시 MakeSc로 돌아오면 meetingName이 사라져서 다시 전달함
-                        resultIntent.putExtra("Name",meetingName);
+                        resultIntent.putExtra("Code",meetingCode);
                         setResult(RESULT_OK, resultIntent);
                         finish();
                     }
