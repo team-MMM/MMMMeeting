@@ -13,13 +13,15 @@ import com.example.mmmmeeting.R;
 
 public class PlaceChoiceActivity extends AppCompatActivity implements View.OnClickListener {
     Button btn_middle, btn_search, btn_vote;
-    private ScheduleInfo postInfo;
+    String code;
+    private ScheduleInfo scheduleInfo;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_place_choice);
 
-        postInfo = (ScheduleInfo) getIntent().getSerializableExtra("scheduleInfo");
+        scheduleInfo = (ScheduleInfo) getIntent().getSerializableExtra("scheduleInfo");
+        code = scheduleInfo.getMeetingID();
 
         btn_middle = findViewById(R.id.middleBtn);
         btn_search = findViewById(R.id.searchBtn);
@@ -35,33 +37,28 @@ public class PlaceChoiceActivity extends AppCompatActivity implements View.OnCli
         switch (v.getId()){
             // 중간 지점 찾기
             case (R.id.middleBtn):
-                myStartActivity(MiddlePlaceActivity.class, postInfo);
+                myStartActivity(MiddlePlaceActivity.class, scheduleInfo);
                 finish();
                 break;
             // 장소 검색
             case(R.id.searchBtn):
-                myStartActivity(SearchPlaceActivity.class, postInfo);
+                myStartActivity(SearchPlaceActivity.class, scheduleInfo);
                 finish();
                 break;
             // 장소 투표
             case(R.id.voteBtn):
-                myStartActivity(VoteActivity.class, postInfo);
+                myStartActivity(VoteActivity.class, scheduleInfo);
                 finish();
                 break;
         }
 
     }
 
-    //Activity 이동하는 함수
-    private void myStartActivity(Class c){
-        Intent intent = new Intent(this,c);
-        intent.addFlags(intent.FLAG_ACTIVITY_CLEAR_TOP);
-        startActivity(intent);
-    }
 
-    private void myStartActivity(Class c, ScheduleInfo postInfo) {
+    private void myStartActivity(Class c, ScheduleInfo schInfo) {
         Intent intent = new Intent(this, c);
-        intent.putExtra("scheduleInfo", postInfo);
+        intent.putExtra("scheduleInfo", schInfo);
+        intent.putExtra("Code",schInfo.getMeetingID());
         startActivityForResult(intent, 0);
     }
 }

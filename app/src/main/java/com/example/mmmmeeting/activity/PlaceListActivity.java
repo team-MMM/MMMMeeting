@@ -100,6 +100,7 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
     private String Tag = "category Test";
     String name;
     String scheduleId;
+    String code;
     String id = null;
     ArrayList<String> category=new ArrayList<>();
     ArrayList<Float[]> userRatings =new ArrayList<>();
@@ -279,7 +280,8 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
         midpoint = i.getParcelableExtra("midpoint");
         name = i.getStringExtra("name");
         scheduleId = i.getStringExtra("scheduleId");
-        Log.d("name Test", name);
+        code = i.getStringExtra("Code");
+        Log.d("code Test", code);
 
         setContentView(R.layout.activity_place_list);
 
@@ -473,27 +475,30 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
 
     // 1-1. 미팅 이름으로 사용자 테이블 접근
     private void meetingFind() {
-        db.collection("meetings").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+        DocumentReference docRef = db.collection("meetings").document(code);
+
+        docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
-            public void onComplete(@NonNull com.google.android.gms.tasks.Task<QuerySnapshot> task) {
+            public void onComplete(@NonNull com.google.android.gms.tasks.Task<DocumentSnapshot> task) {
                 if (task.isSuccessful()) {
-                    //모든 document 출력 (dou id + data arr { : , ... ,  })
-                    for (QueryDocumentSnapshot document : task.getResult()) {
-                        // 모임 이름이 같은 경우 해당 모임의 코드를 텍스트뷰에 출력
-                        if (document.get("name").toString().equals(name)) {
-                            // 찾은 모임의 사용자 테이블로
-                            best= (HashMap<String, Integer>) document.get("best");
-                            List<String> users = (List<String>) document.get("userID");
-                            for (int i = 0; i < users.size(); i++) {
-                                userRating(users.get(i));
-                            }
-                            break;
+                    DocumentSnapshot document = task.getResult();
+                    if (document.exists()) {
+                        // 해당 문서가 존재하는 경우
+                        // 찾은 모임의 사용자 테이블로
+                        best= (HashMap<String, Integer>) document.get("best");
+                        List<String> users = (List<String>) document.get("userID");
+                        for (int i = 0; i < users.size(); i++) {
+                            userRating(users.get(i));
                         }
+                    } else {
+                        // 존재하지 않는 문서
+                        Log.d("Attend", "No Document");
                     }
                 } else {
-                    Log.d(Tag, "Error getting documents: ", task.getException());
+                    Log.d("Attend", "Task Fail : " + task.getException());
                 }
             }
+
         });
     }
 

@@ -42,13 +42,13 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolygonOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -63,14 +63,11 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
-import java.util.Timer;
-import java.util.TimerTask;
 import java.util.concurrent.ExecutionException;
 import com.google.maps.android.PolyUtil;
 import com.google.maps.android.SphericalUtil;
 
 import noman.googleplaces.NRPlaces;
-import noman.googleplaces.Place;
 import noman.googleplaces.PlaceType;
 import noman.googleplaces.PlacesException;
 import noman.googleplaces.PlacesListener;
@@ -78,9 +75,10 @@ import noman.googleplaces.PlacesListener;
 
 public class MiddlePlaceActivity extends AppCompatActivity implements OnMapReadyCallback, PlacesListener {
 
-    private ScheduleInfo postInfo;
+    private ScheduleInfo scheduleInfo;
     private String meetingname;
     private String scheduleId;
+    String code;
 
     //private ArrayList<LatLng> position;
     private double[] userTime;
@@ -156,53 +154,56 @@ public class MiddlePlaceActivity extends AppCompatActivity implements OnMapReady
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(SEOUL, 8));
         mMap.clear();
         FirebaseFirestore db = FirebaseFirestore.getInstance();
-        postInfo = (ScheduleInfo) getIntent().getSerializableExtra("scheduleInfo");
-        meetingname = postInfo.getMeetingID();
-        scheduleId = postInfo.getId();
+        scheduleInfo = (ScheduleInfo) getIntent().getSerializableExtra("scheduleInfo");
+        code = scheduleInfo.getMeetingID();
+        scheduleId = scheduleInfo.getId();
 
+        db.collection("meetings").document(code)
+                .get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>(){
+            @Override
+            public void onComplete(@NonNull com.google.android.gms.tasks.Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    if (document.exists()) {
+                        // 해당 문서가 존재하는 경우
+                        // document에서 이름이 userID인 필드의 데이터 얻어옴
+                        List users = (List) document.getData().get("userID");
+                        String[] addr = new String[users.size()];
+                        String[] name = new String[users.size()];
+                        // userID가 동일한 user 문서에서 이름, 주소 읽어오기
+                        for (int m = 0; m < users.size(); m++) {
+                            DocumentReference docRef = db.collection("users").document(users.get(m).toString());
 
-        // meetings collection에 모임 이름인 문서 읽기
-
-        db.collection("meetings").whereEqualTo("name", meetingname).get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull com.google.android.gms.tasks.Task<QuerySnapshot> task) {
-                        if (task.isSuccessful()) {
-                            for (QueryDocumentSnapshot document : task.getResult()) {
-                                // document에서 이름이 userID인 필드의 데이터 얻어옴
-                                List users = (List) document.getData().get("userID");
-                                String[] addr = new String[users.size()];
-                                String[] name = new String[users.size()];
-                                // userID가 동일한 user 문서에서 이름, 주소 읽어오기
-                                for (int m = 0; m < users.size(); m++) {
-                                    DocumentReference docRef = db.collection("users").document(users.get(m).toString());
-
-                                    docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                                        @Override
-                                        public void onComplete(@NonNull com.google.android.gms.tasks.Task<DocumentSnapshot> task) {
-                                            if (task.isSuccessful()) {
-                                                DocumentSnapshot document = task.getResult();
-                                                if (document.exists()) {
-                                                    addr[i] = document.getData().get("address").toString();
-                                                    name[i++] = document.getData().get("name").toString();
-                                                } else {
-                                                    // 존재하지 않는 문서
-                                                    Log.d("Attend", "No Document");
-                                                }
-                                                if (i==users.size())
-                                                    gStart(addr,name); // 중간지점 찾기 시작
-                                            } else {
-                                                Log.d("Attend", "Task Fail : " + task.getException());
-                                            }
+                            docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                @Override
+                                public void onComplete(@NonNull com.google.android.gms.tasks.Task<DocumentSnapshot> task) {
+                                    if (task.isSuccessful()) {
+                                        DocumentSnapshot document = task.getResult();
+                                        if (document.exists()) {
+                                            addr[i] = document.getData().get("address").toString();
+                                            name[i++] = document.getData().get("name").toString();
+                                        } else {
+                                            // 존재하지 않는 문서
+                                            Log.d("Attend", "No Document");
                                         }
-                                    });
+                                        if (i==users.size())
+                                            gStart(addr,name); // 중간지점 찾기 시작
+                                    } else {
+                                        Log.d("Attend", "Task Fail : " + task.getException());
+                                    }
                                 }
-                            }
-                        } else {
-                            Log.d("Document Read", "Error getting documents: ", task.getException());
+                            });
                         }
+                    } else {
+                        // 존재하지 않는 문서
+                        Log.d("Attend", "No Document");
                     }
-                });
+                } else {
+                    Log.d("Attend", "Task Fail : " + task.getException());
+                }
+
+            }
+        });
 
     }
 
@@ -295,6 +296,7 @@ public class MiddlePlaceActivity extends AppCompatActivity implements OnMapReady
                         bundle.putParcelable("midpoint",midP);
                         bundle.putString("name", meetingname);
                         bundle.putString("scheduleId", scheduleId);
+                        bundle.putString("Code",code);
                         intent.putExtras(bundle);
                         //i.putExtra("midpoint",midP);
                         startActivity(intent);

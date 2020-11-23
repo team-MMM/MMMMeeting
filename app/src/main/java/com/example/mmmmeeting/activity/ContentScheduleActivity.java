@@ -3,7 +3,6 @@
 package com.example.mmmmeeting.activity;
 
 import android.app.Activity;
-import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -13,25 +12,19 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
 
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-
 import com.example.mmmmeeting.Info.ScheduleInfo;
 import com.example.mmmmeeting.OnScheduleListener;
 import com.example.mmmmeeting.R;
 import com.example.mmmmeeting.ScheduleDeleter;
-import com.example.mmmmeeting.fragment.FragCalendar;
-import com.example.mmmmeeting.fragment.FragChat;
-import com.example.mmmmeeting.fragment.FragHome;
-import com.example.mmmmeeting.fragment.FragPlace;
 import com.example.mmmmeeting.view.ReadScheduleView;
 
 public class ContentScheduleActivity extends BasicActivity implements View.OnClickListener {
-    private ScheduleInfo postInfo;
+    private ScheduleInfo scheduleInfo;
     private ScheduleDeleter boardDeleter;
     private ReadScheduleView readContentsVIew;
     private LinearLayout contentsLayout;
     Button btn_calendar, btn_place, btn_attendance;
+    String code;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,7 +32,9 @@ public class ContentScheduleActivity extends BasicActivity implements View.OnCli
         setContentView(R.layout.content_schedule);
 
 
-        postInfo = (ScheduleInfo) getIntent().getSerializableExtra("scheduleInfo");
+        scheduleInfo = (ScheduleInfo) getIntent().getSerializableExtra("scheduleInfo");
+        code = scheduleInfo.getMeetingID();
+
         contentsLayout = findViewById(R.id.contentsLayout);
         readContentsVIew = findViewById(R.id.readScheduleView);
 
@@ -59,15 +54,15 @@ public class ContentScheduleActivity extends BasicActivity implements View.OnCli
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.calendarBtn:
-                myStartActivity(CalendarActivity.class, postInfo);
+                myStartActivity(CalendarActivity.class, scheduleInfo);
                 break;
 
             case R.id.placeBtn:
-                myStartActivity(PlaceChoiceActivity.class, postInfo);
+                myStartActivity(PlaceChoiceActivity.class, scheduleInfo);
                 break;
 
             case R.id.attendanceBtn:
-                myStartActivity(CheckLateActivity.class,postInfo);
+                myStartActivity(CheckLateActivity.class, scheduleInfo);
                 break;
         }
     }
@@ -79,7 +74,7 @@ public class ContentScheduleActivity extends BasicActivity implements View.OnCli
         switch (requestCode) {
             case 0:
                 if (resultCode == Activity.RESULT_OK) {
-                    postInfo = (ScheduleInfo)data.getSerializableExtra("scheduleInfo");
+                    scheduleInfo = (ScheduleInfo)data.getSerializableExtra("scheduleInfo");
                     System.out.println("I'mback");
                     contentsLayout.removeAllViews();
                     uiUpdate();
@@ -98,10 +93,10 @@ public class ContentScheduleActivity extends BasicActivity implements View.OnCli
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.delete:
-                boardDeleter.storageDelete(postInfo);
+                boardDeleter.storageDelete(scheduleInfo);
                 return true;
             case R.id.modify:
-                myStartActivity(MakeScheduleActivity.class, postInfo);
+                myStartActivity(MakeScheduleActivity.class, scheduleInfo);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -121,19 +116,14 @@ public class ContentScheduleActivity extends BasicActivity implements View.OnCli
     };
 
     private void uiUpdate(){
-        readContentsVIew.setScheduleInfo(postInfo);
+        readContentsVIew.setScheduleInfo(scheduleInfo);
     }
 
-    private void myStartActivity(Class c, ScheduleInfo postInfo) {
+    private void myStartActivity(Class c, ScheduleInfo schInfo) {
         Intent intent = new Intent(this, c);
-        intent.putExtra("scheduleInfo", postInfo);
+        intent.putExtra("scheduleInfo", schInfo);
+        intent.putExtra("Code",schInfo.getMeetingID());
         startActivityForResult(intent, 0);
-    }
-
-    private void myStartActivity(Class c) {
-        Intent intent = new Intent(this,c);
-        intent.addFlags(intent.FLAG_ACTIVITY_CLEAR_TOP);
-        startActivity(intent);
     }
 
 }
