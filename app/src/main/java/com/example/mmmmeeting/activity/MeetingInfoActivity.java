@@ -35,6 +35,7 @@ public class MeetingInfoActivity extends AppCompatActivity implements View.OnCli
     TextView name, description, code, user, leadertv;
     Button invite, delete;
     String meetingname;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -43,6 +44,7 @@ public class MeetingInfoActivity extends AppCompatActivity implements View.OnCli
         Intent intent = getIntent();
         meetingname = intent.getExtras().getString("Name");
         String meetingdescription = intent.getExtras().getString("Description");
+        String meetingCode = intent.getExtras().getString("Code");
 
         name = findViewById(R.id.meetingName);
         description = findViewById(R.id.meetingDescription);
@@ -57,8 +59,9 @@ public class MeetingInfoActivity extends AppCompatActivity implements View.OnCli
 
         name.setText(meetingname);
         description.setText(meetingdescription);
+        code.setText(meetingCode);
 
-        codeFind(meetingname);
+        readmeeting(meetingCode);
 
         // 코드가 출력되는 TextView 클릭시 -> 코드 클립보드에 복사되도록
         code.setOnTouchListener(new View.OnTouchListener(){ //터치 이벤트 리스너 등록(누를때)
@@ -78,39 +81,38 @@ public class MeetingInfoActivity extends AppCompatActivity implements View.OnCli
     }
 
     // 모임코드 출력 위해 현재 모임 이름에 해당하는 모임 코드 찾기
-    private void codeFind(String meetingname) {
+    private void readmeeting(String meetingCode) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-        db.collection("meetings").get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (task.isSuccessful()) {
-                            //모든 document 출력 (dou id + data arr { : , ... ,  })
-                            for (QueryDocumentSnapshot document : task.getResult()) {
-                                // 모임 이름이 같은 경우 해당 모임의 코드를 텍스트뷰에 출력
-                                if (document.get("name").toString().equals(meetingname)) {
-                                    code.setText(document.getId());
-                                    // 찾은 모임의 사용자 확인
-                                    userFind(document.getData().get("userID"));
+        DocumentReference docRef = db.collection("meetings").document(meetingCode);
 
-                                    // 모임장 확인
-                                    if(document.getData().get("leader").toString().length()==0){
-                                        newLeader(document.getData().get("userID"),document.getId());
-                                    }
-                                    else {leaderFind(document.getData().get("leader").toString());}
+        docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    if (document.exists()) {
+                        // 해당 문서가 존재하는 경우
+                        // 찾은 모임의 사용자 확인
+                        userFind(document.getData().get("userID"));
 
-                                    Log.d("Document Read", document.getId() + " => " + document.getData());
-                                    return;
-                                } else {
-                                    Log.d("Document Snapshot", "No Document");
-                                }
-                            }
-                        } else {
-                            Log.d("Document Read", "Error getting documents: ", task.getException());
+                        // 모임장 확인
+                        if(document.getData().get("leader").toString().length()==0){
+                            newLeader(document.getData().get("userID"),document.getId());
                         }
+                        else {leaderFind(document.getData().get("leader").toString());}
+
+                        Log.d("Attend", "Data is : " + document.getId());
+                    } else {
+                        // 존재하지 않는 문서
+                        Log.d("Attend", "No Document");
                     }
-                });
+                } else {
+                    Log.d("Attend", "Task Fail : " + task.getException());
+                }
+            }
+
+        });
     }
 
     private void leaderFind(String leader) {
@@ -162,7 +164,6 @@ public class MeetingInfoActivity extends AppCompatActivity implements View.OnCli
 
     private void userFind(Object userID) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
-        final String[] users = {""};
 
         // 모든 유저 정보를 확인 -> 모임에 속한 유저와 같은 uid 발견시 해당 유저의 이름을 출력
         db.collection("users").get()
@@ -173,14 +174,16 @@ public class MeetingInfoActivity extends AppCompatActivity implements View.OnCli
                             //모든 document 확인
                             for (QueryDocumentSnapshot document : task.getResult()) {
                                 if (userID.toString().contains(document.getId())) {
-                                    users[0] += document.get("name").toString() + "  ";
+                                    String username =document.get("name").toString() + "  ";
+
+                                    // 찾은 유저 이름을 텍스트뷰에 설정
+                                    user.append(username);
+
                                     Log.d("Document Read", document.getId() + " => " + document.getData());
                                 } else {
                                     Log.d("Document Snapshot", "No Document");
                                 }
                             }
-                            // 찾은 유저 이름을 텍스트뷰에 설정
-                            user.setText(Arrays.toString(users));
                         } else {
                             Log.d("Document Read", "Error getting documents: ", task.getException());
                         }
