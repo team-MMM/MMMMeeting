@@ -83,13 +83,16 @@ public class inviteActivity extends AppCompatActivity {
         String sms = meetingname+"에서의 초대 코드 : " + code;
 
         try {
+            Integer.parseInt(phoneNo);
+
             //번호로 문자 전송
             SmsManager smsManager = SmsManager.getDefault();
             smsManager.sendTextMessage(phoneNo, null, sms, null, null);
             Log.d("SendSMS", phoneNo+"//"+sms);
             Toast.makeText(getApplicationContext(), "전송 완료!", Toast.LENGTH_LONG).show();
+
         } catch (Exception e) {
-            Toast.makeText(getApplicationContext(), "SMS faild, please try again later!", Toast.LENGTH_LONG).show();
+            Toast.makeText(getApplicationContext(), "문자 전송 실패, 숫자만 입력해주세요!", Toast.LENGTH_LONG).show();
             e.printStackTrace();
         }
 
