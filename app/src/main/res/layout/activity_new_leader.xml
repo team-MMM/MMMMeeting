@@ -22,7 +22,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:ems="10"
-        android:layout_margin="20sp"
+        android:layout_margin="30sp"
         android:hint="새로운 모임장의 이름을 입력하세요"
         />
 

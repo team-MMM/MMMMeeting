@@ -3,8 +3,10 @@ package com.example.mmmmeeting.activity;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.AlertDialog;
 import android.content.ClipData;
 import android.content.ClipboardManager;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -28,10 +30,10 @@ import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.Arrays;
 
-public class MeetingInfoActivity extends AppCompatActivity {
+public class MeetingInfoActivity extends AppCompatActivity implements View.OnClickListener{
 
     TextView name, description, code, user, leadertv;
-    Button invite;
+    Button invite, delete;
     String meetingname;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,22 +49,14 @@ public class MeetingInfoActivity extends AppCompatActivity {
         code = findViewById(R.id.meetingCode);
         user = findViewById(R.id.meetingUsers);
         invite = findViewById(R.id.inviteBtn);
+        delete = findViewById(R.id.deleteBtn);
         leadertv = findViewById(R.id.meetingLeader);
+
+        invite.setOnClickListener(this);
+        delete.setOnClickListener(this);
 
         name.setText(meetingname);
         description.setText(meetingdescription);
-
-        // 초대 버튼 클릭시 -> inviteActivity 넘어가서 초대문자 보내기
-        invite.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(MeetingInfoActivity.this, inviteActivity.class);
-                intent.addFlags(intent.FLAG_ACTIVITY_CLEAR_TOP);
-                intent.putExtra("Name", meetingname);
-                intent.putExtra("Code", code.getText().toString());
-                startActivity(intent);
-            }
-        });
 
         codeFind(meetingname);
 
@@ -192,5 +186,47 @@ public class MeetingInfoActivity extends AppCompatActivity {
                         }
                     }
                 });
+    }
+
+    private void myStartActivity(Class c, TextView code){
+        Intent intent = new Intent(this,c);
+        intent.addFlags(intent.FLAG_ACTIVITY_CLEAR_TOP);
+        intent.putExtra("Code", code.getText().toString());
+        startActivity(intent);
+    }
+
+    private void myStartActivity(Class c, String meetingname, TextView code){
+        Intent intent = new Intent(this,c);
+        intent.addFlags(intent.FLAG_ACTIVITY_CLEAR_TOP);
+        intent.putExtra("Name", meetingname);
+        intent.putExtra("Code", code.getText().toString());
+        startActivity(intent);
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()){
+            case (R.id.inviteBtn):
+                myStartActivity(inviteActivity.class, meetingname, code);
+                break;
+            case(R.id.deleteBtn):
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setTitle("모임 탈퇴")        // 제목
+                        .setMessage( "[ "+meetingname+" ]"+ " 모임을 정말로 나가시겠습니까?")        // 메세지
+                        // .setCancelable(false)        // 뒤로 버튼 클릭시 취소 가능 설정
+                        .setPositiveButton("확인", new DialogInterface.OnClickListener(){
+                            // 확인 버튼 클릭시 설정, 오른쪽 버튼입니다.
+                            public void onClick(DialogInterface dialog, int whichButton){//약속 날짜를 확정 //db로 해당 날짜 올리기
+                                myStartActivity(MeetingDeleteActivity.class, code);
+                            }
+                        })
+                        .setNegativeButton("취소", new DialogInterface.OnClickListener(){// 취소 버튼 클릭시
+                            public void onClick(DialogInterface dialog, int whichButton){//취소 이벤트...
+                            }
+                        });
+                AlertDialog dialog = builder.create();    // 알림창 객체 생성
+                dialog.show();    // 알림창 띄우기
+                break;
+        }
     }
 }

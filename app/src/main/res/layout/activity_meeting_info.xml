@@ -8,10 +8,51 @@
     android:gravity="center"
     tools:context=".activity.MeetingInfoActivity">
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="130dp"
+        android:layout_marginRight="10dp"
+        android:gravity="right">
+
+        <TextView
+            android:layout_width="200dp"
+            android:layout_height="70dp"
+            android:layout_marginTop="25dp"
+            android:layout_marginRight="100dp"
+            android:gravity="center"
+            android:text="모임 정보"
+            android:textColor="#000000"
+            android:textSize="30sp"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/inviteBtn"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_marginTop="22dp"
+            android:layout_marginRight="15dp"
+            android:background="@drawable/invite"
+            android:padding="10sp" />
+
+
+
+        <Button
+            android:id="@+id/deleteBtn"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginRight="10dp"
+            android:background="@drawable/delete_meeting"
+            android:padding="10sp" />
+
+
+    </LinearLayout>
+
     <TextView
         android:text="모임 이름"
         android:textSize="20sp"
-        android:layout_margin="10sp"
+        android:layout_marginLeft="20sp"
+        android:layout_marginBottom="10sp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
 
@@ -20,14 +61,16 @@
         android:hint="Name"
         android:textColor="@color/colorPrimaryDark"
         android:textSize="20sp"
-        android:layout_margin="10sp"
+        android:layout_marginLeft="20sp"
+        android:layout_marginBottom="10sp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
 
     <TextView
         android:text="모임 설명"
         android:textSize="20sp"
-        android:layout_margin="10sp"
+        android:layout_marginLeft="20sp"
+        android:layout_marginBottom="10sp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
 
@@ -36,14 +79,16 @@
         android:hint="Description"
         android:textColor="@color/colorPrimaryDark"
         android:textSize="20sp"
-        android:layout_margin="10sp"
+        android:layout_marginLeft="20sp"
+        android:layout_marginBottom="10sp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
 
     <TextView
         android:text="모임 코드(터치시 복사)"
         android:textSize="20sp"
-        android:layout_margin="10sp"
+        android:layout_marginLeft="20sp"
+        android:layout_marginBottom="10sp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
 
@@ -52,14 +97,16 @@
         android:hint="Code"
         android:textColor="@color/colorPrimaryDark"
         android:textSize="20sp"
-        android:layout_margin="10sp"
+        android:layout_marginLeft="20sp"
+        android:layout_marginBottom="10sp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
 
     <TextView
         android:text="모임장"
         android:textSize="20sp"
-        android:layout_margin="10sp"
+        android:layout_marginLeft="20sp"
+        android:layout_marginBottom="10sp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
 
@@ -68,14 +115,16 @@
         android:hint="Leader"
         android:textColor="@color/colorPrimaryDark"
         android:textSize="20sp"
-        android:layout_margin="10sp"
+        android:layout_marginLeft="20sp"
+        android:layout_marginBottom="10sp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
 
     <TextView
         android:text="모임 참여자"
         android:textSize="20sp"
-        android:layout_margin="10sp"
+        android:layout_marginLeft="20sp"
+        android:layout_marginBottom="10sp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
 
@@ -84,27 +133,10 @@
         android:hint="Users"
         android:textColor="@color/colorPrimaryDark"
         android:textSize="20sp"
-        android:layout_margin="10sp"
+        android:layout_marginLeft="20sp"
+        android:layout_marginBottom="10sp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20sp"
-        android:gravity="center">
-
-        <Button
-            android:id="@+id/inviteBtn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="10sp"
-            android:layout_margin="10sp"
-            android:background="@drawable/button_shape"
-            android:text="초대하기"
-            android:textSize="15sp"/>
-
-    </LinearLayout>
 
 
 </LinearLayout>

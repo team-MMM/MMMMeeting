@@ -31,28 +31,19 @@ import com.google.firebase.firestore.QuerySnapshot;
 
 public class MeetingDeleteActivity extends AppCompatActivity {
 
-    Button delete;
+
     FirebaseFirestore db = FirebaseFirestore.getInstance();
-    private String foundCode;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_meeting_delete);
-
-        delete = findViewById(R.id.deleteBtn);
-
-        delete.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                checkCode();
-            }
-        });
+        Intent intent = getIntent();
+        String code = intent.getExtras().getString("Code");
+        checkCode(code);
     }
 
     // 입력한 코드가 존재하는지 확인
-    private void checkCode() {
-        final String code = ((EditText) findViewById(R.id.deleteCode)).getText().toString();
+    private void checkCode(String code) {
         DocumentReference docRef = db.collection("meetings").document(code);
 
         docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
