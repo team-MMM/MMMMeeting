@@ -22,11 +22,10 @@ import java.util.Date;
 public class OneDayDecorator implements DayViewDecorator { //오늘 날짜를 꾸며줌
 
     private CalendarDay date;
-    private final Drawable drawable;
+
 
     public OneDayDecorator(Activity context) {
         date = CalendarDay.today();
-        drawable = context.getResources().getDrawable(R.drawable.more);
     }
 
     @Override
@@ -36,7 +35,10 @@ public class OneDayDecorator implements DayViewDecorator { //오늘 날짜를 �
 
     @Override
     public void decorate(DayViewFacade view) {
-        view.setSelectionDrawable(drawable); // 날짜 테두리 그리기
+
+        view.addSpan(new StyleSpan(Typeface.BOLD)); //날짜 굵게
+        view.addSpan(new RelativeSizeSpan(1.4f));
+
     }
 
     /**
