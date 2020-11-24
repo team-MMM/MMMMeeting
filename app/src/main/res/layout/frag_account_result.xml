@@ -11,33 +11,51 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
-    <TextView
-        android:id="@+id/cal_title"
-        android:layout_width="wrap_content"
+    <RelativeLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_marginTop="10dp"/>
+        android:orientation="horizontal">
 
-    <TextView
-        android:id="@+id/cal_total"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center" />
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true">
+
+            <TextView
+                android:id="@+id/cal_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+                android:layout_centerHorizontal="true"/>
+
+            <TextView
+                android:id="@+id/cal_total"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/cal_title"
+                android:layout_centerHorizontal="true"/>
+
+        </RelativeLayout>
+
+        <Button
+            android:id="@+id/btn_calculate_modify"
+            android:layout_width="60dp"
+            android:layout_height="50dp"
+            android:background="@drawable/button_shape"
+            android:layout_alignParentRight="true"
+            android:layout_margin="20dp"
+            android:text="수정"/>
+
+    </RelativeLayout>
 
     <ListView
         android:id="@+id/caluser_result"
         android:layout_width="wrap_content"
-        android:layout_height="500dp"
+        android:layout_height="wrap_content"
         android:layout_margin="30dp"
         />
 
-    <Button
-        android:id="@+id/btn_calculate_modify"
-        android:layout_width="100dp"
-        android:layout_height="50dp"
-        android:background="@drawable/button_shape"
-        android:layout_centerHorizontal="true"
-        android:layout_gravity="center"
-        android:text="수정하기"/>
 
 </LinearLayout>

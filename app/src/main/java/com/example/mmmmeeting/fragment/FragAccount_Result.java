@@ -63,9 +63,9 @@ public class FragAccount_Result extends Fragment {
         TextView cal_title = view.findViewById(R.id.cal_title);
         //cal_title.setText(today+"정산결과");
         SpannableString s;
-        s= new SpannableString(today+"  정산결과");
-        s.setSpan(new RelativeSizeSpan(1.8f),0,s.length()-5,0);
-        s.setSpan(new ForegroundColorSpan(Color.parseColor("#62ABD9")),0,s.length()-5,0);
+        s= new SpannableString(today+" 정산");
+        s.setSpan(new RelativeSizeSpan(1.8f),0,s.length()-3,0);
+        s.setSpan(new ForegroundColorSpan(Color.parseColor("#62ABD9")),0,s.length()-3,0);
         cal_title.setText(s);
 
 
