@@ -60,9 +60,11 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import com.google.maps.android.PolyUtil;
 import com.google.maps.android.SphericalUtil;
@@ -106,6 +108,15 @@ public class MiddlePlaceActivity extends AppCompatActivity implements OnMapReady
     private boolean flag;
     private int flagCount;
 
+    private Point[] users;
+    private ArrayList<Integer> member_num;
+    private ArrayList<Point> centers;
+    private double latitude;
+    private double longtitude;
+    private LatLng mid;// 현재 중간지점
+    private LatLng tem; // 이전 중간지점
+    private int temp = 1000;
+
     private GoogleMap mMap;
 
     int i = 0;
@@ -115,27 +126,28 @@ public class MiddlePlaceActivity extends AppCompatActivity implements OnMapReady
     List<Marker> previous_marker = null;
     int radius = 1000;
 
-    Handler mHandler = new Handler(){
-        public void handleMessage(android.os.Message msg)
-        {
-            Bundle bd = msg.getData( ) ;            /// 전달 받은 메세지에서 번들을 받음
-            if(bd.getString("flag")!=null){
+    Handler mHandler = new Handler() {
+        public void handleMessage(android.os.Message msg) {
+            Bundle bd = msg.getData();            /// 전달 받은 메세지에서 번들을 받음
+            if (bd.getString("flag") != null) {
                 String flagStr = bd.getString("flag");
                 // placessuccess가 2번 이상인 상황: flag 설정해서 동작하지 못하게 함
-                if(flagStr == "NO"){
+                if (flagStr == "NO") {
                     flag = true;
                 }
             }
-        } ;
+        }
 
-    } ;
+        ;
+
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_place_middle);
 
-        midpoint_select=(LinearLayout)findViewById(R.id.midpoint_select);
+        midpoint_select = (LinearLayout) findViewById(R.id.midpoint_select);
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
@@ -159,7 +171,7 @@ public class MiddlePlaceActivity extends AppCompatActivity implements OnMapReady
         scheduleId = scheduleInfo.getId();
 
         db.collection("meetings").document(code)
-                .get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>(){
+                .get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull com.google.android.gms.tasks.Task<DocumentSnapshot> task) {
                 if (task.isSuccessful()) {
@@ -186,8 +198,8 @@ public class MiddlePlaceActivity extends AppCompatActivity implements OnMapReady
                                             // 존재하지 않는 문서
                                             Log.d("Attend", "No Document");
                                         }
-                                        if (i==users.size())
-                                            gStart(addr,name); // 중간지점 찾기 시작
+                                        if (i == users.size())
+                                            clustering(addr, name); // 중간지점 찾기 시작
                                     } else {
                                         Log.d("Attend", "Task Fail : " + task.getException());
                                     }
@@ -208,35 +220,204 @@ public class MiddlePlaceActivity extends AppCompatActivity implements OnMapReady
     }
 
     // 중간 지점 찾기 시작!
-    private void gStart(String[] addr, String[] name){
+    private void clustering(String[] addr, String[] name) {
         BitmapDrawable bitmapdraw1 = (BitmapDrawable) getResources().getDrawable(R.drawable.user);
         Bitmap b = bitmapdraw1.getBitmap();
         Bitmap UserMarker = Bitmap.createScaledBitmap(b, 100, 100, false);
+        HashMap<String, ArrayList<String>> user_map = new HashMap<>(); //{"도","주소"}
 
-        Point[] points = new Point[addr.length];
+        int q = 0;
         for (String str : addr) {
-            getPointFromGeoCoder(str, points);
-        }
-        for (int k = 0; k < points.length; k++) {
-           // mMap.addMarker(new MarkerOptions().position(new LatLng(points[k].getX(), points[k].getY())).title(name[k]).icon(BitmapDescriptorFactory.fromBitmap(UserMarker)));
-        }
-        Point[] hull = GrahamScan.convexHull(points);
 
-        countTry = 0;
-        PolygonCenter(hull);
-        curPoint = new LatLng(center.x, center.y);
-        //중간지점 찾기 (사용자 위치들과 무게중심 좌표 넘겨주기)
-        //findMidPoint(hull, curPoint);
-        FindMid();
+            //getPointFromGeoCoder(str);
+            Log.d("Clustering", "addr : " + addr[q]);
+            String[] area = addr[q].split(" ");
+            String do_name = area[0];
+
+            switch (do_name) {
+                case "서울특별시":
+                case "인천광역시":
+                    do_name = "경기도";
+                    break;
+                case "대전광역시":
+                case "세종특별자치시":
+                    do_name = "충청남도";
+                    break;
+                case "대구광역시":
+                    do_name = "전라북도";
+                    break;
+                case "울산광역시":
+                case "부산광역시":
+                    do_name = "경상남도";
+                    break;
+                case "광주광역시":
+                    do_name = "전라남도";
+                    break;
+                default:
+                    do_name = area[0];
+            }
+
+            Log.d("Clustering", "구역 : " + addr[q]);
+            if (user_map.containsKey(do_name)) {
+                /*
+                 * 이미 키가 존재할 경우
+                 * ArrayList를 기존의 Points로 초기화하고 새 Points 추가함
+                 */
+                ArrayList<String> user_point = user_map.get(do_name);
+                user_point.add(addr[q]);
+                user_map.put(do_name, user_point);
+
+            } else {
+                /*
+                 * 키가 존재하지 않을 경우
+                 * ArrayList를 초기화하고 Points추가
+                 */
+                ArrayList<String> user_point = new ArrayList<>();
+                user_point.add(addr[q]);
+                user_map.put(do_name, user_point);
+            }
+            Log.d("Clustering", " 클러스터링중 : " + user_map);
+            q++;
+        }
+        users = new Point[addr.length];
+        for (int i = 0; i < addr.length; i++) {
+            users[i] = getPointFromGeoCoder(addr[i]);
+        }
+
+        for (int k = 0; k < addr.length; k++) {
+            mMap.addMarker(new MarkerOptions().position(new LatLng(users[k].getX(), users[k].getY())).icon(BitmapDescriptorFactory.fromBitmap(UserMarker)));
+        }
+
+
+        //클러스터링된 맵을 반복문을 돌면서 centroid와 size를 저장한다.
+        centers = new ArrayList<>();
+        member_num = new ArrayList<>();
+
+        Point[] points;   //주소좌표 담을 공간
+
+
+        /*클러스터링 결과 맵의 size가
+         *  1. 1인 경우 : 모든 유저가 같은 구역에 있음(Ex)모두 경기도, 서울특별시, 충청도 등)
+         *  2. 모임원들 수와 같은 경우 : 모든 유저가 다른 구역에 흩어져있음
+         *
+         * => 이럴 경우엔 바로 graham을 사용해서 무게중심 구하고 중간지점 구하기
+         */
+
+
+        if (user_map.size() == 1 || user_map.size() == addr.length) {
+            //int k=0;
+            points = new Point[addr.length];
+            for (int i = 0; i < points.length; i++) {
+                points[i] = getPointFromGeoCoder(addr[i]);
+                Log.d("Clustering", "points : " + points[i]);
+            }
+            ArrayList<LatLng> k_result = kmeans(2, points);
+            Log.d("Clustering", "k_result 크기 : " + k_result.size());
+
+            for (int j = 0; j < k_result.size(); j++) {
+                centers.add(new Point(k_result.get(j).latitude, k_result.get(j).longitude));
+            }
+            for (Map.Entry<Integer, ArrayList<Point>> elem : cmap.entrySet()) {
+                //System.out.println( String.format("키 -> %s, 값 -> %s", elem.getKey(), elem.getValue()) );
+                ArrayList<Point> p = elem.getValue();
+                member_num.add(p.size());
+            }
+            Log.d("Clustering", "센터 크기  : " + centers.size());
+            Log.d("Clustering", "membernum 크기  : " + member_num.size());
+
+
+            for (int i = 0; i < centers.size(); i++) {
+                mMap.addMarker(new MarkerOptions().position(new LatLng(centers.get(i).x, centers.get(i).y)).title("centroid " + i).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
+                Log.d("Clustering", "center출력  : " + centers.get(i));
+                // 인원수에 비례하여 평균점 계산
+                latitude += centers.get(i).x * member_num.get(i);
+                longtitude += centers.get(i).y * member_num.get(i);
+            }
+            latitude /= addr.length;
+            longtitude /= addr.length;
+
+            mid = new LatLng(latitude, longtitude);// 현재 중간지점
+            Log.d("Clustering", "현재 중간지점 : " + mid);
+            tem = mid; // 이전 중간지점
+
+            FindMid();
+
+//            Point[] hull = GrahamScan.convexHull(points);
+//            Point mid_per = PolygonCenter(hull);
+//            mid =new LatLng(mid_per.x,mid_per.y);
+//            for(int j=0;j<points.length;j++){
+//                member_num.add(1);
+//            }
+            //curPoint = new LatLng(center.x, center.y);
+//            FindMid();
+        }//군집이 존재할 경우
+        else {
+            Log.d("Clustering", " 군집이 존재합니다.");
+
+
+            for (Map.Entry<String, ArrayList<String>> elem : user_map.entrySet()) {
+                //System.out.println( String.format("키 -> %s, 값 -> %s", elem.getKey(), elem.getValue()) );
+                ArrayList<String> p = elem.getValue();
+                points = new Point[p.size()];
+                //Point[] point = p.toArray(new Point[p.size()]);
+                Log.d("Clustering", " map의 key,value : " + elem.getKey() + "," + elem.getValue());
+
+                for (int i = 0; i < p.size(); i++) {
+                    points[i] = getPointFromGeoCoder(p.get(i));
+                    Log.d("Clustering", "포인트가 존재한다 : " + points[i]);
+                }
+
+                Point[] hull = new Point[points.length];
+                Log.d("Clustering", "포인트의 길이는 : " + points.length);
+
+                if (points.length > 2) {
+                    hull = GrahamScan.convexHull(points);
+                    centers.add(PolygonCenter(hull));
+                } else {
+                    centers.add(PolygonCenter(points));
+                }
+
+                member_num.add(p.size());
+                //curPoint = new LatLng(center.x, center.y);
+            }
+            latitude = 0.0;
+            longtitude = 0.0;
+
+            Log.d("Clustering", "센터 크기  : " + centers.size());
+            Log.d("Clustering", "membernum 크기  : " + member_num.size());
+
+
+            for (int i = 0; i < centers.size(); i++) {
+                mMap.addMarker(new MarkerOptions().position(new LatLng(centers.get(i).x, centers.get(i).y)).title("centroid " + i).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
+                Log.d("Clustering", "center출력  : " + centers.get(i));
+                // 인원수에 비례하여 평균점 계산
+                latitude += centers.get(i).x * member_num.get(i);
+                longtitude += centers.get(i).y * member_num.get(i);
+            }
+            latitude /= addr.length;
+            longtitude /= addr.length;
+
+            mid = new LatLng(latitude, longtitude);// 현재 중간지점
+            Log.d("Clustering", "현재 중간지점 : " + mid);
+            tem = mid; // 이전 중간지점
+            FindMid();
+
+            Log.d("Clustering", "center_p(클러스터의 중심들) : " + centers);
+
+//            for (int k = 0; k < points.length; k++) {
+//                mMap.addMarker(new MarkerOptions().position(new LatLng(points[k].getX(), points[k].getY())).title(name[k]).icon(BitmapDescriptorFactory.fromBitmap(UserMarker)));
+//            }
+        }
+
 
         String midAdr = getCurrentAddress(midP);
-        mMap.addMarker(new MarkerOptions().position(new LatLng(midP.latitude,midP.longitude)).title("중간 지점"));
+        mMap.addMarker(new MarkerOptions().position(new LatLng(midP.latitude, midP.longitude)).title("중간 지점"));
         //##
         //String midAdr = "서울특별시 상계8동 동일로 1545";
 
         //LinearLayout 정의
         RelativeLayout.LayoutParams rl_params = new RelativeLayout.LayoutParams(
-                ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT);
+                ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
 
         //LinearLayout 생성
         RelativeLayout ly = new RelativeLayout(this);
@@ -244,20 +425,20 @@ public class MiddlePlaceActivity extends AppCompatActivity implements OnMapReady
         //ly.setOrientation(LinearLayout.HORIZONTAL);
 
         TextView tv_mid = new TextView(this);
-        int id =1;
+        int id = 1;
         tv_mid.setId(id);
-        tv_mid.setText("중간지점 주소 : "+midAdr);
+        tv_mid.setText("중간지점 주소 : " + midAdr);
         tv_mid.setLayoutParams(rl_params);
         ly.addView(tv_mid);
 
         Button btn_mid = new Button(this);
         btn_mid.setText("선택");
         RelativeLayout.LayoutParams btn_params = new RelativeLayout.LayoutParams(
-                ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT);
-        btn_params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT,RelativeLayout.TRUE);
-        btn_params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM,RelativeLayout.TRUE);
-        btn_params.addRule(RelativeLayout.BELOW,tv_mid.getId());
-        btn_params.setMargins(0,0,30,0);
+                ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        btn_params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT, RelativeLayout.TRUE);
+        btn_params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
+        btn_params.addRule(RelativeLayout.BELOW, tv_mid.getId());
+        btn_params.setMargins(0, 0, 30, 0);
         btn_mid.setLayoutParams(btn_params);
         ly.addView(btn_mid);
 
@@ -274,9 +455,9 @@ public class MiddlePlaceActivity extends AppCompatActivity implements OnMapReady
                 alertDialogBuilder.setTitle("중간지점 선택");
 
                 //AlertDialog 세팅
-                SpannableString s = new SpannableString("이 곳을 중간지점으로 선택하시겠습니까?\n"+midAdr);
-                s.setSpan(new RelativeSizeSpan(0.5f),22,22+midAdr.length(),0);
-                s.setSpan(new ForegroundColorSpan(Color.parseColor("#62ABD9")),22,22+midAdr.length(),0);
+                SpannableString s = new SpannableString("이 곳을 중간지점으로 선택하시겠습니까?\n" + midAdr);
+                s.setSpan(new RelativeSizeSpan(0.5f), 22, 22 + midAdr.length(), 0);
+                s.setSpan(new ForegroundColorSpan(Color.parseColor("#62ABD9")), 22, 22 + midAdr.length(), 0);
                 alertDialogBuilder.setMessage(s)
                         .setCancelable(false)
                         .setPositiveButton("아니오", new DialogInterface.OnClickListener() {
@@ -293,10 +474,10 @@ public class MiddlePlaceActivity extends AppCompatActivity implements OnMapReady
                         Intent intent = new Intent(MiddlePlaceActivity.this, PlaceListActivity.class);
 
                         Bundle bundle = new Bundle();
-                        bundle.putParcelable("midpoint",midP);
+                        bundle.putParcelable("midpoint", midP);
                         bundle.putString("name", meetingname);
                         bundle.putString("scheduleId", scheduleId);
-                        bundle.putString("Code",code);
+                        bundle.putString("Code", code);
                         intent.putExtras(bundle);
                         //i.putExtra("midpoint",midP);
                         startActivity(intent);
@@ -319,197 +500,298 @@ public class MiddlePlaceActivity extends AppCompatActivity implements OnMapReady
     }
 
     // 지오코딩(주소->좌표)
-    private void getPointFromGeoCoder(String addr, Point[] points) {
+    private Point getPointFromGeoCoder(String addr) {
         Geocoder geocoder = new Geocoder(this);
         List<Address> listAddress = null;
         try {
             listAddress = geocoder.getFromLocationName(addr, 10);
         } catch (IOException e) {
             e.printStackTrace();
-            return;
         }
 
         if (listAddress.isEmpty()) {
             System.out.println("주소가 없습니다.");
-            return;
         }
 
-        points[j++] = new Point(listAddress.get(0).getLatitude(), listAddress.get(0).getLongitude());
+        return new Point(listAddress.get(0).getLatitude(), listAddress.get(0).getLongitude());
     }
 
+    private Point pt;
+
     // 무게중심 구하기
-    private void PolygonCenter(Point[] hull) {
+    private Point PolygonCenter(Point[] hull) {
         double area = 0;
         double factor = 0;
 
-        for (int i = 0; i < hull.length - 1; i++) {
-            factor = (hull[i].x * hull[i + 1].y) - (hull[i + 1].x * hull[i].y);
+        double clat = 0.0, clng = 0.0;
 
-            area += factor * 0.5;
-            center.x += (hull[i].x + hull[i + 1].x) * factor;
-            center.y += (hull[i].y + hull[i + 1].y) * factor;
+        if (hull.length == 1) {
+            pt = hull[0];
+        } else if (hull.length == 2) {
+            clat = (hull[0].x + hull[1].x) / 2.0;
+            clng = (hull[0].y + hull[1].y) / 2.0;
+            pt = new Point(clat, clng);
+        } else {
+
+            int j = 0;
+            for (int i = 0; i < hull.length; i++) {
+                j = (i + 1) % hull.length;
+                factor = (hull[i].x * hull[j].y) - (hull[j].x * hull[i].y);
+
+                area += factor;
+                clat += (hull[i].x + hull[j].x) * factor;
+                clng += (hull[i].y + hull[j].y) * factor;
+            }
+
+            area *= 0.5;
+            clat = clat / (area * 6);
+            clng = clng / (area * 6);
+
+            pt = new Point(clat, clng);
         }
-        factor = (hull[hull.length - 1].x * hull[0].y) - (hull[0].x * hull[hull.length - 1].y);
-
-        area += factor * 0.5;
-        center.x += (hull[hull.length - 1].x + hull[0].x) * factor;
-        center.y += (hull[hull.length - 1].y + hull[0].y) * factor;
-
-        center.x = center.x / (area * 6);
-        center.y = center.y / (area * 6);
+        return pt;
     }
 
+
     //중간지점 찾기
+    public void FindMid() {
 
-    /*
-     * 1. 받아온 무게중심까지의 이동시간 받아오기
-     * 2. 이동시간 받은걸로 최적의 경로인지 아닌지 판단(어떻게 판단할 것인지 제대로 정해야할듯)
-     * 3. 최적이다 => midpoint  /  최적이 아니다 => 계산된 값을 m(현재 중간지점)에 더해서 중간지점 갱신하기
-     * 4. 중간지점이 다각형 내부에 있는지 확인하기
-     * 5. 다각형 내부에 중간지점이
-     *                      있다 => findMidPoint 재귀호출해서 현재 중간지점이 최적의 경로인지 다시 판단
-     *                      없다 => 다각형 내부 임의의 점을 지정해서 다시 findMidPoint를 재귀호출하는 방식으로? (아직 잘 모르겠음)
-     * 6. 마지막에 midP에 m을 넣어줌으로써 중간지점 저장
-     *
-     */
-    public void findMidPoint(Point[] hull, LatLng m) {
-
-
+        Log.d("Clustering", " 처음 좌표: " + mid);
         //이동시간 저장할 공간
-        userTime = new double[hull.length];
+        userTime = new double[centers.size()];
 
         latVector = 0;
         lonVector = 0;
-        avgTime = 0;
+        avgTime = 0; // 현재 평균 이동시간
 
         //유저들 이동시간 받아오기
-//        for (int i = 0; i < hull.length; i++) {
-//            //이동시간 받기
-//            double time = getPathTime(hull[i].getposition(), m);
-//            //이동시간 저장
-//            userTime[i] = time;
-//
-//            System.out.println("현재 position부터 중간점까지의 이동시간 : " + time);
-//
-//            //중간지점부터 사용자 위치까지의 단위벡터 구하기
-//            Point unitVector = getUnitVector(m, hull[i].getposition());
-//
-//            //시간가중치와 단위벡터의 곱
-//            latVector += unitVector.getX() * time;
-//            lonVector += unitVector.getY() * time;
-//
-//            // 총 이동시간의 합
-//            avgTime += time;
-//        }
+        for (int i = 0; i < centers.size(); i++) {
+            //이동시간 받기
+            double time = getPathTime(mid, new LatLng(centers.get(i).x, centers.get(i).y));
+            //이동시간 저장
+            userTime[i] = time;
 
-
-        avgDist=0.0;
-        //이동시간 저장할 공간
-        userDist = new double[hull.length];
-        //유저들의 이동좌표
-        for(int i=0;i<hull.length;i++){
-            double dist = SphericalUtil.computeDistanceBetween(hull[i].getposition(), m);
-
-            userDist[i]=dist;
-            //중간지점부터 사용자 위치까지의 단위벡터 구하기
-            Point unitVector = getUnitVector(m, hull[i].getposition());
-
-            //시간가중치와 단위벡터의 곱
-            latVector += unitVector.getX() * dist;
-            lonVector += unitVector.getY() * dist;
+            Log.d("Clustering", "현재 position부터 중간점까지의 이동시간 : " + time);
 
             // 총 이동시간의 합
-            avgDist += dist;
+            avgTime += (time * member_num.get(i));
+        }
+
+        //이동시간의 평균
+        avgTime /= centers.size();
+        Log.d("Clustering", " 평균 시간 : " + avgTime);
+
+        for (int i = 0; i < centers.size(); i++) {
+            //중간지점부터 사용자 위치까지의 단위벡터 구하기
+            Point unitVector = getUnitVector(mid, new LatLng(centers.get(i).x, centers.get(i).y));
+
+            double t = (userTime[i] * member_num.get(i)) - avgTime;
+
+            Log.d("Clustering", i + " 가중치 시간 : " + t);
+
+            //시간가중치와 단위벡터의 곱
+            latVector += unitVector.getX() * t;
+            lonVector += unitVector.getY() * t;
 
         }
 
+        //가중치와 단위벡터의 곱의 합을 클러스터 수로 나눈다.
+        latVector /= (avgTime * centers.size());
+        lonVector /= (avgTime * centers.size());
 
-        //이동시간의 평균
-        //avgTime /= hull.length;
-        avgDist/=hull.length;
-
-        //시간가중치와 단위벡터의 곱의 합을 평균이동시간과 유저들의 수의 곱으로 나눈다.
-//        latVector /= (avgTime * hull.length);
-//        lonVector /= (avgTime * hull.length);
-        latVector /= (avgDist * hull.length);
-        lonVector /= (avgDist * hull.length);
+        Log.d("Clustering", " 시간벡터 : " + latVector + "," + lonVector);
 
         //최적의 경로인지 확인하기 위함
         boolean isOptimized = false;
-        int optC = 0;
 
         //새로운 점이 최적인가?
-//        for (int i = 0; i < userTime.length; i++) {
-//            //임의로 최적의 경로 확인
-//            //사용자 이동시간과 평균 이동시간의 차이가 30분이 넘지 않았을 때 최적이라고 임의로 지정해놓음 (바꿔야함)
-//            if (Math.abs(userTime[i] - avgTime) < 30) {
-//                System.out.println(i + "차이 : " + Math.abs(userTime[i] - avgTime));
-//                optC++;
-//            }
-//            //마지막 점까지 이동시간과 평균시간의 차이가 30분을 넘지 않으면 최적
-//            if (optC == userTime[userTime.length - 1])
-//                isOptimized = true;
-//        }
-
-        //새로운 점이 최적인가?
-        for (int i = 0; i < userDist.length; i++) {
+        for (int i = 0; i < userTime.length; i++) {
             //임의로 최적의 경로 확인
-            //사용자 이동시간과 평균 이동시간의 차이가 30분이 넘지 않았을 때 최적이라고 임의로 지정해놓음 (바꿔야함)
-            if (Math.abs(userDist[i] - avgDist) < 30) {
-                System.out.println(i + "차이 : " + Math.abs(userDist[i] - avgDist));
-                optC++;
-            }
-            //마지막 점까지 이동시간과 평균시간의 차이가 30분을 넘지 않으면 최적
-            if (optC == userDist[userDist.length - 1])
-                isOptimized = true;
+            Log.d("Clustering", i + "차이 : " + Math.abs(userTime[i] * member_num.get(i) - avgTime));
         }
-
-//        최적이라면 => 중간지점 출력(midPoint)
-//        if(isOptimized==true){
-//            midP = m;
-//        }
+        // 현재 평균시간이 이전 평균시간보다 크면 그 전이 최적!
+        if (temp < avgTime) {
+            isOptimized = true;
+        }
+        //최적이라면 => 중간지점 출력(midPoint)
+        if (isOptimized == true) {
+            midP = tem;
+        }
 
 
         boolean check = true;
         //최적이 아니라면, 새로운 위치로 바꾸기
         if (isOptimized == false) {
-            m = new LatLng(m.latitude + latVector / hull.length,
-                    m.longitude + lonVector / hull.length);
-
-            //다각형안에 들어가는지 확인
-            check = point_in_polygon(m, hull);
+            tem = mid;
+            temp = avgTime;
+            mid = new LatLng(mid.latitude + latVector,
+                    mid.longitude + lonVector);
 
             countTry++;
-            System.out.println("중간지점 count : " + countTry);
-            System.out.println("중간지점은 여기! : " + m);
-//            for (int i = 0; i < userTime.length; i++) {
-//                System.out.println("사용자들로부터 중간지점까지의 이동시간은 : " + userTime[i]);
-//            }
-            for (int i = 0; i < userDist.length; i++) {
-                System.out.println("사용자들로부터 중간지점까지의 이동거리는 : " + userDist[i]);
+            Log.d("Clustering", "중간지점 count : " + countTry);
+            Log.d("Clustering", "중간지점은 여기! : " + tem);
+            for (int i = 0; i < userTime.length; i++) {
+                Log.d("Clustering", "사용자들로부터 중간지점까지의 이동시간은 : " + userTime[i]);
             }
-            if (countTry < 6) {
-                findMidPoint(hull, m);
+            // 최대 3번 FindMid 실행
+            if (countTry < 4) {
+                FindMid();
+            } else {
+                midP = tem;
             }
-            //findMidPoint(hull,midP);
         }
         System.out.println("update Check : " + check);
-
-        // 1. 중간지점이 범위 내에 있다면 다시 midpoint가 맞는지 탐색하고
-        // 2. 범위 내에 없다면 범위 내의 임의의 지점을 설정해줘서 다시 탐색하는 방식으로? 수정해야할듯
-//        if(check==true){
-//            countTry++;
-//            if(countTry<5) findMidPoint(hull,mid);
-//        }
-//        if(check==false){
-//            //범위 내 임의의 지점 설정해주기
-//            System.out.println("범위 밖으로 나갔습니다.");
-//        }
-
-        //countTry++;
-        midP = m;
     }
 
+
+    //kmeans클러스터링
+
+    private ArrayList<LatLng> cp;
+    private ArrayList<LatLng> prevcenter;
+    private Map<Integer, ArrayList<Point>> cmap;
+
+    public ArrayList<LatLng> kmeans(int k, Point[] pos) {
+        Log.d("Clustering", " 클러스터개수는 " + k + "개입니다.");
+        //클러스터만큼의 센트로이드 랜덤생성
+        cp = new ArrayList<>();
+        setCentroids(k, pos);
+
+        int iter_i = 0;
+        do {
+            Log.d("Clustering", "--------------" + iter_i + "번째" + "--------------");
+            Log.d("Clustering", "----<<assignment>>----");
+            //assignment
+            assignment(pos);
+            //Log.d("Clustering","----<<updateCenter>>----");
+            //update
+            //updateCenter();
+            iter_i++;
+        } while (Stop());
+        return prevcenter;
+    }
+
+    public void setCentroids(int k_num, Point[] pos) {
+
+        Log.d("Clustering", " 센트로이드 초기화");
+
+        //center.clear();
+        cp = new ArrayList<>();
+
+        int[] result = new int[k_num]; //k개만큼의 난수를 담을 배열
+        LatLng[] result_point = new LatLng[k_num];
+        for (int i = 0; i < k_num; i++) {
+            int rValue = (int) (Math.random() * pos.length);
+
+            result[i] = rValue;
+            for (int j = 0; j < i; j++) {
+                if (result[i] == result[j]) {
+                    i--;
+                    break;
+                } // i번째 난수가 지금까지 도출된 난수와 비교하여 중복이라면 i번째 난수를 다시 출력하도록 i--
+            }
+            Log.d("Clustering", "랜덤 centroid: " + users[rValue].x + "," + users[rValue].y);
+            result_point[i] = new LatLng(users[rValue].x, users[rValue].y);
+        }
+        for (int j = 0; j < result_point.length; j++) {
+            cp.add(result_point[j]);
+        }
+        Log.d("Clustering", "랜덤 centroid 개수 : " + k_num + "/" + cp.size());
+        prevcenter = cp;
+
+    }
+
+
+    public void assignment(Point[] pos) {
+
+        cmap = new HashMap<>();
+
+        for (int i = 0; i < pos.length; i++) {
+            double nearest = 0;
+            int nearest_num = 0;
+            for (int j = 0; j < cp.size(); j++) {
+                Log.d("Clustering", "cp출력 :" + cp.get(j));
+
+                ArrayList<LatLng> pos_list = changeToList(pos);
+                double dist = SphericalUtil.computeDistanceBetween(pos_list.get(i), cp.get(j));
+                if (j == 0) {
+                    nearest = dist;
+                    nearest_num = 0;
+                } else {
+                    if (nearest - dist > 0) {
+                        nearest = dist;
+                        nearest_num = j;
+                    }
+                }
+                Log.d("Clustering", i + "번째 사람의 nearest :" + nearest + ", nearest num : " + nearest_num);
+            }
+            if (cmap.containsKey(nearest_num)) {
+                /*
+                 * 이미 키가 존재할 경우
+                 * ArrayList를 기존의 Points로 초기화하고 새 Points 추가함
+                 */
+                ArrayList<Point> user_point = cmap.get(nearest_num);
+                user_point.add(pos[i]);
+                cmap.put(nearest_num, user_point);
+
+            } else {
+                /*
+                 * 키가 존재하지 않을 경우
+                 * ArrayList를 초기화하고 Points추가
+                 */
+                ArrayList<Point> user_point = new ArrayList<>();
+                user_point.add(pos[i]);
+                cmap.put(nearest_num, user_point);
+            }
+        }
+        Log.d("Clustering", "cmap 출력 : " + cmap);
+        Log.d("Clustering", "----<<updateCenter>>----");
+        //update
+        updateCenter();
+    }
+
+    public void updateCenter() {
+        //center.clear();
+        cp = new ArrayList<>();
+        // 방법2
+        for (Map.Entry<Integer, ArrayList<Point>> elem : cmap.entrySet()) {
+            Log.d("Clustering", "클러스터 출력(key) : " + elem.getKey());
+            Log.d("Clustering", "클러스터 출력(value) : " + elem.getValue());
+            Point[] cluster_points = elem.getValue().toArray(new Point[elem.getValue().size()]);
+            Point p;
+            p = PolygonCenter(cluster_points);
+
+            cp.add(new LatLng(p.x, p.y));
+        }
+        for (int i = 0; i < cp.size(); i++) {
+            Log.d("Clustering", "무게중심 출력 : " + cp.get(i));
+        }
+    }
+
+    public boolean Stop() {
+        boolean check = true;
+        int count_ch = 0;
+        for (int i = 0; i < cp.size(); i++) {
+            double diff_lat = cp.get(i).latitude - prevcenter.get(i).latitude;
+            double diff_lng = cp.get(i).longitude - prevcenter.get(i).longitude;
+            Log.d("Clustering", "prevcenter : " + prevcenter.get(i).latitude + "," + prevcenter.get(i).longitude);
+            if (diff_lat == 0 && diff_lng == 0) {
+                count_ch++;
+            }
+        }
+        if (count_ch == cp.size()) {
+            Log.d("Clustering", "이전과 차이없음");
+            Log.d("Clustering", "클러스터링 완료! ");
+            check = false;
+        }
+        prevcenter = new ArrayList<>();
+        prevcenter = cp;
+        for (int i = 0; i < cp.size(); i++) {
+            Log.d("Clustering", "centroid : " + cp.get(i));
+            Log.d("Clustering", "prevcenter 재지정 : " + prevcenter.get(i));
+        }
+
+        return check;
+    }
 
     //단위벡터 구하기
     public Point getUnitVector(LatLng start, LatLng end) {
@@ -533,15 +815,15 @@ public class MiddlePlaceActivity extends AppCompatActivity implements OnMapReady
         try {
             JSONObject jsonObject = new JSONObject(getJS);
 
-            JSONObject route= jsonObject.getJSONObject("route");
-            System.out.println("route 출력 : "+route);
+            JSONObject route = jsonObject.getJSONObject("route");
+            System.out.println("route 출력 : " + route);
 
             JSONObject traOb = (JSONObject) route.getJSONArray("traoptimal").get(0);
             JSONObject summary = traOb.getJSONObject("summary");
 
             //총 이동시간 => 이건 leg마다 다르니까 step에 같이 출력하기
             duration = summary.getString("duration");
-            System.out.println("duration출력 : "+duration);
+            System.out.println("duration출력 : " + duration);
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -551,9 +833,9 @@ public class MiddlePlaceActivity extends AppCompatActivity implements OnMapReady
             totalT = 0;
         } else {
             Dur = Double.parseDouble(duration);
-            Dur = Dur/60000;
-            System.out.println("이동시간은 다음과 같다 : "+Dur);
-            totalT=Dur;
+            Dur = Dur / 60000;
+            System.out.println("이동시간은 다음과 같다 : " + Dur);
+            totalT = Dur;
         }
 
         return totalT;
@@ -597,7 +879,7 @@ public class MiddlePlaceActivity extends AppCompatActivity implements OnMapReady
     }
 
     // 중간지점 근처 역 찾기
-    private void findSub(LatLng midP){
+    private void findSub(LatLng midP) {
         String apiKey = getString(R.string.api_key);
         previous_marker = new ArrayList<Marker>();
 
@@ -614,11 +896,12 @@ public class MiddlePlaceActivity extends AppCompatActivity implements OnMapReady
                 .build()
                 .execute();
     }
+
     // 500 미터 내에 없을 경우 찾을 때 까지 500 미터 늘려서 다시 계산
     @Override
     public void onPlacesFailure(PlacesException e) {
         String apiKey = getString(R.string.api_key);
-        if(radius < 3000) {
+        if (radius < 3000) {
             radius += 1000;
             new NRPlaces.Builder()
                     .listener(MiddlePlaceActivity.this)
@@ -640,14 +923,14 @@ public class MiddlePlaceActivity extends AppCompatActivity implements OnMapReady
     @Override
     public void onPlacesSuccess(final List<noman.googleplaces.Place> places) {
         flagCount++;
-        if(flagCount>=2) {
+        if (flagCount >= 2) {
             Bundle bd = new Bundle();      /// 번들 생성
             bd.putString("flag", "NO"); // 번들에 값 넣기
             Message msg = mHandler.obtainMessage();   /// 핸들에 전달할 메세지 구조체 받기
             msg.setData(bd);                     /// 메세지에 번들 넣기
             mHandler.handleMessage(msg);
         }
-        if(flag) return;
+        if (flag) return;
 
         BitmapDrawable bitmapdraw2 = (BitmapDrawable) getResources().getDrawable(R.drawable.middleplace);
         Bitmap c = bitmapdraw2.getBitmap();
@@ -656,10 +939,10 @@ public class MiddlePlaceActivity extends AppCompatActivity implements OnMapReady
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                double distance = (double)radius;
+                double distance = (double) radius;
                 double temp = 0.0;
-                LatLng latlng = new LatLng(0,0);
-                int i=1;
+                LatLng latlng = new LatLng(0, 0);
+                int i = 1;
                 int size = places.size();
                 String name = null;
                 for (noman.googleplaces.Place place : places) {
@@ -667,22 +950,22 @@ public class MiddlePlaceActivity extends AppCompatActivity implements OnMapReady
                             = new LatLng(place.getLatitude(), place.getLongitude());
                     temp = distance;
                     distance = SphericalUtil.computeDistanceBetween(midP, latLng);
-                    System.out.println(place.getName()+ " 거리 : "+ distance);
-                    if(distance < temp) {
+                    System.out.println(place.getName() + " 거리 : " + distance);
+                    if (distance < temp) {
                         latlng = latLng;
                         name = place.getName();
                     }
-                    if(i==size) {
+                    if (i == size) {
                         String markerSnippet = getCurrentAddress(latlng);
 
                         MarkerOptions markerOptions = new MarkerOptions();
                         markerOptions.position(latlng);
-                        markerOptions.title(name+"역");
+                        markerOptions.title(name + "역");
                         markerOptions.snippet(markerSnippet).icon(BitmapDescriptorFactory.fromBitmap(MiddleMarker));
                         Marker item = mMap.addMarker(markerOptions);
                         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latlng, 10));
                         previous_marker.add(item);
-                        midP= latlng;
+                        midP = latlng;
                     }
                     i++;
                 }
@@ -782,7 +1065,7 @@ public class MiddlePlaceActivity extends AppCompatActivity implements OnMapReady
         String str_dest = arrival.longitude + "," + arrival.latitude;
 
         str_url = "https://naveropenapi.apigw.ntruss.com/map-direction/v1/driving?" +
-                "start="+str_origin+"&goal="+str_dest;
+                "start=" + str_origin + "&goal=" + str_dest;
 
         String resultText = "값이 없음";
 
@@ -795,108 +1078,6 @@ public class MiddlePlaceActivity extends AppCompatActivity implements OnMapReady
         }
         return resultText;
     }
-
-    LatLng seoul = new LatLng(37.565806, 126.975194); // cluster 1: 덕수궁 (서울 3명)
-    LatLng daejeon = new LatLng(36.335362, 127.458708); // cluster 2: 대전대학교 (대전 1명)
-    LatLng busan = new LatLng(35.233539, 129.080973); // cluster 3: 부산대학교 (부산 1명)
-    LatLng[] cluster = {seoul,daejeon,busan};
-    int[] size = {3,1,1};
-    // 인원수에 비례하여 평균점 계산
-    double latitude = (seoul.latitude*3+daejeon.latitude+busan.latitude)/5;
-    double longtitude = (seoul.longitude*3+daejeon.longitude+busan.longitude)/5;
-    LatLng mid = new LatLng(latitude,longtitude);// 현재 중간지점
-    LatLng tem = mid; // 이전 중간지점
-    int temp = 1000; // 이전 평균 이동시간
-    public void FindMid(){
-        int num = 5; // 모임원 수
-
-        for(int i =0; i< cluster.length; i++) {
-            mMap.addMarker(new MarkerOptions().position(new LatLng(cluster[i].latitude,cluster[i].longitude)).title("centroid "+i).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
-        }
-        System.out.println(" 처음 좌표: "+ mid);
-        //이동시간 저장할 공간
-        userTime = new double[3];
-
-        latVector = 0;
-        lonVector = 0;
-        avgTime = 0; // 현재 평균 이동시간
-
-        //유저들 이동시간 받아오기
-        for (int i = 0; i < cluster.length; i++) {
-            //이동시간 받기
-            double time = getPathTime(mid, cluster[i]);
-            //이동시간 저장
-            userTime[i] = time;
-
-            System.out.println("현재 position부터 중간점까지의 이동시간 : " + time);
-
-            // 총 이동시간의 합
-            avgTime += (time*size[i]);
-        }
-
-        //이동시간의 평균
-        avgTime /= cluster.length;
-        System.out.println(" 평균 시간 : "+ avgTime);
-
-        for(int i = 0; i<cluster.length; i++) {
-            //중간지점부터 사용자 위치까지의 단위벡터 구하기
-            Point unitVector = getUnitVector(mid, cluster[i]);
-
-            double t = (userTime[i]*size[i])-avgTime;
-
-            System.out.println(i+ " 가중치 시간 : "+ t);
-
-            //시간가중치와 단위벡터의 곱
-            latVector += unitVector.getX() * t;
-            lonVector += unitVector.getY() * t;
-
-        }
-
-        //가중치와 단위벡터의 곱의 합을 클러스터 수로 나눈다.
-        latVector /= (avgTime*cluster.length);
-        lonVector /= (avgTime*cluster.length);
-
-        System.out.println(" 시간벡터 : "+ latVector+","+lonVector);
-
-        //최적의 경로인지 확인하기 위함
-        boolean isOptimized = false;
-
-        //새로운 점이 최적인가?
-        for (int i = 0; i < userTime.length; i++) {
-            //임의로 최적의 경로 확인
-            System.out.println(i + "차이 : " + Math.abs(userTime[i]*size[i] - avgTime));
-        }
-        // 현재 평균시간이 이전 평균시간보다 크면 그 전이 최적!
-        if(temp < avgTime) {
-            isOptimized = true;
-        }
-        //최적이라면 => 중간지점 출력(midPoint)
-        if(isOptimized==true){
-            midP = tem;
-        }
-
-
-        boolean check = true;
-        //최적이 아니라면, 새로운 위치로 바꾸기
-        if (isOptimized == false) {
-            tem = mid;
-            temp = avgTime;
-            mid = new LatLng(mid.latitude + latVector ,
-                    mid.longitude + lonVector );
-
-            countTry++;
-            System.out.println("중간지점 count : " + countTry);
-            System.out.println("중간지점은 여기! : " + tem);
-            for (int i = 0; i < userTime.length; i++) {
-                System.out.println("사용자들로부터 중간지점까지의 이동시간은 : " + userTime[i]);
-            }
-            // 최대 3번 FindMid 실행
-            if (countTry < 4) {
-                FindMid();
-            }else{
-                midP=tem;
-            }
-        }
-        System.out.println("update Check : " + check);
-    }
 }
+
+
