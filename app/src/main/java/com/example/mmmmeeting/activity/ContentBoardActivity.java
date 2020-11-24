@@ -42,7 +42,7 @@ public class ContentBoardActivity extends BasicActivity {
         switch (requestCode) {
             case 0:
                 if (resultCode == Activity.RESULT_OK) {
-                    postInfo = (PostInfo)data.getSerializableExtra("postinfo");
+                    postInfo = (PostInfo)data.getSerializableExtra("postInfo");
                     contentsLayout.removeAllViews();
                     uiUpdate();
                 }

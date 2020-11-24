@@ -40,7 +40,9 @@ public class BoardDeleter {
             String contents = contentsList.get(i);
             if (isStorageUrl(contents)) {
                 successCount++;
+                System.out.println("successCount");
                 StorageReference desertRef = storageRef.child("posts/" + id + "/" + storageUrlToName(contents));
+                System.out.println("urlName: "+storageUrlToName(contents));
                 desertRef.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {

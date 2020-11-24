@@ -246,48 +246,12 @@ public class MakeScheduleActivity extends AppCompatActivity {
                                 finish();
                             }
                         }
-                    } else if (!isStorageUrl(pathList.get(pathCount))) {
-                        String path = pathList.get(pathCount);
-                        successCount++;
-                        contentsList.add(path);
-                        String[] pathArray = path.split("\\.");
-                        // schedule 테이블의 문서 ID 받아서 해당 문서에 정보 업로드
-                        final StorageReference mountainImagesRef = storageRef.child("schedule/" + documentReference.getId() + "/" + pathCount + "." + pathArray[pathArray.length - 1]);
-                        try {
-                            InputStream stream = new FileInputStream(new File(pathList.get(pathCount)));
-                            StorageMetadata metadata = new StorageMetadata.Builder().setCustomMetadata("index", "" + (contentsList.size() - 1)).build();
-                            UploadTask uploadTask = mountainImagesRef.putStream(stream, metadata);
-                            uploadTask.addOnFailureListener(new OnFailureListener() {
-                                @Override
-                                public void onFailure(@NonNull Exception exception) {
-                                }
-                            }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                                @Override
-                                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                                    final int index = Integer.parseInt(taskSnapshot.getMetadata().getCustomMetadata("index"));
-                                    mountainImagesRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                                        @Override
-                                        public void onSuccess(Uri uri) {
-                                            successCount--;
-                                            contentsList.set(index, uri.toString());
-                                            if (successCount == 0) {
-                                                ScheduleInfo scheduleInfo = new ScheduleInfo(title, meetingCode, contentsList, date, user.getUid());
-                                                storeUpload(documentReference, scheduleInfo);
-                                            }
-                                        }
-                                    });
-                                }
-                            });
-                        } catch (FileNotFoundException e) {
-                            Log.e("로그", "에러: " + e.toString());
-                        }
-                        pathCount++;
+
                     }
                 }
             }
-            if (successCount == 0) {
-                storeUpload(documentReference, new ScheduleInfo(title, meetingCode, contentsList, date, user.getUid()));
-            }
+            storeUpload(documentReference, new ScheduleInfo(title, meetingCode, contentsList, date, user.getUid()));
+
         } else {
             showToast(MakeScheduleActivity.this, "제목을 입력해주세요.");
         }
@@ -322,28 +286,7 @@ public class MakeScheduleActivity extends AppCompatActivity {
             ArrayList<String> contentsList = scheduleInfo.getContents();
             for (int i = 0; i < contentsList.size(); i++) {
                 String contents = contentsList.get(i);
-                if (isStorageUrl(contents)) {
-                    pathList.add(contents);
-                    ContentsItemView contentsItemView = new ContentsItemView(this);
-                    parent.addView(contentsItemView);
-
-                    contentsItemView.setImage(contents);
-                    contentsItemView.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                        }
-                    });
-
-                    contentsItemView.setOnFocusChangeListener(onFocusChangeListener);
-                    if (i < contentsList.size() - 1) {
-                        String nextContents = contentsList.get(i + 1);
-                        if (!isStorageUrl(nextContents)) {
-                            contentsItemView.setText(nextContents);
-                        }
-                    }
-                } else if (i == 0) {
-                    contentsEditText.setText(contents);
-                }
+                contentsEditText.setText(contents);
             }
         }
     }

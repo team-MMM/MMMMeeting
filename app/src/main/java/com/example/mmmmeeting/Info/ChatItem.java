@@ -4,12 +4,14 @@ import java.util.Date;
 
 public class ChatItem {
 
+    String id;
     String name;
     String message;
     String time;
     Long timestamp;
 
-    public ChatItem(String name, String message, String time, Long timestamp) {
+    public ChatItem(String id, String name, String message, String time, Long timestamp) {
+        this.id = id;
         this.name = name;
         this.message = message;
         this.time = time;
@@ -20,6 +22,12 @@ public class ChatItem {
     }
 
     //Getter & Setter
+    public String getId() { return id; }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
     public String getName() {
         return name;
     }

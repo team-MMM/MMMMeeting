@@ -37,6 +37,7 @@ import java.util.Calendar;
 import java.util.Date;
 
 public class FragChat extends Fragment {
+    FirebaseUser user;
     private FirebaseDatabase firebaseDatabase;
     private DatabaseReference chatRef;
     private MemberInfo memberInfo;
@@ -55,7 +56,9 @@ public class FragChat extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.frag_chat, container, false);
-        final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        user = FirebaseAuth.getInstance().getCurrentUser();
+
+        /*
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         String userId = user.getUid();
 
@@ -71,6 +74,7 @@ public class FragChat extends Fragment {
             }
         });
 
+         */
 
         et=view.findViewById(R.id.et);
         listView=view.findViewById(R.id.listview);
@@ -79,6 +83,7 @@ public class FragChat extends Fragment {
         if(bundle != null) {
             bundle = getArguments();
             meetingCode = bundle.getString("Code");
+            userName = bundle.getString("userName");
         }
 
         // meetingName 기준으로 분리함
@@ -146,7 +151,7 @@ public class FragChat extends Fragment {
     public void clickSend(View view) {
         SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
 
-        String nickName= userName;
+        String name= userName;
         String message= et.getText().toString();
 
         //메세지 작성 시간 문자열로
@@ -156,7 +161,7 @@ public class FragChat extends Fragment {
         Long timestamp = now.getTime();
 
         //DB에 저장할 값들(닉네임, 메세지, 시간)
-        ChatItem messageItem= new ChatItem(nickName,message,time,timestamp);
+        ChatItem messageItem= new ChatItem(user.getUid(), name, message, time, timestamp);
         chatRef.push().setValue(messageItem);
 
         //EditText에 있는 글씨 지우기

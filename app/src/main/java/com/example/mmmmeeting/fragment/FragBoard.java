@@ -173,9 +173,9 @@ public class FragBoard extends Fragment {
                                     Log.d("update Test", meetingCode);
                                     postList.add(new PostInfo(
                                             document.getData().get("title").toString(),
+                                            document.getData().get("description").toString(),
                                             document.getData().get("meetingID").toString(),
                                             (ArrayList<String>) document.getData().get("contents"),
-                                            (ArrayList<String>) document.getData().get("formats"),
                                             document.getData().get("publisher").toString(),
                                             new Date(document.getDate("createdAt").getTime()),
                                             document.getId()));

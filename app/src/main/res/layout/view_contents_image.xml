@@ -3,6 +3,7 @@
     android:id="@+id/contentsImageView"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:layout_margin="10dp"
     android:adjustViewBounds="true"
     android:maxHeight="700dp"
     android:scaleType="fitXY">
