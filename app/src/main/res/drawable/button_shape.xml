@@ -7,7 +7,7 @@
     <!--선-->
     <stroke
         android:width="3sp"
-        android:color="#F28379" />
+        android:color="@color/colorPrimary" />
 
     <!--여백-->
     <padding

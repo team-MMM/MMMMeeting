@@ -4,7 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:background="#ffffff">
 
     <include
         layout="@layout/view_toolbar"
@@ -17,7 +18,7 @@
         android:gravity="center"
         android:text="나의 모임 목록"
         android:textColor="#000000"
-        android:textSize="24sp"
+        android:textSize="30sp"
         android:textStyle="bold" />
 
     <LinearLayout
@@ -31,21 +32,19 @@
             android:id="@+id/meetingAdd"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="생성"
-            android:textColor="#F28379"
-            android:background="@drawable/button_shape"
             android:layout_marginRight="10sp"
-             />
+            android:background="@drawable/button_shape"
+            android:text="생성"
+            android:textColor="@color/colorAccent" />
 
         <Button
             android:id="@+id/meetingAttend"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="참가"
-            android:textColor="#F28379"
-            android:background="@drawable/button_shape"
             android:layout_marginRight="10sp"
-            />
+            android:background="@drawable/button_shape"
+            android:text="참가"
+            android:textColor="@color/colorAccent" />
 
     </LinearLayout>
 

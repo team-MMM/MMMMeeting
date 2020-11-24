@@ -67,7 +67,7 @@ import com.google.android.gms.tasks.Task;
 
 import com.google.firebase.storage.FirebaseStorage;
 
-public class CalendarActivity extends AppCompatActivity {
+public class CalendarActivity extends BasicActivity {
     public String fname=null; //날짜별 메모 저장 파일 이름
     public String str=null;
     public Button cha_Btn,del_Btn,save_Btn,sel_Btn;;
@@ -94,6 +94,7 @@ public class CalendarActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_calendar);
+        setToolbarTitle("캘린더") ;
         materialCalendarView = (MaterialCalendarView)findViewById(R.id.calendarView);
 
         materialCalendarView.state().edit()

@@ -4,10 +4,9 @@
     android:id="@+id/toolbar"
     android:layout_width="match_parent"
     android:layout_height="?attr/actionBarSize"
-    android:background="@color/colorPrimary"
+    android:background="#FFFFFF"
     android:elevation="4dp"
     android:theme="@style/AppTheme"
-    app:theme="@style/ThemeOverlay.AppCompat.ActionBar"
     app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-    app:titleTextColor="#FFFFFF"
-    />
+    app:theme="@style/ThemeOverlay.AppCompat.ActionBar"
+    app:titleTextColor="#000000" />
