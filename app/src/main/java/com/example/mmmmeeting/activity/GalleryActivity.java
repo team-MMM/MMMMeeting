@@ -15,6 +15,7 @@ import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.mmmmeeting.Info.PostInfo;
 import com.example.mmmmeeting.R;
 import com.example.mmmmeeting.adapter.GalleryAdapter;
 
@@ -47,6 +48,7 @@ public class GalleryActivity extends BasicActivity {
         } else {
             recyclerInit();
         }
+
     }
 
     @Override
@@ -64,7 +66,7 @@ public class GalleryActivity extends BasicActivity {
     }
 
     private void recyclerInit(){
-        final int numberOfColumns = 3;
+        final int numberOfColumns = 2;
 
         RecyclerView recyclerView = findViewById(R.id.recyclerView);
         recyclerView.setHasFixedSize(true);

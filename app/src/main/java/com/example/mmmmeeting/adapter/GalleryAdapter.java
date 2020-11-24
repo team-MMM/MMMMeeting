@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
+import com.example.mmmmeeting.Info.PostInfo;
 import com.example.mmmmeeting.R;
 
 import java.util.ArrayList;

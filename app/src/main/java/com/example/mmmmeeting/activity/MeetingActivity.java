@@ -25,6 +25,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -44,6 +45,7 @@ public class MeetingActivity extends BasicActivity {
     private FragAccount fragAccount;
     private Fragment fragment_ac;
     String meetingCode;
+    String userName;
 
     private boolean fr_check = false;
 
@@ -67,6 +69,23 @@ public class MeetingActivity extends BasicActivity {
                 .commit();
         fragment_ac = new Fragment();
 
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        String userId = user.getUid();
+
+        db.collection("users").document(userId).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    if (document.exists()) {
+                        userName = document.get("name").toString();
+                        bundle.putString("userName",userName);
+                    }
+                }
+            }
+        });
+
         bottomNavigationView = findViewById(R.id.bottomNavi);
         // 메뉴 바 아이콘을 눌렀을 때의 화면 동작
         // 각 화면 코드는 fragment 폴더에 있음
@@ -86,7 +105,7 @@ public class MeetingActivity extends BasicActivity {
                         return true;
                     case R.id.menu_chat:
                         FragChat fragChat = new FragChat();
-                        bundle.putString("Code", meetingCode);;
+                        bundle.putString("Code", meetingCode);
                         fragChat.setArguments(bundle);
                         getSupportFragmentManager().beginTransaction()
                                 .replace(R.id.main_frame, fragChat)

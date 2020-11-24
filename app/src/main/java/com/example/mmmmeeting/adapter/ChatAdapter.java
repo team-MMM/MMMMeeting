@@ -10,6 +10,7 @@ import com.example.mmmmeeting.Info.ChatItem;
 import com.example.mmmmeeting.R;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
 
@@ -25,6 +26,8 @@ public class ChatAdapter extends BaseAdapter {
         this.chatItems = chatItems;
         this.layoutInflater = layoutInflater;
     }
+
+
 
     @Override
     public int getCount() {
@@ -47,8 +50,8 @@ public class ChatAdapter extends BaseAdapter {
         ChatItem item=chatItems.get(position);
         View itemView=null;
 
-        //메세지가 내 메세지인지
-        if(item.getName().equals(user.getDisplayName())){
+        //메세지가 내 메세지인지 UID로 확인
+        if(item.getId().equals(user.getUid())){
             itemView= layoutInflater.inflate(R.layout.list_mychatbox,viewGroup,false);
         }else{
             itemView= layoutInflater.inflate(R.layout.list_otherchatbox,viewGroup,false);

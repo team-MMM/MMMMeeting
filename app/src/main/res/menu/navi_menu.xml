@@ -24,7 +24,7 @@
         android:id="@+id/menu_alarm"
         android:enabled="true"
         android:icon="@drawable/menu_alarm"
-        android:title="출석"/>
+        android:title="지각자"/>
 
     <item
         android:id="@+id/menu_account"

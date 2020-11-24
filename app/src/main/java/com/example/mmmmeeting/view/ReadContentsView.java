@@ -66,7 +66,11 @@ public class ReadContentsView extends LinearLayout {
         LinearLayout contentsLayout = findViewById(R.id.contentsLayout);
         ViewGroup.LayoutParams layoutParams = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         ArrayList<String> contentsList = postInfo.getContents();
-        ArrayList<String> formatList = postInfo.getFormats();
+
+        TextView description = (TextView) layoutInflater.inflate(R.layout.view_contents_text, this, false);
+        description.setText(postInfo.getDescription());
+        description.setTextSize(20);
+        contentsLayout.addView(description);
 
         for (int i = 0; i < contentsList.size(); i++) {
             if (i == moreIndex) {
@@ -78,40 +82,12 @@ public class ReadContentsView extends LinearLayout {
             }
 
             String contents = contentsList.get(i);
-            String formats = formatList.get(i);
 
-            if(formats.equals("image")){
-                ImageView imageView = (ImageView)layoutInflater.inflate(R.layout.view_contents_image, this, false);
-                contentsLayout.addView(imageView);
-                Glide.with(this).load(contents).override(1000).thumbnail(0.1f).into(imageView);
-            }else if(formats.equals("video")){
-                final PlayerView playerView = (PlayerView) layoutInflater.inflate(R.layout.view_contents_player, this, false);
 
-                DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(context,
-                        Util.getUserAgent(context, getResources().getString(R.string.app_name)));
-                MediaSource videoSource = new ProgressiveMediaSource.Factory(dataSourceFactory)
-                        .createMediaSource(Uri.parse(contents));
+            ImageView imageView = (ImageView)layoutInflater.inflate(R.layout.view_contents_image, this, false);
+            contentsLayout.addView(imageView);
+            Glide.with(this).load(contents).override(1000).thumbnail(0.1f).into(imageView);
 
-                SimpleExoPlayer player = ExoPlayerFactory.newSimpleInstance(context);
-
-                player.prepare(videoSource);
-
-                player.addVideoListener(new VideoListener() {
-                    @Override
-                    public void onVideoSizeChanged(int width, int height, int unappliedRotationDegrees, float pixelWidthHeightRatio) {
-                        playerView.setLayoutParams(new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, height));
-                    }
-                });
-
-                playerArrayList.add(player);
-
-                playerView.setPlayer(player);
-                contentsLayout.addView(playerView);
-            }else{
-                TextView textView = (TextView) layoutInflater.inflate(R.layout.view_contents_text, this, false);
-                textView.setText(contents);
-                contentsLayout.addView(textView);
-            }
         }
     }
 
