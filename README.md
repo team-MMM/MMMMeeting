@@ -3,9 +3,9 @@
 // 2020.11.24(수현)<br>
 * 게시글 수정, 삭제 오류 수정<br>
 - 이미지 누르면 한 이미지씩 삭제 가능<br>
-- 게시글 삭제는 전체 postInfo 삭제됨, 수정 안되는  고침<br>
+- 게시글 삭제는 전체 postInfo 삭제, 수정 오류도 반영<br>
 =>(DB, Storage에서도 삭제 되는거 확인)<br>
-=>채팅: Realtime Database의 chat 노드, 사진: Storage의 posts노드 사용!
+=>채팅: Realtime Database의 chat 노드, 사진: Storage의 posts노드 사용!<br>
 
 <br>
 // 2020.11.23(수현)<br>
