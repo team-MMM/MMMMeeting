@@ -10,8 +10,9 @@
         <!-- Customize your theme here. -->
         <item name="windowNoTitle">true</item>
         <item name="windowActionBar">false</item>
-        <item name="colorPrimary">#A1CDE1</item>
-        <item name="colorPrimaryDark">#A1CDE1</item>
+
+        <item name="colorPrimary">#FFFFFF</item>
+
         <item name="colorAccent">@color/ic_launcher_new_background</item>
     </style>
 
