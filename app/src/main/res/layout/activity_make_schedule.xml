@@ -28,9 +28,10 @@
             <EditText
                 android:id="@+id/titleEditText"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:ems="10"
                 android:hint="약속 이름"
+                android:layout_margin="20sp"
                 android:inputType="textPersonName" />
 
             <LinearLayout
@@ -45,21 +46,26 @@
                     android:orientation="vertical">
 
                     <include
-                        layout="@layout/view_contents_edit_text"
+                        layout="@layout/view_contents_edit_text2"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content" />
+                        android:layout_margin="20sp"
+                        android:layout_height="match_parent" />
 
                 </LinearLayout>
 
             </LinearLayout>
 
 
-
             <Button
                 android:id="@+id/check"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_margin="20sp"
+                android:layout_gravity="center"
+                android:background="@drawable/button_shape"
+                android:padding="10sp"
                 android:text="확인" />
+
 
         </LinearLayout>
 

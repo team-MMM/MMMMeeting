@@ -167,15 +167,22 @@ public class MakePostActivity extends BasicActivity {
                 case R.id.delete:
                     final View selectedView = (View) selectedImageVIew.getParent();
                     String path;
+                    int contSize;
                     int now = parent.indexOfChild(selectedView) - 1;
-                    int contSize = postInfo.getContents().size();
-                    // 새로 추가한 사진일 때
-                    if(now >= contSize){
-                        path = pathList.get(now-contSize);
-                    }else {
-                    // db에 올라가 있는 사진일 때
-                        path = postInfo.getContents().get(now);
+                    if(postInfo == null){
+                        contSize = 0;
+                        path = pathList.get(now);
+                    }else{
+                        contSize = postInfo.getContents().size();
+                        // 새로 추가한 사진일 때
+                        if(now >= contSize){
+                            path = pathList.get(now-contSize);
+                        }else {
+                            // db에 올라가 있는 사진일 때
+                            path = postInfo.getContents().get(now);
+                        }
                     }
+
                     // 혹시 모르니까 db에 올라간 형식인지 다시 검사..
                     if(isStorageUrl(path)){
                         StorageReference desertRef = storageRef.child("posts/" + postInfo.getId() + "/" + storageUrlToName(path));
@@ -198,7 +205,11 @@ public class MakePostActivity extends BasicActivity {
                         });
                     }else{
                         // 방금 올린 사진일 때
-                        pathList.remove(parent.indexOfChild(selectedView) - 1-postInfo.getContents().size());
+                        if(postInfo == null){
+                            pathList.remove(now);
+                        }else {
+                            pathList.remove(now - postInfo.getContents().size());
+                        }
                         System.out.println(parent.indexOfChild(selectedView) - 1);
                         parent.removeView(selectedView);
                         buttonsBackgroundLayout.setVisibility(View.GONE);

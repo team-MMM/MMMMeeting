@@ -24,7 +24,7 @@
             <EditText
                 android:id="@+id/titleEditText"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="70dp"
                 android:ems="10"
                 android:hint="제목"
                 android:inputType="textPersonName" />
@@ -43,30 +43,31 @@
                     <include
                         layout="@layout/view_contents_edit_text"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content" />
+                        android:layout_height="200dp" />
 
                 </LinearLayout>
 
             </LinearLayout>
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="horizontal">
 
-                <Button
-                    android:id="@+id/image"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="이미지" />
+            <Button
+                android:id="@+id/image"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_margin="10sp"
+                android:layout_gravity="center"
+                android:background="@drawable/ic_baseline_photo_camera_24"/>
 
-            </LinearLayout>
+
+
 
             <Button
                 android:id="@+id/check"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_margin="10sp"
+                android:background="@drawable/button_shape"
+                android:layout_gravity="center"
                 android:text="확인" />
 
         </LinearLayout>
@@ -98,8 +99,11 @@
                 <Button
                     android:id="@+id/delete"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center"
+                    android:background="@drawable/button_shape"
                     android:text="삭제" />
+
             </LinearLayout>
 
         </androidx.cardview.widget.CardView>

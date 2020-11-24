@@ -67,7 +67,6 @@
                 android:layout_height="wrap_content"
                 android:text="출석체크"
                 android:layout_gravity="center"
-                android:textColor="@android:color/holo_blue_light"
                 android:background="@drawable/button_shape"
                 android:layout_marginTop="20dp"
                 />

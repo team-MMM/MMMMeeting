@@ -29,12 +29,12 @@
         android:id="@+id/bottomNavi"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="?android:attr/windowBackground"
+        android:background="@android:color/white"
         android:layout_alignParentBottom="true"
-        app:itemIconTint="#000000"
-        app:itemTextColor="#000000"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:menu="@menu/navi_menu"
+        app:itemIconTint="@color/navi_select_color"
+        app:itemTextColor="@color/navi_select_color"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:labelVisibilityMode="labeled"/>
 
 
