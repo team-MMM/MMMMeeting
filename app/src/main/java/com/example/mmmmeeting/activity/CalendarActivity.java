@@ -321,7 +321,7 @@ public class CalendarActivity extends BasicActivity {
             if (isFinishing()) {
                 return;
             }
-            materialCalendarView.addDecorator(new EventDecorator(Color.GREEN, calendarDays, CalendarActivity.this, 1));
+            materialCalendarView.addDecorator(new EventDecorator(Color.RED, calendarDays, CalendarActivity.this, 1));
         }
     }
 
@@ -407,7 +407,7 @@ public class CalendarActivity extends BasicActivity {
             CalendarDay day = CalendarDay.from(calendar);
             dates.add(day);
         }
-        materialCalendarView.addDecorator(new EventDecorator(Color.GREEN, dates, CalendarActivity.this, 0));
+        materialCalendarView.addDecorator(new EventDecorator(Color.RED, dates, CalendarActivity.this, 0));
     }
 
     public void removeDeco(){
