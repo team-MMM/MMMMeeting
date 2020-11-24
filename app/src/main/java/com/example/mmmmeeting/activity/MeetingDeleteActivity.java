@@ -125,11 +125,10 @@ public class MeetingDeleteActivity extends AppCompatActivity {
 
                     if (document.get("userID").toString().length()==2) {
                         // 모임에 있는 약속, 게시판 내용도 전부 삭제해야..
-                        String meetingName = document.get("name").toString();
                         // 스케쥴, 게시판 DB에서 모임 이름으로 찾아서 삭제
-                        scheduleDelete(meetingName);
-                        boardDelete(meetingName);
-                        chatDelete(meetingName);
+                        scheduleDelete(code);
+                        boardDelete(code);
+                        chatDelete(code);
 
                         meetingdel.delete();
                     }
@@ -141,7 +140,7 @@ public class MeetingDeleteActivity extends AppCompatActivity {
     }
 
 
-    private void scheduleDelete(String name){
+    private void scheduleDelete(String code){
         CollectionReference scheduleDel = db.collection("schedule");
         scheduleDel.get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
@@ -151,7 +150,7 @@ public class MeetingDeleteActivity extends AppCompatActivity {
                             //모든 document 확인
                             for (QueryDocumentSnapshot document : task.getResult()) {
                                 // 문서가 참조하는 이름이 삭제 해야하는 모임 이름과 같으면 일정 삭제
-                                if(document.getData().get("meetingID").toString().equals(name)){
+                                if(document.getData().get("meetingID").toString().equals(code)){
                                     Log.d("일정 삭제",document.getData().get("title").toString());
                                     scheduleDel.document(document.getId()).delete();
                                     return;
@@ -165,7 +164,7 @@ public class MeetingDeleteActivity extends AppCompatActivity {
 
     }
 
-    private void boardDelete(String name){
+    private void boardDelete(String code){
         CollectionReference boardDel = db.collection("posts");
         boardDel.get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
@@ -175,7 +174,7 @@ public class MeetingDeleteActivity extends AppCompatActivity {
                             //모든 document 확인
                             for (QueryDocumentSnapshot document : task.getResult()) {
                                 // 문서가 참조하는 이름이 삭제 해야하는 모임 이름과 같으면 게시글 삭제
-                                if(document.getData().get("meetingID").toString().equals(name)){
+                                if(document.getData().get("meetingID").toString().equals(code)){
                                     Log.d("일정 삭제",document.getData().get("title").toString());
                                     boardDel.document(document.getId()).delete();
                                     return;
@@ -191,9 +190,9 @@ public class MeetingDeleteActivity extends AppCompatActivity {
 
     }
 
-    private void chatDelete(String name){
+    private void chatDelete(String code){
         FirebaseDatabase firebaseDatabase= FirebaseDatabase.getInstance();
-        DatabaseReference chatRef= firebaseDatabase.getReference("chat").child(name);
+        DatabaseReference chatRef= firebaseDatabase.getReference("chat").child(code);
         chatRef.removeValue();
     }
 
