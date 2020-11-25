@@ -1,6 +1,7 @@
 package com.example.mmmmeeting.fragment;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -49,8 +50,11 @@ public class FragChat extends Fragment {
     private ArrayList<ChatItem> messageItems=new ArrayList<>();
     private ChatAdapter adapter;
     private String meetingCode;
+    private SharedPreferences sp;
+    private String profilePath;
 
     public FragChat(){}
+
 
     @Nullable
     @Override
@@ -58,26 +62,12 @@ public class FragChat extends Fragment {
         View view = inflater.inflate(R.layout.frag_chat, container, false);
         user = FirebaseAuth.getInstance().getCurrentUser();
 
-        /*
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-        String userId = user.getUid();
-
-        db.collection("users").document(userId).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                if (task.isSuccessful()) {
-                    DocumentSnapshot document = task.getResult();
-                    if (document.exists()) {
-                        userName = document.get("name").toString();
-                    }
-                }
-            }
-        });
-
-         */
+        sp = getActivity().getSharedPreferences("sp", getActivity().MODE_PRIVATE);
+        profilePath = sp.getString("profilePath","");
 
         et=view.findViewById(R.id.et);
         listView=view.findViewById(R.id.listview);
+        listView.setVisibility(listView.INVISIBLE);
 
         Bundle bundle = this.getArguments();
         if(bundle != null) {
@@ -133,6 +123,7 @@ public class FragChat extends Fragment {
 
         adapter=new ChatAdapter(messageItems,getLayoutInflater());
         listView.setAdapter(adapter);
+        listView.setVisibility(listView.VISIBLE);
 
         Button button = (Button) view.findViewById(R.id.msgBtn);
         button.setOnClickListener(new View.OnClickListener()
@@ -161,7 +152,7 @@ public class FragChat extends Fragment {
         Long timestamp = now.getTime();
 
         //DB에 저장할 값들(닉네임, 메세지, 시간)
-        ChatItem messageItem= new ChatItem(user.getUid(), name, message, time, timestamp);
+        ChatItem messageItem= new ChatItem(user.getUid(), name, message, time, timestamp, profilePath);
         chatRef.push().setValue(messageItem);
 
         //EditText에 있는 글씨 지우기

@@ -8,14 +8,16 @@ public class ChatItem {
     String name;
     String message;
     String time;
+    String profilePath;
     Long timestamp;
 
-    public ChatItem(String id, String name, String message, String time, Long timestamp) {
+    public ChatItem(String id, String name, String message, String time, Long timestamp, String profilePath) {
         this.id = id;
         this.name = name;
         this.message = message;
         this.time = time;
         this.timestamp = timestamp;
+        this.profilePath = profilePath;
     }
 
     public ChatItem() {
@@ -58,6 +60,14 @@ public class ChatItem {
 
     public void setTimestamp(Long timestamp) {
         this.timestamp = timestamp;
+    }
+
+    public String getProfilePath() {
+        return profilePath;
+    }
+
+    public void setProfilePath(String profilePath) {
+        this.profilePath = profilePath;
     }
 
 }

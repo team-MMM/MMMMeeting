@@ -10,14 +10,17 @@ import androidx.cardview.widget.CardView;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.SharedPreferences;
 import android.view.LayoutInflater;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.example.mmmmeeting.BoardDeleter;
 import com.example.mmmmeeting.Info.PostInfo;
 import com.example.mmmmeeting.R;
@@ -26,6 +29,10 @@ import com.example.mmmmeeting.activity.MakePostActivity;
 import com.example.mmmmeeting.OnPostListener;
 import com.example.mmmmeeting.view.ReadContentsView;
 import com.google.android.exoplayer2.SimpleExoPlayer;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
 
@@ -35,6 +42,8 @@ public class BoardAdapter extends RecyclerView.Adapter<BoardAdapter.MainViewHold
     private BoardDeleter boardDeleter; //Firestore db에서 삭제 되도록 연동
     private ArrayList<ArrayList<SimpleExoPlayer>> playerArrayListArrayList = new ArrayList<>();
     private final int MORE_INDEX = 2;
+    String profilePath;
+    FirebaseFirestore db = FirebaseFirestore.getInstance();
 
     static class MainViewHolder extends RecyclerView.ViewHolder {
         CardView cardView;
@@ -90,25 +99,48 @@ public class BoardAdapter extends RecyclerView.Adapter<BoardAdapter.MainViewHold
     public void onBindViewHolder(@NonNull final MainViewHolder holder, int position) {
         CardView cardView = holder.cardView;
         TextView titleTextView = cardView.findViewById(R.id.titleTextView);
+        ImageView profileView = cardView.findViewById(R.id.userProfile);
+        TextView userName = cardView.findViewById(R.id.userName);
+        cardView.setVisibility(cardView.INVISIBLE);
+
 
         PostInfo postInfo = mDataset.get(position);
-        titleTextView.setText(postInfo.getTitle());
 
-        ReadContentsView readContentsVIew = cardView.findViewById(R.id.readContentsView);
-        LinearLayout contentsLayout = cardView.findViewById(R.id.contentsLayout);
+        db.collection("users").document(postInfo.getPublisher()).
+            get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    if (document.exists()) {
+                        String name = document.get("name").toString();
+                        userName.setText(name);
+                        profilePath = document.get("profilePath").toString();
+                        Glide.with(cardView).load(profilePath).centerCrop().override(500).into(profileView);
+                        titleTextView.setText(postInfo.getTitle());
 
-        if (contentsLayout.getTag() == null || !contentsLayout.getTag().equals(postInfo)) {
-            contentsLayout.setTag(postInfo);
-            contentsLayout.removeAllViews();
+                        ReadContentsView readContentsVIew = cardView.findViewById(R.id.readContentsView);
+                        LinearLayout contentsLayout = cardView.findViewById(R.id.contentsLayout);
 
-            readContentsVIew.setMoreIndex(MORE_INDEX);
-            readContentsVIew.setPostInfo(postInfo);
+                        if (contentsLayout.getTag() == null || !contentsLayout.getTag().equals(postInfo)) {
+                            contentsLayout.setTag(postInfo);
+                            contentsLayout.removeAllViews();
 
-            ArrayList<SimpleExoPlayer> playerArrayList = readContentsVIew.getPlayerArrayList();
-            if(playerArrayList != null){
-                playerArrayListArrayList.add(playerArrayList);
+                            readContentsVIew.setMoreIndex(MORE_INDEX);
+                            readContentsVIew.setPostInfo(postInfo);
+
+                            ArrayList<SimpleExoPlayer> playerArrayList = readContentsVIew.getPlayerArrayList();
+                            if(playerArrayList != null){
+                                playerArrayListArrayList.add(playerArrayList);
+                            }
+                        }
+                        cardView.setVisibility(CardView.VISIBLE);
+                    }
+                }
             }
-        }
+        });;
+
+
     }
 
     @Override

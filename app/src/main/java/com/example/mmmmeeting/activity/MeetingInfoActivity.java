@@ -3,6 +3,7 @@ package com.example.mmmmeeting.activity;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ClipData;
 import android.content.ClipboardManager;
@@ -13,9 +14,12 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.example.mmmmeeting.Info.MeetingInfo;
 import com.example.mmmmeeting.R;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -33,10 +37,10 @@ import java.util.List;
 
 public class MeetingInfoActivity extends AppCompatActivity implements View.OnClickListener{
 
-    TextView name, description, code, user, leadertv;
-    Button invite, delete, changeLeader;
-    String meetingname;
-    int num;
+    private TextView name, description, code, user, leadertv;
+    private Button invite, delete, changeLeader;
+    private String meetingname;
+    private int num;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,6 +61,7 @@ public class MeetingInfoActivity extends AppCompatActivity implements View.OnCli
         delete = findViewById(R.id.deleteBtn);
         changeLeader = findViewById(R.id.newLeader);
         leadertv = findViewById(R.id.meetingLeader);
+
 
         if(isLeader){
             changeLeader.setVisibility(View.VISIBLE);
@@ -218,6 +223,13 @@ public class MeetingInfoActivity extends AppCompatActivity implements View.OnCli
         startActivity(intent);
     }
 
+    private void myStartActivity(Class c){
+        Intent intent = new Intent(this,c);
+        intent.addFlags(intent.FLAG_ACTIVITY_CLEAR_TOP);
+        intent.putExtra("Code", code.getText().toString());
+        startActivity(intent);
+    }
+
     @Override
     public void onClick(View v) {
         switch (v.getId()){
@@ -250,6 +262,15 @@ public class MeetingInfoActivity extends AppCompatActivity implements View.OnCli
                 AlertDialog dialog = builder.create();    // 알림창 객체 생성
                 dialog.show();    // 알림창 띄우기
                 break;
+
         }
+    }
+
+
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        finish();
     }
 }

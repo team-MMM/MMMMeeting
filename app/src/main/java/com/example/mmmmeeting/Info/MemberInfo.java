@@ -8,6 +8,7 @@ import java.util.Map;
 public class MemberInfo {
     private String name;
     private String address;
+    private String profilePath;
 
     private HashMap<String, Float> rating = new  HashMap<>();
 
@@ -28,6 +29,14 @@ public class MemberInfo {
 
     public String getAddress(){
         return this.address;
+    }
+
+    public String getProfilePath(){
+        return this.profilePath;
+    }
+
+    public void setProfilePath(String profilePath){
+        this.profilePath = profilePath;
     }
 
     public void setAddress(String address){
