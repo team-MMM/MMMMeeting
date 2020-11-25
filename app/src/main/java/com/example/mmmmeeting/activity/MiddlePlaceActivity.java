@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.ColorDrawable;
 import android.location.Address;
 import android.location.Geocoder;
 import android.os.AsyncTask;
@@ -21,6 +22,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -29,7 +31,9 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDialog;
 
+import com.bumptech.glide.Glide;
 import com.example.mmmmeeting.Info.ScheduleInfo;
 import com.example.mmmmeeting.R;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -106,6 +110,7 @@ public class MiddlePlaceActivity extends AppCompatActivity implements OnMapReady
     private int avgTime;
     private double avgDist;
     private boolean flag;
+    private boolean findSub_flg=true;
     private int flagCount;
 
     private Point[] users;
@@ -116,8 +121,12 @@ public class MiddlePlaceActivity extends AppCompatActivity implements OnMapReady
     private LatLng mid;// 현재 중간지점
     private LatLng tem; // 이전 중간지점
     private int temp = 1000;
+    private String[] address;
+    private String[] m_name;
 
     private GoogleMap mMap;
+
+    AppCompatDialog progressDialog;
 
     int i = 0;
     int j = 0;
@@ -146,6 +155,16 @@ public class MiddlePlaceActivity extends AppCompatActivity implements OnMapReady
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_place_middle);
+
+
+        progressDialog = new AppCompatDialog(MiddlePlaceActivity.this);
+        progressDialog.setCancelable(false);
+        progressDialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
+        progressDialog.setContentView(R.layout.progress_loading);
+
+        ImageView img_loading_frame = (ImageView) progressDialog.findViewById(R.id.iv_frame_loading);
+        Glide.with(getApplicationContext()).load(R.drawable.wemeetnow).into(img_loading_frame);
+
 
         midpoint_select = (LinearLayout) findViewById(R.id.midpoint_select);
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -198,8 +217,13 @@ public class MiddlePlaceActivity extends AppCompatActivity implements OnMapReady
                                             // 존재하지 않는 문서
                                             Log.d("Attend", "No Document");
                                         }
-                                        if (i == users.size())
-                                            clustering(addr, name); // 중간지점 찾기 시작
+                                        if (i == users.size()){
+                                            //clustering(addr, name); // 중간지점 찾기 시작
+                                            address=addr;
+                                            m_name=name;
+                                            BackgroundTask Btask =new BackgroundTask();
+                                            Btask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+                                        }
                                     } else {
                                         Log.d("Attend", "Task Fail : " + task.getException());
                                     }
@@ -219,11 +243,150 @@ public class MiddlePlaceActivity extends AppCompatActivity implements OnMapReady
 
     }
 
+    class BackgroundTask extends AsyncTask<String, Void, String> {
+
+
+        @Override
+        protected void onPreExecute() {
+
+            progressDialog.show();
+
+            super.onPreExecute();
+
+        }
+
+
+        @Override
+        protected String doInBackground(String... strings) {
+
+            String abc = "clustering OK!!!";
+            clustering(address, m_name); // 중간지점 찾기 시작
+            runOnUiThread(new Runnable(){
+                public void run(){
+                    BitmapDrawable bitmapdraw2 = (BitmapDrawable) getResources().getDrawable(R.drawable.mid);
+                    Bitmap b = bitmapdraw2.getBitmap();
+                    Bitmap MidMarker = Bitmap.createScaledBitmap(b, 100, 100, false);
+                    if(findSub_flg==false) {
+                        mMap.addMarker(new MarkerOptions().position(midP).icon(BitmapDescriptorFactory.fromBitmap(MidMarker)));
+                    }
+                    BitmapDrawable bitmapdraw1 = (BitmapDrawable) getResources().getDrawable(R.drawable.user);
+                    b = bitmapdraw1.getBitmap();
+                    Bitmap UserMarker = Bitmap.createScaledBitmap(b, 100, 100, false);
+
+                    for (int k = 0; k < address.length; k++) {
+                        mMap.addMarker(new MarkerOptions().position(new LatLng(users[k].getX(), users[k].getY())).icon(BitmapDescriptorFactory.fromBitmap(UserMarker)));
+                    }
+
+                    String midAdr = getCurrentAddress(midP);
+                    //##
+                    //String midAdr = "서울특별시 상계8동 동일로 1545";
+
+                    //LinearLayout 정의
+                    LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                            ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT);
+                    //LinearLayout 정의
+                    RelativeLayout.LayoutParams rl_params = new RelativeLayout.LayoutParams(
+                            ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT);
+
+                    //LinearLayout 생성
+                    RelativeLayout ly = new RelativeLayout(MiddlePlaceActivity.this);
+                    ly.setLayoutParams(rl_params);
+                    //ly.setOrientation(LinearLayout.HORIZONTAL);
+
+                    TextView tv_mid = new TextView(MiddlePlaceActivity.this);
+                    int id =1;
+                    tv_mid.setId(id);
+                    tv_mid.setText("중간지점 주소 : "+midAdr);
+                    tv_mid.setLayoutParams(rl_params);
+                    ly.addView(tv_mid);
+
+                    Button btn_mid = new Button(MiddlePlaceActivity.this);
+                    btn_mid.setText("선택");
+                    RelativeLayout.LayoutParams btn_params = new RelativeLayout.LayoutParams(
+                            ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT);
+                    btn_params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT,RelativeLayout.TRUE);
+                    btn_params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM,RelativeLayout.TRUE);
+                    btn_params.addRule(RelativeLayout.BELOW,tv_mid.getId());
+                    btn_mid.setLayoutParams(btn_params);
+                    ly.addView(btn_mid);
+
+
+                    midpoint_select.addView(ly);
+                    midpoint_select.setVisibility(View.VISIBLE);
+
+                    btn_mid.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+
+                            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(MiddlePlaceActivity.this);
+                            //제목
+                            alertDialogBuilder.setTitle("중간지점 선택");
+
+                            //AlertDialog 세팅
+                            SpannableString s = new SpannableString("이 곳을 중간지점으로 선택하시겠습니까?\n"+midAdr);
+                            s.setSpan(new RelativeSizeSpan(0.5f),22,22+midAdr.length(),0);
+                            s.setSpan(new ForegroundColorSpan(Color.parseColor("#62ABD9")),22,22+midAdr.length(),0);
+                            alertDialogBuilder.setMessage(s)
+                                    .setCancelable(false)
+                                    .setPositiveButton("아니오", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialogInterface, int i) {
+                                            //프로그램 종료
+                                            MiddlePlaceActivity.this.finish();
+                                        }
+                                    }).setNegativeButton("네", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialogInterface, int i) {
+
+                                            //장소리스트 화면으로 넘어감
+                                            Intent intent = new Intent(MiddlePlaceActivity.this, PlaceListActivity.class);
+
+                                            Bundle bundle = new Bundle();
+                                            bundle.putParcelable("midpoint",midP);
+                                            bundle.putString("code", code);
+                                            bundle.putString("scheduleId", scheduleId);
+                                            intent.putExtras(bundle);
+                                            //i.putExtra("midpoint",midP);
+                                            Log.d("Send","meetingname 전달 : "+code);
+                                            startActivity(intent);
+                                        }
+                                    });
+
+                            //다이얼로그 생성
+                            AlertDialog alertDialog = alertDialogBuilder.create();
+
+                            //다이얼로그 보여주기
+                            alertDialog.show();
+
+                        }
+                    });
+
+                    //중간지점 지도 위에 표시
+                    //mMap.addMarker(new MarkerOptions().position(midP).title("중간지점 찾음!").icon(BitmapDescriptorFactory.fromBitmap(MiddleMarker)));
+                    //mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(midP, 10));
+                }
+            });
+            findSub(midP);
+            //mMap.addMarker(new MarkerOptions().position(midP).icon(BitmapDescriptorFactory.fromBitmap(MidMarker)));
+
+
+            return abc;
+
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+
+            progressDialog.dismiss();
+            super.onPostExecute(s);
+            Toast.makeText(MiddlePlaceActivity.this, "로딩 완료", Toast.LENGTH_SHORT).show();
+        }
+
+    }
+
     // 중간 지점 찾기 시작!
     private void clustering(String[] addr, String[] name) {
-        BitmapDrawable bitmapdraw1 = (BitmapDrawable) getResources().getDrawable(R.drawable.user);
-        Bitmap b = bitmapdraw1.getBitmap();
-        Bitmap UserMarker = Bitmap.createScaledBitmap(b, 100, 100, false);
+
         HashMap<String, ArrayList<String>> user_map = new HashMap<>(); //{"도","주소"}
 
         int q = 0;
@@ -284,10 +447,6 @@ public class MiddlePlaceActivity extends AppCompatActivity implements OnMapReady
             users[i] = getPointFromGeoCoder(addr[i]);
         }
 
-        for (int k = 0; k < addr.length; k++) {
-            mMap.addMarker(new MarkerOptions().position(new LatLng(users[k].getX(), users[k].getY())).icon(BitmapDescriptorFactory.fromBitmap(UserMarker)));
-        }
-
 
         //클러스터링된 맵을 반복문을 돌면서 centroid와 size를 저장한다.
         centers = new ArrayList<>();
@@ -327,7 +486,7 @@ public class MiddlePlaceActivity extends AppCompatActivity implements OnMapReady
 
 
             for (int i = 0; i < centers.size(); i++) {
-                mMap.addMarker(new MarkerOptions().position(new LatLng(centers.get(i).x, centers.get(i).y)).title("centroid " + i).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
+                //mMap.addMarker(new MarkerOptions().position(new LatLng(centers.get(i).x, centers.get(i).y)).title("centroid " + i).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
                 Log.d("Clustering", "center출력  : " + centers.get(i));
                 // 인원수에 비례하여 평균점 계산
                 latitude += centers.get(i).x * member_num.get(i);
@@ -408,95 +567,6 @@ public class MiddlePlaceActivity extends AppCompatActivity implements OnMapReady
 //                mMap.addMarker(new MarkerOptions().position(new LatLng(points[k].getX(), points[k].getY())).title(name[k]).icon(BitmapDescriptorFactory.fromBitmap(UserMarker)));
 //            }
         }
-
-
-        String midAdr = getCurrentAddress(midP);
-        mMap.addMarker(new MarkerOptions().position(new LatLng(midP.latitude, midP.longitude)).title("중간 지점"));
-        //##
-        //String midAdr = "서울특별시 상계8동 동일로 1545";
-
-        //LinearLayout 정의
-        RelativeLayout.LayoutParams rl_params = new RelativeLayout.LayoutParams(
-                ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-
-        //LinearLayout 생성
-        RelativeLayout ly = new RelativeLayout(this);
-        ly.setLayoutParams(rl_params);
-        //ly.setOrientation(LinearLayout.HORIZONTAL);
-
-        TextView tv_mid = new TextView(this);
-        int id = 1;
-        tv_mid.setId(id);
-        tv_mid.setText("중간지점 주소 : " + midAdr);
-        tv_mid.setLayoutParams(rl_params);
-        ly.addView(tv_mid);
-
-        Button btn_mid = new Button(this);
-        btn_mid.setText("선택");
-        RelativeLayout.LayoutParams btn_params = new RelativeLayout.LayoutParams(
-                ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        btn_params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT, RelativeLayout.TRUE);
-        btn_params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
-        btn_params.addRule(RelativeLayout.BELOW, tv_mid.getId());
-        btn_params.setMargins(0, 0, 30, 0);
-        btn_mid.setLayoutParams(btn_params);
-        ly.addView(btn_mid);
-
-
-        midpoint_select.addView(ly);
-        midpoint_select.setVisibility(View.VISIBLE);
-
-        btn_mid.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(MiddlePlaceActivity.this);
-                //제목
-                alertDialogBuilder.setTitle("중간지점 선택");
-
-                //AlertDialog 세팅
-                SpannableString s = new SpannableString("이 곳을 중간지점으로 선택하시겠습니까?\n" + midAdr);
-                s.setSpan(new RelativeSizeSpan(0.5f), 22, 22 + midAdr.length(), 0);
-                s.setSpan(new ForegroundColorSpan(Color.parseColor("#62ABD9")), 22, 22 + midAdr.length(), 0);
-                alertDialogBuilder.setMessage(s)
-                        .setCancelable(false)
-                        .setPositiveButton("아니오", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                //프로그램 종료
-                                MiddlePlaceActivity.this.finish();
-                            }
-                        }).setNegativeButton("네", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-
-                        //장소리스트 화면으로 넘어감
-                        Intent intent = new Intent(MiddlePlaceActivity.this, PlaceListActivity.class);
-
-                        Bundle bundle = new Bundle();
-                        bundle.putParcelable("midpoint", midP);
-                        bundle.putString("name", meetingname);
-                        bundle.putString("scheduleId", scheduleId);
-                        bundle.putString("Code", code);
-                        intent.putExtras(bundle);
-                        //i.putExtra("midpoint",midP);
-                        startActivity(intent);
-                    }
-                });
-
-                //다이얼로그 생성
-                AlertDialog alertDialog = alertDialogBuilder.create();
-
-                //다이얼로그 보여주기
-                alertDialog.show();
-
-            }
-        });
-
-        //중간지점 지도 위에 표시
-        //mMap.addMarker(new MarkerOptions().position(midP).title("중간지점 찾음!").icon(BitmapDescriptorFactory.fromBitmap(MiddleMarker)));
-        //mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(midP, 10));
-        findSub(midP);
     }
 
     // 지오코딩(주소->좌표)
@@ -912,6 +982,9 @@ public class MiddlePlaceActivity extends AppCompatActivity implements OnMapReady
                     .language("ko", "KR")
                     .build()
                     .execute();
+        }
+        else{
+            findSub_flg=false;
         }
     }
 
