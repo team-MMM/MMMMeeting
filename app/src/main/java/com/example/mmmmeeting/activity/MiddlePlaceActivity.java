@@ -9,6 +9,7 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.location.Address;
 import android.location.Geocoder;
 import android.os.AsyncTask;
@@ -296,8 +297,11 @@ public class MiddlePlaceActivity extends AppCompatActivity implements OnMapReady
                     TextView tv_mid = new TextView(MiddlePlaceActivity.this);
                     int id =1;
                     tv_mid.setId(id);
-                    tv_mid.setText("중간지점 주소 : "+midAdr);
+                    tv_mid.setText("중간지점 주소 \n"+midAdr);
+                    tv_mid.setTextSize(15);
+                    tv_mid.setTextColor(Color.BLACK);
                     tv_mid.setLayoutParams(rl_params);
+                    tv_mid.setPadding(10,10,10,10);
                     ly.addView(tv_mid);
 
                     Button btn_mid = new Button(MiddlePlaceActivity.this);
@@ -306,8 +310,9 @@ public class MiddlePlaceActivity extends AppCompatActivity implements OnMapReady
                             ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT);
                     btn_params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT,RelativeLayout.TRUE);
                     btn_params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM,RelativeLayout.TRUE);
-                    btn_params.addRule(RelativeLayout.BELOW,tv_mid.getId());
+                    btn_params.addRule(RelativeLayout.ALIGN_RIGHT,tv_mid.getId());
                     btn_mid.setLayoutParams(btn_params);
+                    btn_mid.setBackground(getDrawable(R.drawable.button_shape));
                     ly.addView(btn_mid);
 
 
@@ -324,8 +329,8 @@ public class MiddlePlaceActivity extends AppCompatActivity implements OnMapReady
 
                             //AlertDialog 세팅
                             SpannableString s = new SpannableString("이 곳을 중간지점으로 선택하시겠습니까?\n"+midAdr);
-                            s.setSpan(new RelativeSizeSpan(0.5f),22,22+midAdr.length(),0);
-                            s.setSpan(new ForegroundColorSpan(Color.parseColor("#62ABD9")),22,22+midAdr.length(),0);
+                            s.setSpan(new RelativeSizeSpan(1.0f),22,22+midAdr.length(),0);
+                            s.setSpan(new ForegroundColorSpan(Color.parseColor("#F28379")),22,22+midAdr.length(),0);
                             alertDialogBuilder.setMessage(s)
                                     .setCancelable(false)
                                     .setPositiveButton("아니오", new DialogInterface.OnClickListener() {
