@@ -19,6 +19,7 @@
         android:layout_below="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_margin="10dp"
         android:orientation="vertical"
         android:background="@android:color/white"
         >
@@ -41,6 +42,7 @@
             android:layout_weight="1"
             android:background="@drawable/back_name"
             android:text="투표 시작"
+            android:layout_margin="20dp"
             android:visibility="invisible" />
 
     </LinearLayout>
@@ -52,16 +54,18 @@
         android:background="@drawable/back_name"
         android:layout_below="@+id/com_Btn"
         android:text="투표 종료"
+        android:layout_margin="20dp"
         android:visibility="invisible" />
 
 
     <Button
-            android:id="@+id/com_Btn"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@drawable/back_name"
-            android:layout_below="@+id/place_list_view"
-            android:text="투표 완료" />
+        android:id="@+id/com_Btn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/place_list_view"
+        android:layout_margin="20dp"
+        android:background="@drawable/back_name"
+        android:text="투표 완료" />
 
 
 </RelativeLayout>

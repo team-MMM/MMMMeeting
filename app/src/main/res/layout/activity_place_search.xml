@@ -36,6 +36,7 @@
             android:layout_height="48dp"
             android:layout_marginRight="30dp"
             android:background="@drawable/back_name"
+            android:visibility="gone"
             android:text="경로 검색" />
 
         <Button

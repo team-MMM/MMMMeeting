@@ -259,7 +259,7 @@ public class VoteActivity extends BasicActivity {
             TextView pInfo = new TextView(VoteActivity.this);
             SpannableString s = new SpannableString(placeName + "\n\n" + placeAddress);
             s.setSpan(new RelativeSizeSpan(1.8f), 0, placeName.length(), 0);
-            s.setSpan(new ForegroundColorSpan(Color.parseColor("#62ABD9")), 0, placeName.length(), 0);
+            s.setSpan(new ForegroundColorSpan(Color.parseColor("#F28379")), 0, placeName.length(), 0);
             pInfo.setText(s);
             pInfo.setLayoutParams(rl_param);
             pl_name.addView(pInfo);
