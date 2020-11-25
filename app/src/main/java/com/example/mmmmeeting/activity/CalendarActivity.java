@@ -221,7 +221,7 @@ public class CalendarActivity extends BasicActivity {
                                             day[1]=Day;
                                             Intent intent = new Intent(CalendarActivity.this, NoticeActivity.class);
                                             intent.putExtra("meetingdate", day);
-                                            intent.putExtra("scInfo",  scInfo.getMeetingID());
+                                            intent.putExtra("scInfo",  scInfo.getTitle());
                                             startActivityForResult(intent, 0); // 시간 받아오기
 
                                             selectedDay.clear();
