@@ -99,7 +99,6 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
     private int preferNum;
 
     private String Tag = "category Test";
-    String name;
     String scheduleId;
     String code;
     String id = null;
@@ -279,10 +278,9 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
         //이전 엑티비티에서 중간지점 받아오기(일단 주석처리)
         Intent i = getIntent();
         midpoint = i.getParcelableExtra("midpoint");
-        name = i.getStringExtra("name");
+        code = i.getStringExtra("code");
         scheduleId = i.getStringExtra("scheduleId");
-        code = i.getStringExtra("Code");
-        Log.d("code Test", code);
+        Log.d("Send","meetingname 전달받기 : "+code);
 
         setContentView(R.layout.activity_place_list);
 
