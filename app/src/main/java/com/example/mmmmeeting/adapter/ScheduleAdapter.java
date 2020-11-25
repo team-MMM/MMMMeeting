@@ -109,7 +109,7 @@ public class ScheduleAdapter extends RecyclerView.Adapter<ScheduleAdapter.MainVi
                                     cal.setTime(meetingDate);
                                     Intent intent = new Intent(activity, AlarmActivity.class);
                                     intent.putExtra("alarm", cal);
-                                    intent.putExtra("date", scInfo.getMeetingID());
+                                    intent.putExtra("date", scInfo.getTitle());
                                     activity.startActivityForResult(intent, 0);
                                     Toast.makeText(activity.getApplicationContext(), sdf.format(meetingDate) + "에 설정되었습니다.", Toast.LENGTH_SHORT).show();
                                 }
@@ -124,14 +124,6 @@ public class ScheduleAdapter extends RecyclerView.Adapter<ScheduleAdapter.MainVi
                 }else {
                     Toast.makeText(activity.getApplicationContext(), "아직 모임 날짜가 없습니다.", Toast.LENGTH_SHORT).show();
                 }
-
-
-                // 오랫동안 눌렀을 때 이벤트가 발생됨
-                //Toast.makeText(getApplicationContext(), "롱클릭", Toast.LENGTH_SHORT).show();
-                // 리턴값이 있다
-                // 이메서드에서 이벤트에대한 처리를 끝냈음
-                //    그래서 다른데서는 처리할 필요없음 true
-                // 여기서 이벤트 처리를 못했을 경우는 false
                 return true;
             }
         });
@@ -141,8 +133,6 @@ public class ScheduleAdapter extends RecyclerView.Adapter<ScheduleAdapter.MainVi
                 showPopup(v, mainViewHolder.getAdapterPosition());
             }
         });
-
-
 
         return mainViewHolder;
     }
