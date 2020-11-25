@@ -9,7 +9,7 @@
         android:right="0dip"
         android:bottom="0dip" />
 
-    <solid android:color="@color/colorPrimary" />
+<!--    <solid android:color="@color/colorPrimary" />-->
 
     <stroke
         android:width="3dip"
