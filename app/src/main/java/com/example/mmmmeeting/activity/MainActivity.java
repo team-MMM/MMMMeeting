@@ -1,5 +1,7 @@
 package com.example.mmmmeeting.activity;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -104,8 +106,25 @@ public class MainActivity extends BasicActivity implements View.OnClickListener 
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()){
             case R.id.revoke:
-                revokeAccess();
-                finish();
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setTitle("회원 탈퇴")        // 제목
+                        .setMessage( "우리 지금 만나 앱을 정말로 탈퇴하시겠습니까?")        // 메세지
+                        // .setCancelable(false)        // 뒤로 버튼 클릭시 취소 가능 설정
+                        .setPositiveButton("확인", new DialogInterface.OnClickListener(){
+                            // 확인 버튼 클릭시 설정, 오른쪽 버튼입니다.
+                            public void onClick(DialogInterface dialog, int whichButton){
+                                revokeAccess();
+                                finish();
+                            }
+                        })
+                        .setNegativeButton("취소", new DialogInterface.OnClickListener(){// 취소 버튼 클릭시
+                            public void onClick(DialogInterface dialog, int whichButton){//취소 이벤트...
+                            }
+                        });
+                AlertDialog dialog = builder.create();    // 알림창 객체 생성
+                dialog.show();    // 알림창 띄우기
+
                 return true;
 
             case R.id.logout:
