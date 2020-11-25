@@ -1,13 +1,19 @@
 package com.example.mmmmeeting.activity;
 
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.gif.GifDrawable;
+import com.bumptech.glide.request.target.ImageViewTarget;
 import com.example.mmmmeeting.R;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -31,12 +37,20 @@ public class SignActivity extends BasicActivity {
     private GoogleSignInClient mGoogleSignInClient;
     private static final int RC_SIGN_IN = 9001;
     private SignInButton signInButton;
+    private ImageView img_logo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         setToolbarTitle("우리 지금 만나");
+
+        img_logo = (ImageView)findViewById(R.id.img_logo);
+
+        Glide.with(SignActivity.this)
+                .load(R.drawable.wmn_logo)
+                .into(new GifDrawableImageViewTarget(img_logo, 1));
+
 
         signInButton = findViewById(R.id.signInButton);
         mAuth = FirebaseAuth.getInstance();
@@ -60,6 +74,28 @@ public class SignActivity extends BasicActivity {
             }
         });
 
+    }
+    public class GifDrawableImageViewTarget extends ImageViewTarget<Drawable> {
+
+        private int mLoopCount = GifDrawable.LOOP_FOREVER;
+
+        public GifDrawableImageViewTarget(ImageView view, int loopCount) {
+            super(view);
+            mLoopCount = loopCount;
+        }
+
+        public GifDrawableImageViewTarget(ImageView view, int loopCount, boolean waitForLayout) {
+            super(view, waitForLayout);
+            mLoopCount = loopCount;
+        }
+
+        @Override
+        protected void setResource(@Nullable Drawable resource) {
+            if (resource instanceof GifDrawable) {
+                ((GifDrawable) resource).setLoopCount(mLoopCount);
+            }
+            view.setImageDrawable(resource);
+        }
     }
 
     private void signIn() {

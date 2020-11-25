@@ -7,25 +7,26 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:background="#ffffff"
     >
 
-    <include
-        layout="@layout/view_toolbar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-
     <ImageView
-        android:layout_width="wrap_content"
-        android:layout_height="400sp"
-        android:layout_marginTop="40sp"
-        android:src="@drawable/logo_transparent" />
+        android:id="@+id/img_logo"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="0.85"/>
 
-    <com.google.android.gms.common.SignInButton
-        android:id="@+id/signInButton"
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_centerInParent="true"/>
+        android:layout_weight="0.15"
+        android:layout_gravity="center">
+        <com.google.android.gms.common.SignInButton
+            android:id="@+id/signInButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"/>
+    </LinearLayout>
 
 
 </LinearLayout>
