@@ -30,6 +30,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserInfo;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -46,6 +47,8 @@ import java.io.InputStream;
 import java.lang.reflect.Member;
 import java.util.ArrayList;
 import java.util.Objects;
+
+import de.hdodenhof.circleimageview.CircleImageView;
 
 public class MemberInitActivity extends BasicActivity implements View.OnClickListener, RatingBar.OnRatingBarChangeListener {
 
@@ -102,7 +105,23 @@ public class MemberInitActivity extends BasicActivity implements View.OnClickLis
         float shoppingBar = sp.getFloat("shopping",0);
         float parkBar = sp.getFloat("park",0);
         float actBar = sp.getFloat("act",0);
-        String profilePath = sp.getString("profilePath","");
+
+        if(sp.getString("profilePath","")==null){
+            db.collection("users").document("profilePath")
+                    .get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                @Override
+                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                    if (task.isSuccessful()) {
+                        DocumentSnapshot document = task.getResult();
+                        if (document.exists()) {
+                            profilePath = document.get("profilePath").toString();
+                        }
+                    }
+                }
+            });
+        }else{
+            profilePath = sp.getString("profilePath","");
+        }
 
         // 뷰에 반영
         nameTv.setText(name);
