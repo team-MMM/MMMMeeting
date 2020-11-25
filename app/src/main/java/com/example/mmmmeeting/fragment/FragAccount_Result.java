@@ -65,7 +65,7 @@ public class FragAccount_Result extends Fragment {
         SpannableString s;
         s= new SpannableString(today+" 정산");
         s.setSpan(new RelativeSizeSpan(1.8f),0,s.length()-3,0);
-        s.setSpan(new ForegroundColorSpan(Color.parseColor("#62ABD9")),0,s.length()-3,0);
+        s.setSpan(new ForegroundColorSpan(Color.parseColor("#F28379")),0,s.length()-3,0);
         cal_title.setText(s);
 
 

@@ -56,95 +56,152 @@
 
     </LinearLayout>
 
-    <TextView
-        android:text="이름"
-        android:textSize="20sp"
-        android:layout_marginLeft="20sp"
-        android:layout_marginBottom="10sp"
-        android:textColor="@android:color/black"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:orientation="horizontal">
+        <TextView
+            android:text="이름"
+            android:textSize="20sp"
+            android:layout_marginLeft="20sp"
+            android:layout_marginBottom="10sp"
+            android:textColor="@android:color/black"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
 
-    <TextView
-        android:id="@+id/meetingName"
-        android:hint="Name"
-        android:textSize="20sp"
-        android:layout_marginLeft="20sp"
-        android:layout_marginBottom="10sp"
+        <View
+            android:layout_width="4dp"
+            android:layout_height="25dp"
+            android:layout_marginLeft="20sp"
+            android:background="@color/colorPrimaryDark"/>
+
+        <TextView
+            android:id="@+id/meetingName"
+            android:hint="Name"
+            android:textSize="20sp"
+            android:textColor="@android:color/black"
+            android:layout_marginLeft="20sp"
+            android:layout_marginBottom="10sp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+    </LinearLayout>
+
+
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:orientation="horizontal">
+        <TextView
+            android:text="설명"
+            android:textSize="20sp"
+            android:textColor="@android:color/black"
+            android:layout_marginLeft="20sp"
+            android:layout_marginBottom="10sp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+        <View
+            android:layout_width="4dp"
+            android:layout_height="25dp"
+            android:layout_marginLeft="20sp"
+            android:background="@color/colorPrimaryDark"/>
 
-    <TextView
-        android:text="설명"
-        android:textSize="20sp"
-        android:textColor="@android:color/black"
-        android:layout_marginLeft="20sp"
-        android:layout_marginBottom="10sp"
+        <TextView
+            android:id="@+id/meetingDescription"
+            android:hint="Description"
+            android:textColor="@android:color/black"
+            android:textSize="20sp"
+            android:layout_marginLeft="20sp"
+            android:layout_marginBottom="10sp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+    </LinearLayout>
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:orientation="horizontal">
+        <TextView
+            android:text="모임장"
+            android:textSize="20sp"
+            android:layout_marginLeft="20sp"
+            android:textColor="@android:color/black"
+            android:layout_marginBottom="10sp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+        <View
+            android:layout_width="4dp"
+            android:layout_height="25dp"
+            android:layout_marginLeft="20sp"
+            android:background="@color/colorPrimaryDark"/>
 
-    <TextView
-        android:id="@+id/meetingDescription"
-        android:hint="Description"
-        android:textSize="20sp"
-        android:layout_marginLeft="20sp"
-        android:layout_marginBottom="10sp"
+        <TextView
+            android:id="@+id/meetingLeader"
+            android:hint="Leader"
+            android:textSize="20sp"
+            android:layout_marginLeft="20sp"
+            android:layout_marginBottom="10sp"
+            android:textColor="@android:color/black"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+    </LinearLayout>
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:orientation="horizontal">
 
-    <TextView
-        android:text="코드(터치시 복사)"
-        android:textSize="20sp"
-        android:layout_marginLeft="20sp"
-        android:layout_marginBottom="10sp"
-        android:textColor="@android:color/black"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
-
+        <TextView
+            android:text="코드(터치시 복사)"
+            android:textSize="20sp"
+            android:layout_marginLeft="20sp"
+            android:textColor="@android:color/black"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+        <View
+            android:layout_width="4dp"
+            android:layout_height="25dp"
+            android:layout_marginLeft="20sp"
+            android:background="@color/colorPrimaryDark"/>
+    </LinearLayout>
     <TextView
         android:id="@+id/meetingCode"
         android:hint="Code"
-        android:textSize="20sp"
-        android:layout_marginLeft="20sp"
-        android:layout_marginBottom="10sp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
-
-    <TextView
-        android:text="모임장"
-        android:textSize="20sp"
-        android:layout_marginLeft="20sp"
+        android:layout_marginLeft="20dp"
         android:textColor="@android:color/black"
-        android:layout_marginBottom="10sp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
-
-    <TextView
-        android:id="@+id/meetingLeader"
-        android:hint="Leader"
         android:textSize="20sp"
-        android:layout_marginLeft="20sp"
         android:layout_marginBottom="10sp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
 
-    <TextView
-        android:text="참여자"
-        android:textSize="20sp"
-        android:layout_marginLeft="20sp"
-        android:layout_marginBottom="10sp"
-        android:textColor="@android:color/black"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:orientation="horizontal">
+        <TextView
+            android:text="참여자"
+            android:textSize="20sp"
+            android:layout_marginBottom="10sp"
+            android:layout_marginLeft="20sp"
+            android:textColor="@android:color/black"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+        <View
+            android:layout_width="4dp"
+            android:layout_height="25dp"
+            android:layout_marginLeft="20sp"
+            android:background="@color/colorPrimaryDark"/>
 
+    </LinearLayout>
     <TextView
         android:id="@+id/meetingUsers"
         android:hint="Users"
         android:textSize="20sp"
-        android:layout_marginLeft="20sp"
+        android:textColor="@android:color/black"
+        android:layout_marginLeft="20dp"
         android:layout_marginBottom="10sp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
-
-
 </LinearLayout>

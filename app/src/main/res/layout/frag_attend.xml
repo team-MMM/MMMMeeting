@@ -18,7 +18,7 @@
         android:textSize="20sp"
         android:text="우리 모임 지각왕"
         android:layout_below="@+id/toolbar"
-        android:textColor="@color/fui_bgFacebook"
+        android:textColor="@color/colorPrimary"
         android:textStyle="bold"
         android:paddingTop="10dp"
         android:layout_centerHorizontal="true"/>
