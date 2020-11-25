@@ -17,18 +17,21 @@
             android:id="@+id/radiusText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="@android:color/black"
+            android:textColor="@color/colorPrimary"
+            android:textStyle="bold"
+            android:textSize="15sp"
             android:layout_margin="10sp"/>
 
         <SeekBar
             android:id="@+id/radiusBar"
+            android:thumb="@drawable/seekbar_thumb"
+            android:progressDrawable="@drawable/seekbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="10sp"
             android:max="3000"
             android:min="500"
             />
-
     </LinearLayout>
 
     <fragment
@@ -42,8 +45,10 @@
     <LinearLayout
         android:id="@+id/category"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="60dp"
         android:layout_below="@+id/place_map"
+        android:background="@color/colorPrimary"
+        android:gravity="center_vertical"
         android:orientation="horizontal">
 
         <TextView
@@ -53,12 +58,18 @@
             android:textColor="@android:color/black"
             android:layout_margin="10sp"/>
 
-        <Spinner
-            android:id="@+id/categoryList"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="10sp"
-        />
+
+
+            <Spinner
+                android:id="@+id/categoryList"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/custom_spn_background"
+                android:dropDownSelector="@color/colorAccent"
+                android:dropDownWidth="70dp"
+                android:spinnerMode="dropdown"
+                android:layout_margin="10sp"
+                />
 
     </LinearLayout>
 

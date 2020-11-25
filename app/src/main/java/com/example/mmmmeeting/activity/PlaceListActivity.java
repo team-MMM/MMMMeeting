@@ -1,6 +1,7 @@
 package com.example.mmmmeeting.activity;
 
 import android.content.Intent;
+import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.location.Address;
 import android.location.Geocoder;
@@ -157,8 +158,8 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
                 CircleOptions circle = new CircleOptions().center(midpoint)
                         .radius(radius)      //반지름 단위 : m
                         .strokeWidth(0)
-                        .strokeColor(Color.parseColor("#4071cce7"))
-                        .fillColor(Color.parseColor("#4071cce7"));
+                        .strokeColor(Color.parseColor("#40F28379"))
+                        .fillColor(Color.parseColor("#40F28379"));
                 mMap.addCircle(circle);
 
                 int zoom = 15- radius/900;
@@ -239,8 +240,8 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
                 CircleOptions circle = new CircleOptions().center(midpoint)
                         .radius(radius[0])      //반지름 단위 : m
                         .strokeWidth(0)
-                        .strokeColor(Color.parseColor("#4071cce7"))
-                        .fillColor(Color.parseColor("#4071cce7"));
+                        .strokeColor(Color.parseColor("#40F28379"))
+                        .fillColor(Color.parseColor("#40F28379"));
 
                 int zoom = 15-radius[0]/900;
                 mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(midpoint, zoom));
@@ -373,8 +374,8 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
         CircleOptions circle = new CircleOptions().center(midpoint)
                 .radius(500)      //반지름 단위 : m
                 .strokeWidth(0)
-                .strokeColor(Color.parseColor("#4071cce7"))
-                .fillColor(Color.parseColor("#4071cce7"));
+                .strokeColor(Color.parseColor("#40F28379"))
+                .fillColor(Color.parseColor("#40F28379"));
         mMap.addCircle(circle);
 
         //mMap.clear();
@@ -879,7 +880,7 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
                 TextView pInfo = new TextView(PlaceListActivity.this);
                 SpannableString s = new SpannableString(place_name[ratingList.get(j)]+"\n"+placeAddress);
                 s.setSpan(new RelativeSizeSpan(1.8f),0,place_name[ratingList.get(j)].length(),0);
-                s.setSpan(new ForegroundColorSpan(Color.parseColor("#62ABD9")),0,place_name[ratingList.get(j)].length(),0);
+                s.setSpan(new ForegroundColorSpan(Color.parseColor("#F28379")),0,place_name[ratingList.get(j)].length(),0);
                 pInfo.setText(s);
                 pInfo.setLayoutParams(rl_param);
                 pl_name.addView(pInfo);
@@ -921,6 +922,7 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
 
                 RatingBar rb = new RatingBar(PlaceListActivity.this,null,android.R.attr.ratingBarStyleSmall);
                 rb.setNumStars(5);
+                rb.setProgressTintList(ColorStateList.valueOf(0xFFF28379));
                 rb.setRating(rating[ratingList.get(j)]);
                 rb.setStepSize((float)0.1);
                 rb.setPadding(0,5,0,0);
