@@ -878,7 +878,7 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
                 TextView pInfo = new TextView(PlaceListActivity.this);
                 SpannableString s = new SpannableString(place_name[ratingList.get(j)]+"\n"+placeAddress);
                 s.setSpan(new RelativeSizeSpan(1.8f),0,place_name[ratingList.get(j)].length(),0);
-                s.setSpan(new ForegroundColorSpan(Color.parseColor("#F28379")),0,place_name[ratingList.get(j)].length(),0);
+                s.setSpan(new ForegroundColorSpan(Color.BLACK),0,place_name[ratingList.get(j)].length(),0);
                 pInfo.setText(s);
                 pInfo.setLayoutParams(rl_param);
                 pl_name.addView(pInfo);
@@ -920,7 +920,6 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
 
                 RatingBar rb = new RatingBar(PlaceListActivity.this,null,android.R.attr.ratingBarStyleSmall);
                 rb.setNumStars(5);
-                rb.setProgressTintList(ColorStateList.valueOf(0xFFF28379));
                 rb.setRating(rating[ratingList.get(j)]);
                 rb.setStepSize((float)0.1);
                 rb.setPadding(0,5,0,0);
