@@ -26,10 +26,19 @@
     <LinearLayout
         android:id="@+id/midpoint_select"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:layout_height="90dp"
         android:layout_weight="0.1"
-        android:orientation="vertical"
-        android:visibility="gone">
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="최소 평균 이동시간인 지점을 중간지점으로 선택했습니다."
+            android:textColor="@android:color/background_dark"
+            android:textSize="16dp"
+            android:layout_margin="5dp"
+            android:textStyle="bold"/>
+
     </LinearLayout>
 
 </LinearLayout>
