@@ -71,7 +71,7 @@ public class AlarmReceiver extends BroadcastReceiver {
                 .setWhen(System.currentTimeMillis())
                 .setTicker("{Time to watch some cool stuff!}")
                 .setContentTitle("약속 예정 알림")
-                .setContentText("오늘 " + tt + "에 [" + sc + "]모임의 약속이 있습니다.")
+                .setContentText("오늘 " + tt + "에 [" + sc + "]의 약속이 있습니다.")
                 .setContentInfo("INFO")
                 .setContentIntent(pendingI);
 
