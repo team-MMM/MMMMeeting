@@ -7,9 +7,9 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
-import android.graphics.drawable.Drawable;
 import android.location.Address;
 import android.location.Geocoder;
 import android.os.AsyncTask;
@@ -20,6 +20,7 @@ import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.RelativeSizeSpan;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -124,6 +125,7 @@ public class MiddlePlaceActivity extends AppCompatActivity implements OnMapReady
     private int temp = 1000;
     private String[] address;
     private String[] m_name;
+    private String sub_name=null;
 
     private GoogleMap mMap;
 
@@ -281,6 +283,7 @@ public class MiddlePlaceActivity extends AppCompatActivity implements OnMapReady
                     String midAdr = getCurrentAddress(midP);
                     //##
                     //String midAdr = "서울특별시 상계8동 동일로 1545";
+                    findSub(midP);
 
                     //LinearLayout 정의
                     LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
@@ -288,6 +291,7 @@ public class MiddlePlaceActivity extends AppCompatActivity implements OnMapReady
                     //LinearLayout 정의
                     RelativeLayout.LayoutParams rl_params = new RelativeLayout.LayoutParams(
                             ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT);
+                    rl_params.setMargins(10,0,10,0);
 
                     //LinearLayout 생성
                     RelativeLayout ly = new RelativeLayout(MiddlePlaceActivity.this);
@@ -297,20 +301,22 @@ public class MiddlePlaceActivity extends AppCompatActivity implements OnMapReady
                     TextView tv_mid = new TextView(MiddlePlaceActivity.this);
                     int id =1;
                     tv_mid.setId(id);
-                    tv_mid.setText("중간지점 주소 \n"+midAdr);
-                    tv_mid.setTextSize(15);
-                    tv_mid.setTextColor(Color.BLACK);
+                    tv_mid.setText("중간지점 주소 : "+midAdr);
+                    tv_mid.setTypeface(null, Typeface.BOLD);
+                    tv_mid.setTextSize(16);
                     tv_mid.setLayoutParams(rl_params);
-                    tv_mid.setPadding(10,10,10,10);
                     ly.addView(tv_mid);
+
+                    final int width = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 100, getResources().getDisplayMetrics());
+                    final int height = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 50, getResources().getDisplayMetrics());
 
                     Button btn_mid = new Button(MiddlePlaceActivity.this);
                     btn_mid.setText("선택");
-                    RelativeLayout.LayoutParams btn_params = new RelativeLayout.LayoutParams(
-                            ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT);
+                    RelativeLayout.LayoutParams btn_params = new RelativeLayout.LayoutParams(width,height);
                     btn_params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT,RelativeLayout.TRUE);
-                    btn_params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM,RelativeLayout.TRUE);
-                    btn_params.addRule(RelativeLayout.ALIGN_RIGHT,tv_mid.getId());
+                    //btn_params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM,RelativeLayout.TRUE);
+                    btn_params.addRule(RelativeLayout.BELOW,tv_mid.getId());
+                    btn_params.setMargins(0,0,30,0);
                     btn_mid.setLayoutParams(btn_params);
                     btn_mid.setBackground(getDrawable(R.drawable.button_shape));
                     ly.addView(btn_mid);
@@ -328,35 +334,68 @@ public class MiddlePlaceActivity extends AppCompatActivity implements OnMapReady
                             alertDialogBuilder.setTitle("중간지점 선택");
 
                             //AlertDialog 세팅
-                            SpannableString s = new SpannableString("이 곳을 중간지점으로 선택하시겠습니까?\n"+midAdr);
-                            s.setSpan(new RelativeSizeSpan(1.0f),22,22+midAdr.length(),0);
-                            s.setSpan(new ForegroundColorSpan(Color.parseColor("#F28379")),22,22+midAdr.length(),0);
-                            alertDialogBuilder.setMessage(s)
-                                    .setCancelable(false)
-                                    .setPositiveButton("아니오", new DialogInterface.OnClickListener() {
-                                        @Override
-                                        public void onClick(DialogInterface dialogInterface, int i) {
-                                            //프로그램 종료
-                                            MiddlePlaceActivity.this.finish();
-                                        }
-                                    }).setNegativeButton("네", new DialogInterface.OnClickListener() {
-                                        @Override
-                                        public void onClick(DialogInterface dialogInterface, int i) {
+                            if(sub_name==null){
+                                sub_name="없습니다.";
+                                SpannableString s = new SpannableString("가장 가까운 역이 "+sub_name +"\n이 곳을 중간지점으로 선택하시겠습니까?\n"+ midAdr);
+                                int i = 33 + sub_name.length();
+                                s.setSpan(new RelativeSizeSpan(0.7f), i, i + midAdr.length(), 0);
+                                s.setSpan(new ForegroundColorSpan(Color.parseColor("#62ABD9")), i, i + midAdr.length(), 0);
+                                alertDialogBuilder.setMessage(s)
+                                        .setCancelable(false)
+                                        .setPositiveButton("아니오", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialogInterface, int i) {
+                                                //프로그램 종료
+                                                MiddlePlaceActivity.this.finish();
+                                            }
+                                        }).setNegativeButton("네", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialogInterface, int i) {
 
-                                            //장소리스트 화면으로 넘어감
-                                            Intent intent = new Intent(MiddlePlaceActivity.this, PlaceListActivity.class);
+                                                //장소리스트 화면으로 넘어감
+                                                Intent intent = new Intent(MiddlePlaceActivity.this, PlaceListActivity.class);
 
-                                            Bundle bundle = new Bundle();
-                                            bundle.putParcelable("midpoint",midP);
-                                            bundle.putString("code", code);
-                                            bundle.putString("scheduleId", scheduleId);
-                                            intent.putExtras(bundle);
-                                            //i.putExtra("midpoint",midP);
-                                            Log.d("Send","meetingname 전달 : "+code);
-                                            startActivity(intent);
-                                        }
-                                    });
+                                                Bundle bundle = new Bundle();
+                                                bundle.putParcelable("midpoint",midP);
+                                                bundle.putString("code", code);
+                                                bundle.putString("scheduleId", scheduleId);
+                                                intent.putExtras(bundle);
+                                                //i.putExtra("midpoint",midP);
+                                                Log.d("Send","meetingname 전달 : "+code);
+                                                startActivity(intent);
+                                            }
+                                        });
 
+                            }
+                            else{
+                                sub_name+="역 입니다.";
+                                SpannableString s = new SpannableString("가장 가까운 역은 "+sub_name +"\n이 곳을 중간지점으로 선택하시겠습니까?\n");
+                                alertDialogBuilder.setMessage(s)
+                                        .setCancelable(false)
+                                        .setPositiveButton("아니오", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialogInterface, int i) {
+                                                //프로그램 종료
+                                                MiddlePlaceActivity.this.finish();
+                                            }
+                                        }).setNegativeButton("네", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialogInterface, int i) {
+
+                                        //장소리스트 화면으로 넘어감
+                                        Intent intent = new Intent(MiddlePlaceActivity.this, PlaceListActivity.class);
+
+                                        Bundle bundle = new Bundle();
+                                        bundle.putParcelable("midpoint",midP);
+                                        bundle.putString("code", code);
+                                        bundle.putString("scheduleId", scheduleId);
+                                        intent.putExtras(bundle);
+                                        //i.putExtra("midpoint",midP);
+                                        Log.d("Send","meetingname 전달 : "+code);
+                                        startActivity(intent);
+                                    }
+                                });
+                            }
                             //다이얼로그 생성
                             AlertDialog alertDialog = alertDialogBuilder.create();
 
@@ -371,7 +410,7 @@ public class MiddlePlaceActivity extends AppCompatActivity implements OnMapReady
                     //mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(midP, 10));
                 }
             });
-            findSub(midP);
+
             //mMap.addMarker(new MarkerOptions().position(midP).icon(BitmapDescriptorFactory.fromBitmap(MidMarker)));
 
 
@@ -1034,6 +1073,7 @@ public class MiddlePlaceActivity extends AppCompatActivity implements OnMapReady
                         name = place.getName();
                     }
                     if (i == size) {
+                        sub_name=name;
                         String markerSnippet = getCurrentAddress(latlng);
 
                         MarkerOptions markerOptions = new MarkerOptions();
