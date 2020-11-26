@@ -37,19 +37,12 @@ public class SignActivity extends BasicActivity {
     private GoogleSignInClient mGoogleSignInClient;
     private static final int RC_SIGN_IN = 9001;
     private SignInButton signInButton;
-    private ImageView img_logo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         setToolbarTitle("우리 지금 만나");
-
-        img_logo = (ImageView)findViewById(R.id.img_logo);
-
-        Glide.with(SignActivity.this)
-                .load(R.drawable.wmn_logo)
-                .into(new GifDrawableImageViewTarget(img_logo, 1));
 
 
         signInButton = findViewById(R.id.signInButton);
@@ -74,28 +67,6 @@ public class SignActivity extends BasicActivity {
             }
         });
 
-    }
-    public class GifDrawableImageViewTarget extends ImageViewTarget<Drawable> {
-
-        private int mLoopCount = GifDrawable.LOOP_FOREVER;
-
-        public GifDrawableImageViewTarget(ImageView view, int loopCount) {
-            super(view);
-            mLoopCount = loopCount;
-        }
-
-        public GifDrawableImageViewTarget(ImageView view, int loopCount, boolean waitForLayout) {
-            super(view, waitForLayout);
-            mLoopCount = loopCount;
-        }
-
-        @Override
-        protected void setResource(@Nullable Drawable resource) {
-            if (resource instanceof GifDrawable) {
-                ((GifDrawable) resource).setLoopCount(mLoopCount);
-            }
-            view.setImageDrawable(resource);
-        }
     }
 
     private void signIn() {

@@ -19,6 +19,8 @@
 
         <activity android:name=".activity.MeetingAttendActivity" />
         <activity android:name=".activity.SignActivity">
+        </activity>
+        <activity android:name=".activity.IntroActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
