@@ -280,12 +280,24 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:layout_margin="4dp"
                 android:orientation="vertical">
                 <Button
                     android:id="@+id/gallery"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:background="@drawable/button_shape"
+                    android:layout_marginBottom="3dp"
                     android:text="갤러리" />
+
+                <Button
+                    android:id="@+id/delete"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:background="@drawable/button_shape"
+                    android:text="삭제" />
             </LinearLayout>
 
         </androidx.cardview.widget.CardView>

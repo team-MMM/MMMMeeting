@@ -305,15 +305,12 @@ public class FragAttend extends Fragment {
         // 출첵 점수 저장
         for(int i=0;i<userList.size();i++) {
             String userName = userList.get(i);
-            System.out.println("지금유저: "+userName);
 
             Iterator iter = attenderSet.iterator();
             while (iter.hasNext()) {
                 String checkUser = (String) iter.next();
-                System.out.println("출첵한사람: " + checkUser);
                 if (userName.equals(checkUser)) {
                     Double point = Double.parseDouble(String.valueOf(attender.get(checkUser)));
-                    System.out.println("내출첵포인트:" + point);
                     tempMap.put(userName, point);
                     break;
                 } else {
@@ -330,10 +327,8 @@ public class FragAttend extends Fragment {
         while (iter.hasNext()) {
             String user = (String) iter.next();
             Double now = tempMap.get(user).doubleValue();
-            System.out.println("지금유저: "+user + "포인트: "+now);
             if(attendMap.get(user)!=null) {
                 Double old = attendMap.get(user).doubleValue();
-                System.out.println("지금유저: "+user + "old포인트: "+old);
                 now += old;
             }
 
@@ -363,65 +358,12 @@ public class FragAttend extends Fragment {
 
                                     String user_name = document.get("name").toString();
 
-
                                     s = new SpannableString(num+"등 ("+attendMap.get(user_id).doubleValue()+"점)");
                                     s.setSpan(new RelativeSizeSpan(1.2f),0,s.length()-8,0);
                                     s.setSpan(new ForegroundColorSpan(Color.BLACK),0,s.length()-8,0);
-                                    CalUserItems item = new CalUserItems(user_name);
+                                    CalUserItems item = new CalUserItems(user_name,user_id);
                                     item.setMoney(s.toString());
                                     adapter.addItem(item);
-
-
-                                    /*
-                                    //LinearLayout 정의
-                                    LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                                            ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-                                    params.setMargins(15, 15, 15, 10);
-
-
-
-
-                                    //LinearLayout 생성
-                                    LinearLayout ly = new LinearLayout(getContext());
-                                    ly.setLayoutParams(params);
-                                    ly.setOrientation(LinearLayout.HORIZONTAL);
-
-
-                                    TextView rank = new TextView(getContext());
-                                    rank.setLayoutParams(params);
-                                    rank.setText(num + "등");
-                                    rank.setTextSize(25);
-                                    rank.setTextColor(Color.BLACK);
-                                    ly.addView(rank);
-
-                                    //ImageView 생성
-                                    LinearLayout ivly = new LinearLayout(getContext());
-                                    ivly.setOrientation(LinearLayout.VERTICAL);
-                                    ivly.setLayoutParams(params);
-
-                                    ImageView iv = new ImageView(getContext());
-                                    iv.setImageResource(R.drawable.user);
-                                    LinearLayout.LayoutParams ivlp = new LinearLayout.LayoutParams(120, 100);
-                                    ivlp.gravity = Gravity.CENTER_VERTICAL | Gravity.CENTER_HORIZONTAL;
-                                    iv.setLayoutParams(ivlp);
-                                    ivly.addView(iv);
-
-                                    TextView tiv = new TextView(getContext());
-                                    tiv.setGravity(Gravity.CENTER_VERTICAL | Gravity.CENTER_HORIZONTAL);
-                                    tiv.setText(user_name);
-                                    ivly.addView(tiv);
-
-                                    ly.addView(ivly);
-
-                                    TextView point = new TextView(getContext());
-                                    point.setLayoutParams(params);
-                                    point.setText("(" + attendMap.get(user_id).doubleValue() + "점)");
-                                    rank.setTextColor(Color.BLACK);
-                                    ly.addView(point);
-
-                                    attend_show.addView(ly);
-
-                                     */
 
                                 }
                             }

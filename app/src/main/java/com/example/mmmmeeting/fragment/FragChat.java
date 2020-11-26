@@ -92,12 +92,60 @@ public class FragChat extends Fragment {
                 //새로 추가된 데이터(값 : MessageItem객체) 가져오기
                 ChatItem messageItem= dataSnapshot.getValue(ChatItem.class);
 
-                //새로운 메세지를 리스뷰에 추가하기 위해 ArrayList에 추가
-                messageItems.add(messageItem);
+                Calendar cal = Calendar.getInstance();
+                Calendar temp = Calendar.getInstance();
 
-                //리스트뷰를 갱신
-                adapter.notifyDataSetChanged();
-                listView.setSelection(messageItems.size()-1); //리스트뷰의 마지막 위치로 스크롤 위치 이동
+                if(messageItems.size() == 0){
+                    cal.setTimeInMillis(messageItem.getTimestamp());
+                    int month = cal.get(Calendar.MONTH);
+                    int day = cal.get(Calendar.DAY_OF_MONTH);
+
+                    ChatItem date = new ChatItem();
+                    int nyear = cal.get(Calendar.YEAR);
+                    date.setId("date");
+                    date.setTime(nyear + "년 " + (month + 1) + "월 " + day + "일");
+                    messageItems.add(date);
+
+                    //새로운 메세지를 리스뷰에 추가하기 위해 ArrayList에 추가
+                    messageItems.add(messageItem);
+
+                }else{
+                    System.out.println(messageItems);
+                    if(messageItems.get(messageItems.size() - 1).getTimestamp() == null){
+                        //새로운 메세지를 리스뷰에 추가하기 위해 ArrayList에 추가
+                        messageItems.add(messageItem);
+                        adapter.notifyDataSetChanged();
+                        listView.setSelection(messageItems.size()-1);
+
+                    }else {
+
+                        cal.setTimeInMillis(messageItems.get(messageItems.size() - 1).getTimestamp());
+                        int year = cal.get(Calendar.YEAR);
+                        int month = cal.get(Calendar.MONTH);
+                        int day = cal.get(Calendar.DAY_OF_MONTH);
+
+                        temp.setTimeInMillis(messageItem.getTimestamp());
+                        int nyear = temp.get(Calendar.YEAR);
+                        int nmonth = temp.get(Calendar.MONTH);
+                        int nday = temp.get(Calendar.DAY_OF_MONTH);
+                        System.out.println("date: " + month + " " + day);
+                        System.out.println("now: " + nmonth + " " + nday);
+
+                        // 마지막 메세지보다 날짜가 지난 경우
+                        if ((year > nyear) || (month > nmonth) || (month == nmonth && day < nday)
+                        || (month == 11 && month == 0)) {
+                            ChatItem date = new ChatItem();
+                            date.setId("date");
+                            date.setTime(nyear + "년 " + (nmonth + 1) + "월 " + nday + "일");
+                            messageItems.add(date);
+                        }
+                        //새로운 메세지를 리스뷰에 추가하기 위해 ArrayList에 추가
+                        messageItems.add(messageItem);
+                        adapter.notifyDataSetChanged();
+                        listView.setSelection(messageItems.size() - 1);
+                    }
+                }
+
             }
 
             @Override

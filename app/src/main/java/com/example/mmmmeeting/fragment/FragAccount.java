@@ -37,6 +37,8 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
+import java.util.ArrayList;
+
 public class FragAccount extends Fragment {
     private View view;
 
@@ -46,6 +48,11 @@ public class FragAccount extends Fragment {
     private int[] money;
     private Button btn_calculate;
     private String meetingCode;
+    ArrayList<String> user_name = new ArrayList<>();
+    ArrayList<String> user_id = new ArrayList<>();
+    ArrayList<String> temp_id = new ArrayList<>();
+    CalUserAdapter adapter;
+    ListView listView;
 
     public static FragAccount newInstance() {
         return new FragAccount();
@@ -57,6 +64,8 @@ public class FragAccount extends Fragment {
         db = FirebaseFirestore.getInstance();
 
         btn_calculate = view.findViewById(R.id.btn_calculate);
+        listView = view.findViewById(R.id.caluser);
+        adapter = new CalUserAdapter();
 
         if(view!=null){
             ViewGroup parentvg = (ViewGroup)view.getParent();
@@ -81,7 +90,9 @@ public class FragAccount extends Fragment {
                     DocumentSnapshot document = task.getResult();
                     if (document.exists()) {
                         // 해당 문서가 존재하는 경우
-                        setLayoutOfAccount(document.getData().get("userID"));
+                        temp_id = (ArrayList<String>) document.getData().get("userID");
+                        setLayoutOfAccount(temp_id);
+                        System.out.println("my");
                         Log.d("Attend", "Data is : " + document.getId());
                     } else {
                         // 존재하지 않는 문서
@@ -97,10 +108,9 @@ public class FragAccount extends Fragment {
         return view;
     }
 
-    public void setLayoutOfAccount(Object userId){
+    public void setLayoutOfAccount(ArrayList<String> userId){
+        System.out.println("userID"+userId);
 
-        final ListView listView = view.findViewById(R.id.caluser);
-        final CalUserAdapter adapter = new CalUserAdapter();
 
         //db에서 모임원들 이름 가져오기
         db.collection("users").get()
@@ -108,18 +118,22 @@ public class FragAccount extends Fragment {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         if (task.isSuccessful()) {
-                            int i = 0;
-                            String[] user_name = new String[task.getResult().size()];
+
                             for (QueryDocumentSnapshot document : task.getResult()) {
-                                if (userId.toString().contains(document.getId())) {
-                                    user_name[i] = document.get("name").toString();
-                                    adapter.addItem(new CalUserItems(user_name[i]));
-                                    Log.d("Document Read", document.getId() + " => " + document.getData());
-                                    i++;
+                                if(userId.equals(document.getId()));
+                                {
+                                    String name = document.get("name").toString();
+                                    user_name.add(name);
+                                    user_id.add(document.getId());
+                                    System.out.println(name);
+                                    CalUserItems item = new CalUserItems(name, document.getId());
+                                    System.out.println(item);
+                                    adapter.addItem(item);
                                 }
                             }
-                            int user_num = i;
 
+
+                            int user_num = user_id.size();
                             listView.setAdapter(adapter);
 
                             //버튼 클릭이벤트 : 정산결과로 넘어감
@@ -153,7 +167,7 @@ public class FragAccount extends Fragment {
                                     }
 
                                     if(sum==0){
-                                        final Snackbar snackbar = Snackbar.make(view, "금액을 입력해주세요.^^", Snackbar.LENGTH_INDEFINITE);
+                                        final Snackbar snackbar = Snackbar.make(view, "금액을 입력해주세요^^", Snackbar.LENGTH_INDEFINITE);
                                         snackbar.setAction("확인", new View.OnClickListener() {
                                             @Override
                                             public void onClick(View v) {
@@ -168,7 +182,8 @@ public class FragAccount extends Fragment {
                                         Bundle bundle = new Bundle();
                                         bundle.putIntArray("pay",money);
                                         bundle.putInt("total",sum);
-                                        bundle.putStringArray("user_name",user_name);
+                                        bundle.putSerializable("user_name",user_name);
+                                        bundle.putSerializable("user_id",user_id);
                                         bundle.putInt("user_num",user_num);
                                         fr.setArguments(bundle);
 

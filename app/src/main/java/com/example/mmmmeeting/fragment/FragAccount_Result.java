@@ -25,16 +25,20 @@ import com.example.mmmmeeting.adapter.CalUserAdapter;
 import com.example.mmmmeeting.adapter.CalUserResultAdapter;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 
 public class FragAccount_Result extends Fragment {
     private View view;
 
     private int[] pay;
-    private String[] user_name;
     private int total;
     private int user_num;
     Button btn_calculate_modify ;
+    ArrayList<String> user_name = new ArrayList<>();
+    ArrayList<String> user_id = new ArrayList<>();
+    ListView listView;
+    CalUserResultAdapter adapter;
 
     public static FragAccount_Result newInstance() {
         return new FragAccount_Result();
@@ -44,12 +48,16 @@ public class FragAccount_Result extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.frag_account_result, container, false);
 
+        listView = view.findViewById(R.id.caluser_result);
+        adapter = new CalUserResultAdapter();
+
         //FragAccount.java에서 정보를 받아온다.
         Bundle args = getArguments();
         if(args!=null){
             System.out.println("번들로 받아오자!");
             pay = args.getIntArray("pay");
-            user_name = args.getStringArray("user_name");
+            user_name = (ArrayList<String>) args.getSerializable("user_name");
+            user_id = (ArrayList<String>) args.getSerializable("user_id");
             total = args.getInt("total");
             user_num = args.getInt("user_num");
         }
@@ -71,15 +79,14 @@ public class FragAccount_Result extends Fragment {
 
         TextView cal_total = view.findViewById(R.id.cal_total);
         cal_total.setText("총 금액 : "+total);
-        cal_total.setTextSize(15);
+        cal_total.setTextSize(20);
 
-        final ListView listView = view.findViewById(R.id.caluser_result);
-        final CalUserResultAdapter adapter = new CalUserResultAdapter();
+
 
         //여기서는 모임원의 수만큼 반복문을 돌면서 정산 결과를 동적 뷰로 생성한다.
         for(int i=0;i<user_num;i++){
 
-            adapter.addItem(new CalUserItems(user_name[i]));
+            adapter.addItem(new CalUserItems(user_name.get(i),user_id.get(i)));
 
             int m = total/user_num-pay[i];
             System.out.println("m값은 :"+m);

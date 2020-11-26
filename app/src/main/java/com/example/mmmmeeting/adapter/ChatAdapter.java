@@ -21,7 +21,10 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import org.w3c.dom.Text;
+
 import java.util.ArrayList;
+import java.util.Calendar;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -60,6 +63,15 @@ public class ChatAdapter extends BaseAdapter {
         ChatItem item=chatItems.get(position);
         View itemView=null;
 
+        // 날짜만 받아왔을 때
+        if(item.getId().equals("date")){
+            itemView= layoutInflater.inflate(R.layout.list_date,viewGroup,false);
+            TextView date = itemView.findViewById(R.id.date);
+            System.out.println("date is: "+item.getTime());
+            date.setText(item.getTime());
+            itemView.setVisibility(itemView.VISIBLE);
+            return itemView;
+        }
 
 
         //메세지가 내 메세지인지 UID로 확인

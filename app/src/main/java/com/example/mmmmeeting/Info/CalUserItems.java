@@ -6,11 +6,13 @@ import android.text.TextWatcher;
 public class CalUserItems {
     private String userName;
     private String money;
+    private String id;
     public TextWatcher mTextWatcher;
 
-    public CalUserItems(String userName){
+    public CalUserItems(String userName, String id){
         this.userName = userName;
         this.money = "0";
+        this.id = id;
 
         //EditText 변경 리스너 생성
         mTextWatcher = new TextWatcher() {
@@ -46,5 +48,14 @@ public class CalUserItems {
     public void setMoney(String money) {
         this.money = money;
     }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id){
+        this.id = id;
+    }
+
 
 }

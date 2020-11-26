@@ -15,10 +15,11 @@
         android:layout_height="wrap_content"
         android:layout_margin="10sp">
 
-        <ImageView
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id = "@+id/profile"
             android:layout_width="60dp"
             android:layout_height="50dp"
-            android:src="@drawable/user"
+            android:src="@drawable/profile"
             android:layout_gravity="center_vertical|center_horizontal"
             />
 

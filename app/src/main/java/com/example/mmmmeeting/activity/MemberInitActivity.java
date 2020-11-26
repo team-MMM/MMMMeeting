@@ -39,6 +39,10 @@ import com.google.firebase.storage.UploadTask;
 import static com.example.mmmmeeting.Util.INTENT_MEDIA;
 import static com.example.mmmmeeting.Util.INTENT_PATH;
 import static com.example.mmmmeeting.Util.GALLERY_IMAGE;
+import static com.example.mmmmeeting.Util.isProfileUrl;
+import static com.example.mmmmeeting.Util.isStorageUrl;
+import static com.example.mmmmeeting.Util.showToast;
+import static com.example.mmmmeeting.Util.storageUrlToName;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -58,6 +62,9 @@ public class MemberInitActivity extends BasicActivity implements View.OnClickLis
     private SharedPreferences sp;
     private ImageView profileImageVIew;
     private String profilePath;
+    private RelativeLayout buttonBackgroundLayout;
+    FirebaseStorage storage = FirebaseStorage.getInstance();
+    StorageReference storageRef = storage.getReference();
 
     FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
     FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -73,6 +80,7 @@ public class MemberInitActivity extends BasicActivity implements View.OnClickLis
         nameTv = (EditText)findViewById(R.id.nameEditText);
 
         profileImageVIew = findViewById(R.id.profileImageView);
+        buttonBackgroundLayout = findViewById(R.id.buttonsBackgroundLayout);
 
         restaurant = findViewById(R.id.restaurantRate);
         cafe = findViewById(R.id.cafetRate);
@@ -80,7 +88,12 @@ public class MemberInitActivity extends BasicActivity implements View.OnClickLis
         park = findViewById(R.id.parkRate);
         act = findViewById(R.id.actRate);
 
+        sp = getSharedPreferences("sp", MODE_PRIVATE);
+
+
         beforeInfo();
+
+        System.out.println("main:"+profilePath);
 
         checkButton.setOnClickListener(this);
         addressSearch.setOnClickListener(this);
@@ -92,12 +105,16 @@ public class MemberInitActivity extends BasicActivity implements View.OnClickLis
         park.setOnRatingBarChangeListener(this);
         act.setOnRatingBarChangeListener(this);
 
+        buttonBackgroundLayout.setOnClickListener(this);
+        findViewById(R.id.delete).setOnClickListener(this);
+        findViewById(R.id.gallery).setOnClickListener(this);
+
 
     }
 
     private void beforeInfo() {
         // 이전 저장 값 보여주기 -> 창 띄울 때 자동으로 띄워져 있게
-        sp = getSharedPreferences("sp", MODE_PRIVATE);
+
         String name = sp.getString("name", "");
         String address = sp.getString("address","");
         float restaurantBar = sp.getFloat("restaurant",0);
@@ -105,23 +122,8 @@ public class MemberInitActivity extends BasicActivity implements View.OnClickLis
         float shoppingBar = sp.getFloat("shopping",0);
         float parkBar = sp.getFloat("park",0);
         float actBar = sp.getFloat("act",0);
+        profilePath = sp.getString("profilePath","");
 
-        if(sp.getString("profilePath","")==null){
-            db.collection("users").document("profilePath")
-                    .get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                @Override
-                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                    if (task.isSuccessful()) {
-                        DocumentSnapshot document = task.getResult();
-                        if (document.exists()) {
-                            profilePath = document.get("profilePath").toString();
-                        }
-                    }
-                }
-            });
-        }else{
-            profilePath = sp.getString("profilePath","");
-        }
 
         // 뷰에 반영
         nameTv.setText(name);
@@ -132,9 +134,12 @@ public class MemberInitActivity extends BasicActivity implements View.OnClickLis
         park.setRating(parkBar);
         act.setRating(actBar);
 
+        if(profilePath.equals("")){
+            profileImageVIew.setImageResource(R.drawable.profile);
 
-        Glide.with(this).load(profilePath).centerCrop().override(500).into(profileImageVIew);
-
+        }else if(profilePath!=null) {
+            Glide.with(this).load(profilePath).centerCrop().override(500).into(profileImageVIew);
+        }
     }
 
 
@@ -173,10 +178,48 @@ public class MemberInitActivity extends BasicActivity implements View.OnClickLis
                 myStartActivity(SearchAddressActivity.class);
                 break;
 
-            case(R.id.profileImageView):
+            case R.id.profileImageView:
+                buttonBackgroundLayout.setVisibility(View.VISIBLE);
+                break;
+
+            case R.id.buttonsBackgroundLayout:
+                buttonBackgroundLayout.setVisibility(View.GONE);
+                break;
+
+            case R.id.gallery:
                 myStartActivity(GalleryActivity.class,GALLERY_IMAGE,0);
                 break;
 
+            case R.id.delete:
+                FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                System.out.println("delpath:"+profilePath);
+                if(isProfileUrl(profilePath)){
+                    final StorageReference mountainImagesRef = storageRef.child("users/" + user.getUid() + "/profileImage.jpg");
+                    mountainImagesRef.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid) {
+                            showToast(MemberInitActivity.this,"프로필 사진을 삭제하였습니다.");
+                            db.collection("users").document(user.getUid())
+                                    .update("profilePath","");
+                            profilePath = "";
+                            System.out.println("db:"+profilePath);
+                            profileImageVIew.setImageResource(R.drawable.profile);
+                            buttonBackgroundLayout.setVisibility(View.GONE);
+                        }
+                    }).addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception exception) {
+                            showToast(MemberInitActivity.this,"프로필 사진 삭제에 실패하였습니다.");
+                        }
+                    });
+                }else{
+                    // 방금 올린 사진일 때
+                    profilePath = "";
+                    System.out.println("del:"+profilePath);
+                    profileImageVIew.setImageResource(R.drawable.profile);
+                    buttonBackgroundLayout.setVisibility(View.GONE);
+                }
+                break;
         }
     }
 
@@ -186,8 +229,6 @@ public class MemberInitActivity extends BasicActivity implements View.OnClickLis
         String address = ((TextView)findViewById(R.id.addressText)).getText().toString();
         String name = ((EditText)findViewById(R.id.nameEditText)).getText().toString();
 
-        FirebaseStorage storage = FirebaseStorage.getInstance();
-        StorageReference storageRef = storage.getReference();
 
         // 멤버 정보 객체 생성 -> db저장
         MemberInfo memberInfo = new MemberInfo(name, address);
@@ -201,6 +242,10 @@ public class MemberInitActivity extends BasicActivity implements View.OnClickLis
 
         if (user != null) {
             if (profilePath != null) {
+                if(profilePath.equals("")){
+                    storeUploader(memberInfo);
+                }
+                System.out.println(profilePath);
                 System.out.println("profile");
                 final StorageReference mountainImagesRef = storageRef.child("users/" + user.getUid() + "/profileImage.jpg");
                 try {
@@ -220,6 +265,7 @@ public class MemberInitActivity extends BasicActivity implements View.OnClickLis
                             if (task.isSuccessful()) {
                                 Uri downloadUri = task.getResult();
                                 memberInfo.setProfilePath(downloadUri.toString());
+                                System.out.println("profilepath"+downloadUri.toString());
                                 storeUploader(memberInfo);
                             } else {
                                 startToast("이미지 업로드가 실패하였습니다.");
@@ -243,7 +289,6 @@ public class MemberInitActivity extends BasicActivity implements View.OnClickLis
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
-                        sp = getSharedPreferences("sp", MODE_PRIVATE);
                         SharedPreferences.Editor editor = sp.edit(); // editor 사용해 저장
 
                         // 사용자 입력 값 입력
@@ -254,7 +299,13 @@ public class MemberInitActivity extends BasicActivity implements View.OnClickLis
                         editor.putFloat("shopping", shopping.getRating());
                         editor.putFloat("park", park.getRating());
                         editor.putFloat("act", act.getRating());
-                        editor.putString("profilePath",memberInfo.getProfilePath());
+                        if(memberInfo.getProfilePath()!=null) {
+                            System.out.println(memberInfo.getProfilePath());
+                            editor.putString("profilePath", memberInfo.getProfilePath());
+                        }else{
+                            editor.remove("profilePath");
+                            System.out.println("remove");
+                        }
 
                         editor.commit(); // 저장 반영
                         startToast("회원정보 등록에 성공하였습니다.");
@@ -318,6 +369,7 @@ public class MemberInitActivity extends BasicActivity implements View.OnClickLis
             profilePath = data.getStringExtra(INTENT_PATH);
             System.out.println(profilePath);
             Glide.with(this).load(profilePath).centerCrop().override(500).into(profileImageVIew);
+            buttonBackgroundLayout.setVisibility(View.GONE);
         }
 
 

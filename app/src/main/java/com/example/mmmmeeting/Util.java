@@ -23,6 +23,10 @@ public class Util {
         return Patterns.WEB_URL.matcher(url).matches() && url.contains("https://firebasestorage.googleapis.com/v0/b/mmm-meeting.appspot.com/o/post");
     }
 
+    public static boolean isProfileUrl(String url){
+        return Patterns.WEB_URL.matcher(url).matches() && url.contains("https://firebasestorage.googleapis.com/v0/b/mmm-meeting.appspot.com/o/users");
+    }
+
     public static String storageUrlToName(String url){
         return url.split("\\?")[0].split("%2F")[url.split("\\?")[0].split("%2F").length - 1];
     }
