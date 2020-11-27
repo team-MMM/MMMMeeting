@@ -22,6 +22,7 @@ import android.widget.CalendarView;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.text.method.ScrollingMovementMethod;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -116,6 +117,8 @@ public class CalendarActivity extends BasicActivity {
         sel_Btn=findViewById(R.id.sel_Btn);
         memotext=findViewById(R.id.memotext);
         contextEditText=findViewById(R.id.contextEditText);
+
+        memotext.setMovementMethod(new ScrollingMovementMethod());
 
         db = FirebaseFirestore.getInstance();
         Intent intent = getIntent();
