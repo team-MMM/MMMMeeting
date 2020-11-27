@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.example.mmmmeeting.R;
@@ -72,7 +73,7 @@ public class MeetingRoomListAdapter extends BaseAdapter {
         descriptText.setText(listItem.getDescription());
         nameText.setText(listItem.getName());
 
-        LinearLayout gridItem = (LinearLayout) convertView.findViewById(R.id.meetingRoomItem);
+        RelativeLayout gridItem = (RelativeLayout) convertView.findViewById(R.id.meetingRoomItem);
 
         // 다음 액티비티 넘어가게
         gridItem.setOnClickListener(new View.OnClickListener() {

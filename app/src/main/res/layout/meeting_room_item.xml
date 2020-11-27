@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -9,26 +10,38 @@
     android:background="@drawable/rounded"
     android:padding="10dp"
     >
+
+        <ImageView
+            android:id="@+id/imageView2"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_marginBottom="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="10dp"
+            android:background="@mipmap/ic_launcher_new" />
+
         <TextView
             android:id="@+id/roomName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_margin="8sp"
+            android:layout_toRightOf="@id/imageView2"
             android:hint="모임 이름"
-            android:layout_margin="10sp"
             android:textColor="@android:color/black"
-            android:textStyle="bold"
             android:textSize="20sp"
-            />
+            android:textStyle="bold" />
 
         <TextView
             android:id="@+id/roomDescription"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/roomName"
-            android:layout_marginLeft="10sp"
-            android:layout_marginBottom="10sp"
+            android:layout_marginLeft="8sp"
+            android:layout_marginBottom="8sp"
+            android:layout_toRightOf="@id/imageView2"
             android:hint="모임 설명"
             android:textColor="@android:color/black"
             android:textSize="15sp"
             />
-</LinearLayout>
+</RelativeLayout>

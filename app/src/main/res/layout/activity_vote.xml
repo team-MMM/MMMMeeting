@@ -27,6 +27,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="투표를 하셨으면 완료버튼을 눌러주세요 !"
+            android:textSize="18dp"
             android:layout_margin="22dp" />
 
     </LinearLayout>
