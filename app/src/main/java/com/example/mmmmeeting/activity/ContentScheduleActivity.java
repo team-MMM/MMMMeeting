@@ -16,12 +16,12 @@ import com.example.mmmmeeting.Info.ScheduleInfo;
 import com.example.mmmmeeting.OnScheduleListener;
 import com.example.mmmmeeting.R;
 import com.example.mmmmeeting.ScheduleDeleter;
-import com.example.mmmmeeting.view.ReadScheduleView;
+import com.example.mmmmeeting.view.ReadScheduleView.new;
 
 public class ContentScheduleActivity extends BasicActivity implements View.OnClickListener {
     private ScheduleInfo scheduleInfo;
     private ScheduleDeleter boardDeleter;
-    private ReadScheduleView readContentsVIew;
+    private ReadScheduleView_new readContentsVIew;
     private LinearLayout contentsLayout;
     Button btn_calendar, btn_place, btn_attendance;
     String code;
@@ -36,7 +36,7 @@ public class ContentScheduleActivity extends BasicActivity implements View.OnCli
         code = scheduleInfo.getMeetingID();
 
         contentsLayout = findViewById(R.id.contentsLayout);
-        readContentsVIew = findViewById(R.id.readScheduleView);
+        readContentsVIew = findViewById(R.id.readScheduleView_new);
 
         btn_calendar = findViewById(R.id.calendarBtn);
         btn_place = findViewById(R.id.placeBtn);
