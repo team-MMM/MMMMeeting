@@ -242,38 +242,40 @@ public class MemberInitActivity extends BasicActivity implements View.OnClickLis
 
         if (user != null) {
             if (profilePath != null) {
-                if(profilePath.equals("")){
+                if(profilePath.equals("") || isProfileUrl(profilePath)){
+                    memberInfo.setProfilePath(profilePath);
                     storeUploader(memberInfo);
-                }
-                System.out.println(profilePath);
-                System.out.println("profile");
-                final StorageReference mountainImagesRef = storageRef.child("users/" + user.getUid() + "/profileImage.jpg");
-                try {
-                    InputStream stream = new FileInputStream(new File(profilePath));
-                    UploadTask uploadTask = mountainImagesRef.putStream(stream);
-                    uploadTask.continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
-                        @Override
-                        public Task<Uri> then(@NonNull Task<UploadTask.TaskSnapshot> task) throws Exception {
-                            if (!task.isSuccessful()) {
-                                throw task.getException();
+                }else{
+                    System.out.println(profilePath);
+                    System.out.println("profile");
+                    final StorageReference mountainImagesRef = storageRef.child("users/" + user.getUid() + "/profileImage.jpg");
+                    try {
+                        InputStream stream = new FileInputStream(new File(profilePath));
+                        UploadTask uploadTask = mountainImagesRef.putStream(stream);
+                        uploadTask.continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
+                            @Override
+                            public Task<Uri> then(@NonNull Task<UploadTask.TaskSnapshot> task) throws Exception {
+                                if (!task.isSuccessful()) {
+                                    throw task.getException();
+                                }
+                                return mountainImagesRef.getDownloadUrl();
                             }
-                            return mountainImagesRef.getDownloadUrl();
-                        }
-                    }).addOnCompleteListener(new OnCompleteListener<Uri>() {
-                        @Override
-                        public void onComplete(@NonNull Task<Uri> task) {
-                            if (task.isSuccessful()) {
-                                Uri downloadUri = task.getResult();
-                                memberInfo.setProfilePath(downloadUri.toString());
-                                System.out.println("profilepath"+downloadUri.toString());
-                                storeUploader(memberInfo);
-                            } else {
-                                startToast("이미지 업로드가 실패하였습니다.");
+                        }).addOnCompleteListener(new OnCompleteListener<Uri>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Uri> task) {
+                                if (task.isSuccessful()) {
+                                    Uri downloadUri = task.getResult();
+                                    memberInfo.setProfilePath(downloadUri.toString());
+                                    System.out.println("profilepath"+downloadUri.toString());
+                                    storeUploader(memberInfo);
+                                } else {
+                                    startToast("이미지 업로드가 실패하였습니다.");
+                                }
                             }
-                        }
-                    });
-                } catch (FileNotFoundException e) {
-                    Log.e("로그", "에러: " + e.toString());
+                        });
+                    } catch (FileNotFoundException e) {
+                        Log.e("로그", "에러: " + e.toString());
+                    }
                 }
             } else {
                 storeUploader(memberInfo);
