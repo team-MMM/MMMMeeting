@@ -836,11 +836,13 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
                 //System.out.println(distancePoint);
                 float rat = ratingMap.get(j).floatValue();
 
-                if(radius < 1000){
+                if(radius == 500){
+                    ratingMap.put(j, rat);
+                }else if(500 < radius && radius <= 1000){
                     // rating 점수 + 거리 점수의 가중치를 [0.1:0.3]으로 환산한 최종 점수
                     ratingMap.put(j,(float)(0.1 * rat + 0.3 * distancePoint));
                 }
-                else if(radius < 2000){
+                else if(1000 < radius && radius <= 2000){
                     ratingMap.put(j,(float)(0.1 * rat + 0.1 * distancePoint));
                 }else{
                     ratingMap.put(j,(float)(0.3 * rat + 0.1 * distancePoint));
@@ -1081,8 +1083,21 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
         } catch (JSONException e) {
             e.printStackTrace();
             System.out.println("No Result");
-            Toast.makeText(this, "현재 범위 내에 검색 결과가 없습니다.", Toast.LENGTH_SHORT).show();
+            //Toast.makeText(this, "현재 범위 내에 검색 결과가 없습니다.", Toast.LENGTH_SHORT).show();
+            LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+            lp.gravity = Gravity.CENTER;
+            lp.setMargins(10,100,10,10);
 
+            TextView view1 = new TextView(PlaceListActivity.this);
+            view1.setText("중간지점 근처에\n현재 카테고리에 해당하는 장소가\n존재하지 않습니다.\n\n범위를 늘려보세요!");
+            view1.setTextSize(20f);
+            view1.setTextColor(Color.BLACK);
+            view1.setBackgroundColor(Color.WHITE);
+            view1.setGravity(Gravity.CENTER);
+            view1.setPadding(20,50,20,20);
+            view1.setLayoutParams(lp);
+            //부모 뷰에 추가
+            place_list_view.addView(view1);
         }catch(NullPointerException e){
             e.printStackTrace();
         }
