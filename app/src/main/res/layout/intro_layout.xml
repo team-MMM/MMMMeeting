@@ -9,9 +9,9 @@
     <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="50dp"
+        android:layout_margin="60dp"
         android:paddingTop="160dp"
-        android:paddingBottom="160dp"
+        android:paddingBottom="170dp"
         android:scaleType="fitXY"
         android:src="@drawable/logo_mmm"/>
 
