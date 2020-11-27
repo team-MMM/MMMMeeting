@@ -31,6 +31,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="@drawable/button_shape"
+        android:textColor="@android:color/white"
         android:layout_margin="20sp"
         android:padding="15sp"
         android:text="초대문자 보내기"

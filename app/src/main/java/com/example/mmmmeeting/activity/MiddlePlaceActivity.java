@@ -107,6 +107,7 @@ public class MiddlePlaceActivity extends AppCompatActivity implements OnMapReady
     private LatLng curPoint = new LatLng(37.56593052663891, 126.97680764976288);
 
     private String str_url;
+    private String midAdr;
 
     private double latVector, lonVector;
     private int avgTime;
@@ -266,24 +267,33 @@ public class MiddlePlaceActivity extends AppCompatActivity implements OnMapReady
             clustering(address, m_name); // 중간지점 찾기 시작
             runOnUiThread(new Runnable(){
                 public void run(){
-                    BitmapDrawable bitmapdraw2 = (BitmapDrawable) getResources().getDrawable(R.drawable.mid);
-                    Bitmap b = bitmapdraw2.getBitmap();
-                    Bitmap MidMarker = Bitmap.createScaledBitmap(b, 100, 100, false);
-                    if(findSub_flg==false) {
-                        mMap.addMarker(new MarkerOptions().position(midP).icon(BitmapDescriptorFactory.fromBitmap(MidMarker)));
-                    }
+
+
                     BitmapDrawable bitmapdraw1 = (BitmapDrawable) getResources().getDrawable(R.drawable.user);
-                    b = bitmapdraw1.getBitmap();
+                    Bitmap b = bitmapdraw1.getBitmap();
                     Bitmap UserMarker = Bitmap.createScaledBitmap(b, 100, 100, false);
 
                     for (int k = 0; k < address.length; k++) {
                         mMap.addMarker(new MarkerOptions().position(new LatLng(users[k].getX(), users[k].getY())).icon(BitmapDescriptorFactory.fromBitmap(UserMarker)));
                     }
 
-                    String midAdr = getCurrentAddress(midP);
+                    midAdr = getCurrentAddress(midP);
                     //##
                     //String midAdr = "서울특별시 상계8동 동일로 1545";
                     findSub(midP);
+
+                    if(sub_name==null){
+                        BitmapDrawable bitmapdraw3 = (BitmapDrawable) getResources().getDrawable(R.drawable.middleplace);
+                        Bitmap bit = bitmapdraw3.getBitmap();
+                        Bitmap MidMarker = Bitmap.createScaledBitmap(bit, 100, 100, false);
+
+                        MarkerOptions markerOptions = new MarkerOptions();
+                        markerOptions.position(midP);
+                        markerOptions.title("중간지점");
+                        markerOptions.snippet(midAdr).icon(BitmapDescriptorFactory.fromBitmap(MidMarker));
+                        mMap.addMarker(markerOptions);
+                        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(midP, 10));
+                    }
 
                     //LinearLayout 정의
                     LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
@@ -319,6 +329,7 @@ public class MiddlePlaceActivity extends AppCompatActivity implements OnMapReady
                     btn_params.setMargins(0,0,30,0);
                     btn_mid.setLayoutParams(btn_params);
                     btn_mid.setBackground(getDrawable(R.drawable.button_shape));
+                    btn_mid.setTextColor(Color.WHITE);
                     ly.addView(btn_mid);
 
 
@@ -1029,6 +1040,7 @@ public class MiddlePlaceActivity extends AppCompatActivity implements OnMapReady
         }
         else{
             findSub_flg=false;
+
         }
     }
 
@@ -1074,6 +1086,7 @@ public class MiddlePlaceActivity extends AppCompatActivity implements OnMapReady
                     }
                     if (i == size) {
                         sub_name=name;
+
                         String markerSnippet = getCurrentAddress(latlng);
 
                         MarkerOptions markerOptions = new MarkerOptions();

@@ -39,6 +39,7 @@
         android:id="@+id/btn_calculate_modify"
         android:layout_below="@+id/toolbar"
         android:background="@drawable/button_shape"
+        android:textColor="@android:color/white"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="수정"

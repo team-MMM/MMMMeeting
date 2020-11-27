@@ -71,6 +71,7 @@
             android:layout_alignParentRight="true"
             android:layout_toRightOf="@+id/addressText"
             android:background="@drawable/button_shape"
+            android:textColor="@android:color/white"
             />
 
     </RelativeLayout>
@@ -257,6 +258,7 @@
         android:layout_height="wrap_content"
         android:layout_margin="20sp"
         android:background="@drawable/button_shape"
+        android:textColor="@android:color/white"
         android:text="저장"/>
 
         </LinearLayout>
@@ -288,6 +290,7 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:background="@drawable/button_shape"
+                    android:textColor="@android:color/white"
                     android:layout_marginBottom="3dp"
                     android:text="갤러리" />
 
@@ -297,6 +300,7 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:background="@drawable/button_shape"
+                    android:textColor="@android:color/white"
                     android:text="삭제" />
             </LinearLayout>
 

@@ -48,6 +48,10 @@
 
     </LinearLayout>
 
+    <FrameLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
     <ListView
         android:id="@+id/meetingRoomList"
         android:layout_width="match_parent"
@@ -56,5 +60,17 @@
         android:divider="#00000000"
         android:padding="20dp"
         />
+
+        <TextView
+            android:id="@+id/text"
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:gravity="center"
+            android:textColor="#6C6C6C"
+            android:lineSpacingExtra="8dp"
+            android:textSize="18sp" />
+
+    </FrameLayout>
 </LinearLayout>
+
 

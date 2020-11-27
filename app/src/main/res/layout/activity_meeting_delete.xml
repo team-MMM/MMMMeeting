@@ -33,6 +33,7 @@
         android:layout_height="wrap_content"
         android:layout_margin="20dp"
         android:background="@drawable/button_shape"
+        android:textColor="@android:color/white"
         android:padding="10sp"
         android:text="모임 탈퇴" />
 

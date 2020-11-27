@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!--배경색-->
+    <solid android:color="@android:color/white" />
+
+    <!--선-->
+    <stroke
+        android:width="3sp"
+        android:color="@color/colorPrimary" />
+
+    <!--배경-->
+<!--    <solid android:color="@color/colorPrimary" />-->
+
+    <!--여백-->
+    <padding
+        android:bottom="2sp"
+        android:left="2sp"
+        android:right="2sp"
+        android:top="2sp" />
+
+    <!--둥글게-->
+    <corners
+        android:topLeftRadius="10sp"
+        android:topRightRadius="10sp"
+        android:bottomLeftRadius="10sp"
+        android:bottomRightRadius="10sp"  />
+
+</shape>

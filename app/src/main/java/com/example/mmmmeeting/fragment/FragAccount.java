@@ -37,7 +37,6 @@ public class FragAccount extends Fragment {
     private String meetingCode;
     ArrayList<String> user_name = new ArrayList<>();
     ArrayList<String> user_id = new ArrayList<>();
-    ArrayList<String> temp_id = new ArrayList<>();
     CalUserAdapter adapter;
     ListView listView;
 
@@ -77,9 +76,7 @@ public class FragAccount extends Fragment {
                     DocumentSnapshot document = task.getResult();
                     if (document.exists()) {
                         // 해당 문서가 존재하는 경우
-                        temp_id = (ArrayList<String>) document.getData().get("userID");
-                        setLayoutOfAccount(temp_id);
-                        System.out.println("my");
+                        setLayoutOfAccount((ArrayList<String>) document.getData().get("userID"));
                         Log.d("Attend", "Data is : " + document.getId());
                     } else {
                         // 존재하지 않는 문서
@@ -97,7 +94,7 @@ public class FragAccount extends Fragment {
 
     public void setLayoutOfAccount(ArrayList<String> userId){
         System.out.println("userID"+userId);
-
+        Log.d("Account debug", "get userId" + userId);
 
         //db에서 모임원들 이름 가져오기
         db.collection("users").get()
@@ -107,14 +104,13 @@ public class FragAccount extends Fragment {
                         if (task.isSuccessful()) {
 
                             for (QueryDocumentSnapshot document : task.getResult()) {
-                                if(userId.equals(document.getId()));
-                                {
+                                if(userId.toString().contains(document.getId())) {
                                     String name = document.get("name").toString();
                                     user_name.add(name);
                                     user_id.add(document.getId());
-                                    System.out.println(name);
+                                    Log.d("Account debug", "get name" + name);
                                     CalUserItems item = new CalUserItems(name, document.getId());
-                                    System.out.println(item);
+                                    Log.d("Account debug", "get item" + item);
                                     adapter.addItem(item);
                                 }
                             }
