@@ -528,7 +528,7 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
             float point =  Float.valueOf(String.valueOf(best.get(userID)));
 
             if(point == 0 ){
-                point=0.07f;
+                point=0.09f;
             }
             else if(point == -1){
                 point = 0.03f;
@@ -542,6 +542,9 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
             }
 
             attendPoint.add(point);
+        }
+        else {
+            attendPoint.add(0.09f);
         }
 
         // 배열에 저장
@@ -584,6 +587,9 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
         Log.d(Tag, "original variance" + Arrays.toString(variance));
         Log.d(Tag, "sort variance" + Arrays.toString(temp));
 
+        Log.d(Tag, "attend point" + attendPoint.toString());
+
+
         int n = temp.length;
         double m;
 
@@ -597,6 +603,9 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
 
         //가중치 적용
         for(int i=0; i< userRatings.size(); i++){
+
+            Log.d(Tag, "Start rating is update " + Arrays.toString(userRatings.get(i)));
+
             // 호불호 업데이트
             if (variance[i] > m) { // 사용자 분산이 분산의 중앙값보다 크면
                 // 사용자 별점 업데이트
@@ -613,8 +622,9 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
                     rating[j] = rating[j]*attendPoint.get(i);
                 }
                 userRatings.set(i,rating);
+                Log.d(Tag, "~~ attend update (존재 유저)" + Arrays.toString(userRatings.get(i)));
             }
-            Log.d(Tag, "~~ attend update " + Arrays.toString(userRatings.get(i)));
+
         }
 
     }
