@@ -67,6 +67,7 @@
                 android:layout_height="wrap_content"
                 android:layout_margin="10sp"
                 android:background="@drawable/button_shape"
+                android:textColor="@android:color/white"
                 android:layout_gravity="center"
                 android:text="확인" />
 
@@ -102,6 +103,7 @@
                     android:layout_height="match_parent"
                     android:layout_gravity="center"
                     android:background="@drawable/button_shape"
+                    android:textColor="@android:color/white"
                     android:text="삭제" />
 
             </LinearLayout>

@@ -38,7 +38,7 @@
         android:layout_marginTop="20dp"
         android:background="@drawable/button_shape"
         android:text="출석체크"
-        android:textColor="@color/colorAccent" />
+        android:textColor="@android:color/white" />
 
 
 </LinearLayout>

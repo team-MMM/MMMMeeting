@@ -16,7 +16,7 @@ import com.example.mmmmeeting.Info.ScheduleInfo;
 import com.example.mmmmeeting.OnScheduleListener;
 import com.example.mmmmeeting.R;
 import com.example.mmmmeeting.ScheduleDeleter;
-import com.example.mmmmeeting.view.ReadScheduleView.new;
+import com.example.mmmmeeting.view.ReadScheduleView_new;
 
 public class ContentScheduleActivity extends BasicActivity implements View.OnClickListener {
     private ScheduleInfo scheduleInfo;

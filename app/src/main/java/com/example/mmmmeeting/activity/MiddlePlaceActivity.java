@@ -319,6 +319,7 @@ public class MiddlePlaceActivity extends AppCompatActivity implements OnMapReady
                     btn_params.setMargins(0,0,30,0);
                     btn_mid.setLayoutParams(btn_params);
                     btn_mid.setBackground(getDrawable(R.drawable.button_shape));
+                    btn_mid.setTextColor(Color.WHITE);
                     ly.addView(btn_mid);
 
 

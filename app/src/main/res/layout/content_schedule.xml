@@ -46,6 +46,7 @@
                 android:layout_gravity="center_horizontal"
                 android:layout_margin="20sp"
                 android:background="@drawable/button_shape"
+                android:textColor="@android:color/white"
                 android:ems="10"
                 android:text="언제?"
                 android:textSize="20sp" />
@@ -59,7 +60,9 @@
                 android:ems="10"
                 android:text="어디서?"
                 android:textSize="20sp"
-                android:background="@drawable/button_shape" />
+                android:background="@drawable/button_shape"
+                android:textColor="@android:color/white"
+                />
 
             <Button
                 android:id="@+id/attendanceBtn"
@@ -69,7 +72,8 @@
                 android:layout_marginTop="20dp"
                 android:background="@drawable/button_shape"
                 android:text="출석체크"
-                android:textColor="@color/colorAccent" />
+                android:textColor="@android:color/white"
+                />
         </LinearLayout>
     </LinearLayout>
 
