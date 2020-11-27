@@ -23,26 +23,34 @@
         android:layout_centerHorizontal="true"
         />
 
+    <TextView
+        android:id="@+id/alarm"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/schedule_name"
+        android:layout_centerHorizontal="true"
+        android:text="약속을 길게 누르면 미리 알람을 받을 수 있습니다!"
+        android:textColor="#606060"
+        android:textSize="15sp" />
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_below="@+id/schedule_name"
-            android:layout_marginTop="10dp">
-
+            android:layout_below="@+id/alarm"
+            android:layout_marginTop="18dp">
         </androidx.recyclerview.widget.RecyclerView>
 
     <TextView
         android:id="@+id/text"
         android:layout_width="match_parent"
         android:layout_height="239dp"
-        android:layout_marginBottom="120dp"
-        android:layout_marginStart="0dp"
-        android:layout_marginTop="110dp"
+        android:layout_below="@+id/alarm"
         android:gravity="center"
         android:lineSpacingExtra="8dp"
         android:textColor="#6C6C6C"
-        android:textSize="18sp" />
+        android:textSize="18sp"
+        android:layout_marginTop="18dp"/>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/write_schedule"
