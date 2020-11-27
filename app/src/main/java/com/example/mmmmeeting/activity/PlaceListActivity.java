@@ -878,12 +878,11 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
                 fl_place_list.setPadding(20,10,0,30);
 
 
-                RelativeLayout.LayoutParams rl_param = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams rl_param = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
                         ViewGroup.LayoutParams.WRAP_CONTENT);
-
-                RelativeLayout pl_name = new RelativeLayout(PlaceListActivity.this);
+                LinearLayout pl_name = new LinearLayout(PlaceListActivity.this);
                 pl_name.setLayoutParams(rl_param);
-
+                pl_name.setOrientation(LinearLayout.HORIZONTAL);
 
                 String placeAddress = getCurrentAddress(placeList[ratingList.get(j)]);
                 //장소 이름, 주소 출력부분
@@ -892,30 +891,31 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
                 s.setSpan(new RelativeSizeSpan(1.8f),0,place_name[ratingList.get(j)].length(),0);
                 s.setSpan(new ForegroundColorSpan(Color.BLACK),0,place_name[ratingList.get(j)].length(),0);
                 pInfo.setText(s);
-                pInfo.setLayoutParams(rl_param);
+                LinearLayout.LayoutParams text_param = new LinearLayout.LayoutParams(850,ViewGroup.LayoutParams.WRAP_CONTENT);
+                pInfo.setLayoutParams(text_param);
                 pl_name.addView(pInfo);
-
-                //삭제버튼
-                Button delete = new Button(PlaceListActivity.this);
-                RelativeLayout.LayoutParams btn_param2 = new RelativeLayout.LayoutParams(90, 90);
-                btn_param2.addRule(RelativeLayout.ALIGN_PARENT_RIGHT, RelativeLayout.TRUE);
-                btn_param2.setMargins(0,0,20,0);
-                delete.setLayoutParams(btn_param2);
-                delete.setPadding(0, 20, 5, 0);
-                delete.setId(2*(i + 1));
-                delete.setBackground(ContextCompat.getDrawable(PlaceListActivity.this, R.drawable.delete));
-                pl_name.addView(delete);
 
                 //추가버튼
                 Button add = new Button(PlaceListActivity.this);
-                RelativeLayout.LayoutParams btn_param = new RelativeLayout.LayoutParams(90, 90);
-                btn_param.addRule(RelativeLayout.LEFT_OF, delete.getId());
+                LinearLayout.LayoutParams btn_param = new LinearLayout.LayoutParams(90, 90);
+//                btn_param.addRule(RelativeLayout.LEFT_OF, delete.getId());
                 btn_param.setMargins(0,0,10,0);
                 add.setLayoutParams(btn_param);
                 add.setPadding(0, 20, 5, 0);
                 add.setId(2*i + 1);
                 add.setBackground(ContextCompat.getDrawable(PlaceListActivity.this, R.drawable.add_location));
                 pl_name.addView(add);
+
+                //삭제버튼
+                Button delete = new Button(PlaceListActivity.this);
+                LinearLayout.LayoutParams btn_param2 = new LinearLayout.LayoutParams(90, 90);
+//                btn_param2.addRule(RelativeLayout.ALIGN_PARENT_RIGHT, RelativeLayout.TRUE);
+                btn_param2.setMargins(0,0,20,0);
+                delete.setLayoutParams(btn_param2);
+                delete.setPadding(0, 20, 5, 0);
+                delete.setId(2*(i + 1));
+                delete.setBackground(ContextCompat.getDrawable(PlaceListActivity.this, R.drawable.delete));
+                pl_name.addView(delete);
 
                 fl_place_list.addView(pl_name);
 
