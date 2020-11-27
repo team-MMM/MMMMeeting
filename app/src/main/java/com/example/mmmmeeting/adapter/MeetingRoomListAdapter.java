@@ -11,7 +11,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.example.mmmmeeting.R;
-import com.example.mmmmeeting.Info.GridItems;
+import com.example.mmmmeeting.Info.MeetingRoomItems;
 import com.example.mmmmeeting.activity.MeetingActivity;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -23,13 +23,13 @@ import java.util.ArrayList;
 
 import androidx.annotation.NonNull;
 
-public class GridListAdapter extends BaseAdapter {
-    ArrayList<GridItems> items = new ArrayList<GridItems>();
+public class MeetingRoomListAdapter extends BaseAdapter {
+    ArrayList<MeetingRoomItems> items = new ArrayList<MeetingRoomItems>();
     Context context; // activity 정보 저장
     String code;
 
     // 아이템 추가
-    public  void addItem(GridItems item) {
+    public  void addItem(MeetingRoomItems item) {
         items.add(item);
     }
 
@@ -56,12 +56,12 @@ public class GridListAdapter extends BaseAdapter {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         context = parent.getContext(); // activity 정보 읽기
-        GridItems listItem = items.get(position); //position 해당하는 listItem
+        MeetingRoomItems listItem = items.get(position); //position 해당하는 listItem
 
         //list_item inflate => convertView 참조
         if(convertView==null){
             LayoutInflater inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            convertView = inflater.inflate(R.layout.my_meeting_grid_item,parent,false);
+            convertView = inflater.inflate(R.layout.meeting_room_item,parent,false);
         }
 
         // 텍스트뷰 설정
@@ -72,7 +72,7 @@ public class GridListAdapter extends BaseAdapter {
         descriptText.setText(listItem.getDescription());
         nameText.setText(listItem.getName());
 
-        LinearLayout gridItem = (LinearLayout) convertView.findViewById(R.id.gridItem);
+        LinearLayout gridItem = (LinearLayout) convertView.findViewById(R.id.meetingRoomItem);
 
         // 다음 액티비티 넘어가게
         gridItem.setOnClickListener(new View.OnClickListener() {

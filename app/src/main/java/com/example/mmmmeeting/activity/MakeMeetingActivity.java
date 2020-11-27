@@ -10,7 +10,6 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
-import com.example.mmmmeeting.Info.GridItems;
 import com.example.mmmmeeting.Info.MeetingInfo;
 import com.example.mmmmeeting.R;
 import com.google.android.gms.tasks.OnCompleteListener;

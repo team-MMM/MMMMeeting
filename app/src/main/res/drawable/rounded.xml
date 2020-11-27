@@ -9,10 +9,10 @@
         android:right="5dp"
         android:bottom="5dp" />
 
-    <solid android:color="@color/colorPrimary" />
+<!--    <solid android:color="@color/colorPrimary" />-->
 
     <stroke
-        android:width="3dip"
+        android:width="4dp"
         android:color="@color/colorPrimary" />
 
 </shape>

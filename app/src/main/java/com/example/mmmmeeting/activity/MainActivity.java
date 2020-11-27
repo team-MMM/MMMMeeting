@@ -9,14 +9,14 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.GridView;
+import android.widget.ListView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
-import com.example.mmmmeeting.Info.GridItems;
+import com.example.mmmmeeting.Info.MeetingRoomItems;
 import com.example.mmmmeeting.R;
-import com.example.mmmmeeting.adapter.GridListAdapter;
+import com.example.mmmmeeting.adapter.MeetingRoomListAdapter;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -59,8 +59,8 @@ public class MainActivity extends BasicActivity implements View.OnClickListener 
     // 모임 목록을 보여줌
     private void showMeetings(){
         final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        final GridView gridView = findViewById(R.id.gridView);
-        final GridListAdapter adapter = new GridListAdapter();
+        final ListView gridView = findViewById(R.id.meetingRoomList);
+        final MeetingRoomListAdapter adapter = new MeetingRoomListAdapter();
 
         mAuth = FirebaseAuth.getInstance();
         FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -79,7 +79,7 @@ public class MainActivity extends BasicActivity implements View.OnClickListener 
                                 if(document.getData().get("userID").toString().contains(user.getUid())){
                                     // 현재 유저가 존재하는 모임을 찾은 경우
                                     // adapter에 모임에 대한 정보를 갖는 객체 생성해 저장
-                                    adapter.addItem(new GridItems(document.getData().get("name").toString(),document.getData().get("description").toString()));
+                                    adapter.addItem(new MeetingRoomItems(document.getData().get("name").toString(),document.getData().get("description").toString()));
                                     Log.d("Document Read", document.getId() + " => " + document.getData());
                                 } else {
                                     Log.d("Document Snapshot", "No Document");
