@@ -81,7 +81,7 @@ import noman.googleplaces.PlacesException;
 import noman.googleplaces.PlacesListener;
 
 
-public class MiddlePlaceActivity extends AppCompatActivity implements OnMapReadyCallback, PlacesListener {
+public class  MiddlePlaceActivity extends AppCompatActivity implements OnMapReadyCallback, PlacesListener {
 
     private ScheduleInfo scheduleInfo;
     private String meetingname;
@@ -92,7 +92,6 @@ public class MiddlePlaceActivity extends AppCompatActivity implements OnMapReady
     private double[] userTime;
     private double[] userDist;
     //##
-    //private LatLng midP = new LatLng(37.6663555,127.0557141);
     private LatLng midP;
 
     private int countTry;
@@ -113,7 +112,7 @@ public class MiddlePlaceActivity extends AppCompatActivity implements OnMapReady
     private int avgTime;
     private double avgDist;
     private boolean flag;
-    private boolean findSub_flg=true;
+    private boolean findSub_flg=false;
     private int flagCount;
 
     private Point[] users;
@@ -282,18 +281,17 @@ public class MiddlePlaceActivity extends AppCompatActivity implements OnMapReady
                     //String midAdr = "서울특별시 상계8동 동일로 1545";
                     findSub(midP);
 
-                    if(sub_name==null){
-                        BitmapDrawable bitmapdraw3 = (BitmapDrawable) getResources().getDrawable(R.drawable.middleplace);
-                        Bitmap bit = bitmapdraw3.getBitmap();
-                        Bitmap MidMarker = Bitmap.createScaledBitmap(bit, 100, 100, false);
+                    BitmapDrawable bitmapdraw3 = (BitmapDrawable) getResources().getDrawable(R.drawable.middleplace);
+                    Bitmap bit = bitmapdraw3.getBitmap();
+                    Bitmap MidMarker = Bitmap.createScaledBitmap(bit, 100, 100, false);
 
-                        MarkerOptions markerOptions = new MarkerOptions();
-                        markerOptions.position(midP);
-                        markerOptions.title("중간지점");
-                        markerOptions.snippet(midAdr).icon(BitmapDescriptorFactory.fromBitmap(MidMarker));
-                        mMap.addMarker(markerOptions);
-                        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(midP, 10));
-                    }
+                    MarkerOptions markerOptions = new MarkerOptions();
+                    markerOptions.position(midP);
+                    markerOptions.title("중간지점");
+                    markerOptions.snippet(midAdr).icon(BitmapDescriptorFactory.fromBitmap(MidMarker));
+                    mMap.addMarker(markerOptions);
+                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(midP, 12));
+
 
                     //LinearLayout 정의
                     LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
@@ -371,7 +369,6 @@ public class MiddlePlaceActivity extends AppCompatActivity implements OnMapReady
                                                 bundle.putString("code", code);
                                                 bundle.putString("scheduleId", scheduleId);
                                                 intent.putExtras(bundle);
-                                                //i.putExtra("midpoint",midP);
                                                 Log.d("Send","meetingname 전달 : "+code);
                                                 startActivity(intent);
                                             }
@@ -401,7 +398,6 @@ public class MiddlePlaceActivity extends AppCompatActivity implements OnMapReady
                                         bundle.putString("code", code);
                                         bundle.putString("scheduleId", scheduleId);
                                         intent.putExtras(bundle);
-                                        //i.putExtra("midpoint",midP);
                                         Log.d("Send","meetingname 전달 : "+code);
                                         startActivity(intent);
                                     }
@@ -416,14 +412,8 @@ public class MiddlePlaceActivity extends AppCompatActivity implements OnMapReady
                         }
                     });
 
-                    //중간지점 지도 위에 표시
-                    //mMap.addMarker(new MarkerOptions().position(midP).title("중간지점 찾음!").icon(BitmapDescriptorFactory.fromBitmap(MiddleMarker)));
-                    //mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(midP, 10));
                 }
             });
-
-            //mMap.addMarker(new MarkerOptions().position(midP).icon(BitmapDescriptorFactory.fromBitmap(MidMarker)));
-
 
             return abc;
 
@@ -556,14 +546,6 @@ public class MiddlePlaceActivity extends AppCompatActivity implements OnMapReady
 
             FindMid();
 
-//            Point[] hull = GrahamScan.convexHull(points);
-//            Point mid_per = PolygonCenter(hull);
-//            mid =new LatLng(mid_per.x,mid_per.y);
-//            for(int j=0;j<points.length;j++){
-//                member_num.add(1);
-//            }
-            //curPoint = new LatLng(center.x, center.y);
-//            FindMid();
         }//군집이 존재할 경우
         else {
             Log.d("Clustering", " 군집이 존재합니다.");
@@ -618,9 +600,6 @@ public class MiddlePlaceActivity extends AppCompatActivity implements OnMapReady
 
             Log.d("Clustering", "center_p(클러스터의 중심들) : " + centers);
 
-//            for (int k = 0; k < points.length; k++) {
-//                mMap.addMarker(new MarkerOptions().position(new LatLng(points[k].getX(), points[k].getY())).title(name[k]).icon(BitmapDescriptorFactory.fromBitmap(UserMarker)));
-//            }
         }
     }
 
@@ -785,11 +764,9 @@ public class MiddlePlaceActivity extends AppCompatActivity implements OnMapReady
         do {
             Log.d("Clustering", "--------------" + iter_i + "번째" + "--------------");
             Log.d("Clustering", "----<<assignment>>----");
-            //assignment
+
             assignment(pos);
-            //Log.d("Clustering","----<<updateCenter>>----");
-            //update
-            //updateCenter();
+
             iter_i++;
         } while (Stop());
         return prevcenter;
@@ -1040,7 +1017,6 @@ public class MiddlePlaceActivity extends AppCompatActivity implements OnMapReady
         }
         else{
             findSub_flg=false;
-
         }
     }
 
@@ -1061,7 +1037,7 @@ public class MiddlePlaceActivity extends AppCompatActivity implements OnMapReady
         }
         if (flag) return;
 
-        BitmapDrawable bitmapdraw2 = (BitmapDrawable) getResources().getDrawable(R.drawable.middleplace);
+        BitmapDrawable bitmapdraw2 = (BitmapDrawable) getResources().getDrawable(R.drawable.subway_st);
         Bitmap c = bitmapdraw2.getBitmap();
         Bitmap MiddleMarker = Bitmap.createScaledBitmap(c, 100, 100, false);
         // 중간지점과 가장 가까운 역 표시
@@ -1094,7 +1070,7 @@ public class MiddlePlaceActivity extends AppCompatActivity implements OnMapReady
                         markerOptions.title(name + "역");
                         markerOptions.snippet(markerSnippet).icon(BitmapDescriptorFactory.fromBitmap(MiddleMarker));
                         Marker item = mMap.addMarker(markerOptions);
-                        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latlng, 10));
+                        //mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latlng, 12));
                         previous_marker.add(item);
                         midP = latlng;
                     }
@@ -1112,7 +1088,6 @@ public class MiddlePlaceActivity extends AppCompatActivity implements OnMapReady
 
     @Override
     public void onPlacesFinished() {
-
     }
 
     public String getCurrentAddress(LatLng latlng) {
