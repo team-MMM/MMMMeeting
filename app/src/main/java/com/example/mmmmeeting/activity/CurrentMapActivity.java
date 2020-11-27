@@ -275,10 +275,10 @@ import java.util.Map;
     private void setMarker(){
 
         markerOptions = new MarkerOptions();
-        //##markerOptions.position(placeLatLng);
+        markerOptions.position(placeLatLng);
         //밑에 두줄 지우고 ##부분 주석 지우면 약속 장소 위도, 경도로 설정
-        LatLng latLng = new LatLng(37.42199, -122.08);
-        markerOptions.position(latLng);
+        //LatLng latLng = new LatLng(37.42199, -122.08);
+        //markerOptions.position(latLng);
         markerOptions.title("약속 장소");
         markerOptions.snippet(place);
         markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));

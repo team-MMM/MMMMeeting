@@ -5,12 +5,15 @@ package com.example.mmmmeeting.activity;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import com.example.mmmmeeting.Info.ScheduleInfo;
 import com.example.mmmmeeting.OnScheduleListener;
@@ -22,6 +25,8 @@ import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 import androidx.annotation.NonNull;
@@ -35,6 +40,10 @@ public class ContentScheduleActivity extends BasicActivity implements View.OnCli
     Button btn_middle, btn_search, btn_vote;
     private View content_schedule;
     String code;
+    private int hour, minute;
+    Handler handler;
+    Calendar cal;
+    Calendar tempCal;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,7 +74,26 @@ public class ContentScheduleActivity extends BasicActivity implements View.OnCli
 
         boardDeleter = new ScheduleDeleter(this);
         boardDeleter.setOnPostListener(onPostListener);
+
+        cal = Calendar.getInstance();
+        tempCal = Calendar.getInstance();
+
         uiUpdate();
+
+        handler =new Handler(){
+            @Override
+            public void handleMessage(Message msg){
+                Bundle bd = msg.getData( ) ;
+                String str = bd.getString("arg");
+                switch (str) {
+                    case "Late":
+                        Toast.makeText(getApplicationContext(),"약속시간이 지났습니다.",Toast.LENGTH_SHORT).show();
+                        break;
+                    case "TimeCheck":
+                        myStartActivity(CurrentMapActivity.class, scheduleInfo, hour, minute);
+                }
+            }
+        };
     }
 
     public void onClick(View v) {
@@ -122,9 +150,59 @@ public class ContentScheduleActivity extends BasicActivity implements View.OnCli
                 break;
 
             case R.id.attendanceBtn:
-                myStartActivity(CheckLateActivity.class, scheduleInfo);
+                if(scheduleInfo.getMeetingDate() == null || scheduleInfo.getMeetingPlace() == null){
+                    Toast.makeText(getApplicationContext(),"약속 시간 또는 장소가 정해지지 않았습니다.",Toast.LENGTH_SHORT).show();
+                    return;
+                }else{
+                    timeCheck();
+                }
                 break;
         }
+    }
+
+    private void timeCheck(){
+        Date now = new Date();
+        tempCal.setTime(now);
+        // 현재 시간 받아오기
+        int nowHour = tempCal.get(Calendar.HOUR_OF_DAY);
+        int nowMinute = tempCal.get(Calendar.MINUTE);
+        int nowMonth = tempCal.get(Calendar.MONTH);
+        int nowDay = tempCal.get(Calendar.DAY_OF_MONTH);
+
+        cal.setTime(scheduleInfo.getMeetingDate());
+        int month = cal.get(Calendar.MONTH);
+        int day = cal.get(Calendar.DAY_OF_MONTH);
+        hour = cal.get(Calendar.HOUR_OF_DAY);
+        minute = cal.get(Calendar.MINUTE);
+
+        System.out.println(month+" "+day+" "+nowMonth+" "+nowDay);
+        System.out.println(hour+" "+minute+" "+nowHour+" "+nowMinute);
+        // 당일의 경우 시간 체크
+        if(nowMonth==month && nowDay == day){
+            if(nowHour > hour || (nowHour == hour && nowMinute >= minute)) {
+                // flag를 없애고 bundle로 값을 전달해줌
+                System.out.println("1");
+                Bundle bd = new Bundle();
+                bd.putString("arg", "Late");
+                sendMessage(bd);
+            }else{
+                System.out.println("2");
+                Bundle bd = new Bundle();
+                bd.putString("arg", "TimeCheck");
+                sendMessage(bd);
+            }
+        }else{
+            System.out.println("3");
+            Bundle bd = new Bundle();
+            bd.putString("arg", "Late");
+            sendMessage(bd);
+        }
+    }
+
+    private void sendMessage(Bundle bd){
+        Message msg = handler.obtainMessage();
+        msg.setData(bd);
+        handler.sendMessage(msg);
     }
 
 
@@ -186,4 +264,11 @@ public class ContentScheduleActivity extends BasicActivity implements View.OnCli
         startActivityForResult(intent, 0);
     }
 
+    private void myStartActivity(Class c, ScheduleInfo postInfo, int hour, int minute) {
+        Intent intent = new Intent(this,c);
+        intent.putExtra("scheduleInfo", postInfo);
+        intent.putExtra("hour", hour);
+        intent.putExtra("minute", minute);
+        startActivityForResult(intent, 0);
+    }
 }
