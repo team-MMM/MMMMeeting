@@ -136,7 +136,7 @@ public class FragAccount extends Fragment {
                                             }
                                             sum += money[i];
                                         }catch(NumberFormatException e){
-                                            final Snackbar snackbar = Snackbar.make(view, "숫자만 입력해주세요.^^", Snackbar.LENGTH_INDEFINITE);
+                                            final Snackbar snackbar = Snackbar.make(view, "숫자만 입력해주세요.", Snackbar.LENGTH_INDEFINITE);
                                             snackbar.setAction("확인", new View.OnClickListener() {
                                                 @Override
                                                 public void onClick(View v) {
@@ -150,7 +150,7 @@ public class FragAccount extends Fragment {
                                     }
 
                                     if(sum==0){
-                                        final Snackbar snackbar = Snackbar.make(view, "금액을 입력해주세요^^", Snackbar.LENGTH_INDEFINITE);
+                                        final Snackbar snackbar = Snackbar.make(view, "금액을 입력해주세요!", Snackbar.LENGTH_INDEFINITE);
                                         snackbar.setAction("확인", new View.OnClickListener() {
                                             @Override
                                             public void onClick(View v) {

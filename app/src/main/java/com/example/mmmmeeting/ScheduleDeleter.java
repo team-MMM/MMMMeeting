@@ -73,7 +73,7 @@ public class ScheduleDeleter {
                     .addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void aVoid) {
-                            showToast(activity, "게시글을 삭제하였습니다.");
+                            showToast(activity, "약속을 삭제하였습니다.");
                             onPostListener.onDelete(postInfo);
                             //postsUpdate();
                         }
@@ -81,7 +81,7 @@ public class ScheduleDeleter {
                     .addOnFailureListener(new OnFailureListener() {
                         @Override
                         public void onFailure(@NonNull Exception e) {
-                            showToast(activity, "게시글을 삭제하지 못하였습니다.");
+                            showToast(activity, "약속을 삭제하지 못하였습니다.");
                         }
                     });
         }

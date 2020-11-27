@@ -50,7 +50,7 @@ public class AlarmReceiver extends BroadcastReceiver {
 
 
             String channelName ="약속 알람 채널";
-            String description = "약속 힌시간 전에 알람합니다.";
+            String description = "약속 한시간 전에 알람합니다.";
             int importance = NotificationManager.IMPORTANCE_HIGH; //소리와 알림메시지를 같이 보여줌
 
             NotificationChannel channel = new NotificationChannel("default", channelName, importance);
