@@ -30,13 +30,13 @@
                 android:textSize="30sp"
                 android:textStyle="bold" />
 
-            <com.example.mmmmeeting.view.ReadScheduleView
-                android:id="@+id/readScheduleView"
+             <com.example.mmmmeeting.view.ReadScheduleView_new
+                android:id="@+id/readScheduleView_new"
                 android:layout_width="match_parent"
                 android:layout_height="80dp"
                 android:layout_marginBottom="20sp">
 
-            </com.example.mmmmeeting.view.ReadScheduleView>
+            </com.example.mmmmeeting.view.ReadScheduleView_new>
 
 
             <Button
