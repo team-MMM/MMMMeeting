@@ -15,8 +15,25 @@
         />
 
     <LinearLayout
-        android:id="@+id/place_list_view"
+        android:id="@+id/vote_info"
         android:layout_below="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:background="@android:color/white"
+        >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="투표를 하셨으면 완료버튼을 눌러주세요 !"
+            android:layout_margin="22dp" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/place_list_view"
+        android:layout_below="@+id/vote_info"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="10dp"
