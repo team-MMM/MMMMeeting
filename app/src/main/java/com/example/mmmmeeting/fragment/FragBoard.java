@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -38,7 +39,8 @@ public class FragBoard extends Fragment {
     private boolean updating;
     private boolean topScrolled;
     private String meetingCode;
-
+    int check = 0;
+    TextView text;
     public FragBoard() { }
 
     @Override
@@ -51,7 +53,7 @@ public class FragBoard extends Fragment {
                              Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.frag_board, container, false);
-
+        text = (TextView)view.findViewById(R.id.text);
         Bundle bundle = this.getArguments();
         if(bundle != null) {
             bundle = getArguments();
@@ -171,6 +173,7 @@ public class FragBoard extends Fragment {
                                 Log.d(TAG, document.getId() + " => " + document.getData());
                                 if(document.getData().get("meetingID").toString().equals(meetingCode)) {
                                     Log.d("update Test", meetingCode);
+                                    check = 1;
                                     postList.add(new PostInfo(
                                             document.getData().get("title").toString(),
                                             document.getData().get("description").toString(),
@@ -180,6 +183,11 @@ public class FragBoard extends Fragment {
                                             new Date(document.getDate("createdAt").getTime()),
                                             document.getId()));
                                 }
+                            }
+                            if (check == 0) {
+                                text.setText("작성된 게시글이 없습니다." + "\n" + "새로운 게시글을 작성해보세요!");
+                            } else {
+                                text.setText("");
                             }
                             boardAdapter.notifyDataSetChanged();
                         } else {

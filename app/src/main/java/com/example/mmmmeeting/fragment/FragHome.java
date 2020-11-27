@@ -44,6 +44,8 @@ public class FragHome extends Fragment {
     private boolean topScrolled;
     private TextView name;
     private String meetingCode;
+    int check = 0;
+    TextView text;
 
     public FragHome() { }
 
@@ -54,6 +56,7 @@ public class FragHome extends Fragment {
         View view = inflater.inflate(R.layout.frag_home, container, false);
         name = (TextView)view.findViewById(R.id.schedule_name);
         name.setText("약속 목록");
+        text = (TextView)view.findViewById(R.id.text);
 
         Bundle bundle = this.getArguments();
         if(bundle != null) {
@@ -137,7 +140,6 @@ public class FragHome extends Fragment {
         @Override
         public void onClick(View v) {
             switch (v.getId()) {
-
                 // +버튼 누르면 약속 생성
                 case R.id.write_schedule:
                     myStartActivity(MakeScheduleActivity.class);
@@ -175,7 +177,7 @@ public class FragHome extends Fragment {
                             }
                             for (QueryDocumentSnapshot document : task.getResult()) {
                                 Log.d(TAG, document.getId() + " => " + document.getData());
-                                if(document.getData().get("meetingID").toString().equals(meetingCode)){
+                                if (document.getData().get("meetingID").toString().equals(meetingCode)) {
                                     Log.d("update Test", meetingCode);
                                     ScheduleInfo temp = new ScheduleInfo(
                                             document.getData().get("title").toString(),
@@ -184,17 +186,22 @@ public class FragHome extends Fragment {
                                             new Date(document.getDate("createdAt").getTime()),
                                             document.getId());
 
-                                    if(document.get("meetingPlace")!=null){
-                                        HashMap<String, Object> place = (HashMap<String, Object>)document.get("meetingPlace");
+                                    if (document.get("meetingPlace") != null) {
+                                        HashMap<String, Object> place = (HashMap<String, Object>) document.get("meetingPlace");
                                         temp.setMeetingPlace(place.get("name").toString());
                                     }
 
-                                    if(document.get("meetingDate")!=null){
+                                    if (document.get("meetingDate") != null) {
                                         temp.setMeetingDate(document.getDate("meetingDate"));
                                     }
-
+                                    check = 1;
                                     postList.add(temp);
                                 }
+                            }
+                            if (check == 0) {
+                                text.setText("생성된 약속이 없습니다." + "\n" + "새로운 약속을 생성해보세요!");
+                            } else {
+                                text.setText("");
                             }
                             scheduleAdapter.notifyDataSetChanged();
                         } else {
