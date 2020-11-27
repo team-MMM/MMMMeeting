@@ -115,8 +115,10 @@ public class BoardAdapter extends RecyclerView.Adapter<BoardAdapter.MainViewHold
                     if (document.exists()) {
                         String name = document.get("name").toString();
                         userName.setText(name);
-                        profilePath = document.get("profilePath").toString();
-                        Glide.with(cardView).load(profilePath).centerCrop().override(500).into(profileView);
+                        if(document.get("profilePath")!=null) {
+                            profilePath = document.get("profilePath").toString();
+                            Glide.with(cardView).load(profilePath).centerCrop().override(500).into(profileView);
+                        }
                         titleTextView.setText(postInfo.getTitle());
 
                         ReadContentsView readContentsVIew = cardView.findViewById(R.id.readContentsView);
