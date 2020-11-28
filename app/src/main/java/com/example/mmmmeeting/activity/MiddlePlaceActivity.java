@@ -88,13 +88,11 @@ import noman.googleplaces.PlacesListener;
 public class  MiddlePlaceActivity extends AppCompatActivity implements OnMapReadyCallback, PlacesListener {
 
     private ScheduleInfo scheduleInfo;
-    private String meetingname;
     private String scheduleId;
     String code;
 
     //private ArrayList<LatLng> position;
     private double[] userTime;
-    private double[] userDist;
     //##
     private LatLng midP;
 
@@ -105,9 +103,6 @@ public class  MiddlePlaceActivity extends AppCompatActivity implements OnMapRead
     private String duration;
     private double Dur;
 
-
-    //임의로 중간지점 대충 지정
-    private LatLng curPoint = new LatLng(37.56593052663891, 126.97680764976288);
 
     private String str_url;
     private String midAdr;
@@ -130,13 +125,6 @@ public class  MiddlePlaceActivity extends AppCompatActivity implements OnMapRead
     private String[] address;
     private String[] m_name;
     private String sub_name=null;
-    private String[] profilePath;
-
-    String img_url=null;
-    int num = 0;
-    HttpURLConnection conn = null;
-    BufferedInputStream bis = null;
-    Bitmap profile;
 
     private GoogleMap mMap;
 
@@ -144,7 +132,6 @@ public class  MiddlePlaceActivity extends AppCompatActivity implements OnMapRead
 
     int i = 0;
     int j = 0;
-    Point center = new Point(0, 0);
 
     List<Marker> previous_marker = null;
     int radius = 1000;
@@ -215,7 +202,6 @@ public class  MiddlePlaceActivity extends AppCompatActivity implements OnMapRead
                         List users = (List) document.getData().get("userID");
                         String[] addr = new String[users.size()];
                         String[] name = new String[users.size()];
-                        String[] path = new String[users.size()];
                         // userID가 동일한 user 문서에서 이름, 주소 읽어오기
                         for (int m = 0; m < users.size(); m++) {
                             DocumentReference docRef = db.collection("users").document(users.get(m).toString());
@@ -228,12 +214,6 @@ public class  MiddlePlaceActivity extends AppCompatActivity implements OnMapRead
                                         if (document.exists()) {
                                             addr[i] = document.getData().get("address").toString();
                                             name[i] = document.getData().get("name").toString();
-                                            if(document.getData().get("profilePath") != null) {
-                                                path[i] = document.getData().get("profilePath").toString();
-                                            }
-                                            else{
-                                                path[i]=null;
-                                            }
                                             i++;
                                         } else {
                                             // 존재하지 않는 문서
@@ -243,7 +223,6 @@ public class  MiddlePlaceActivity extends AppCompatActivity implements OnMapRead
                                             //clustering(addr, name); // 중간지점 찾기 시작
                                             address=addr;
                                             m_name=name;
-                                            profilePath=path;
                                             BackgroundTask Btask =new BackgroundTask();
                                             Btask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
                                         }
@@ -292,17 +271,7 @@ public class  MiddlePlaceActivity extends AppCompatActivity implements OnMapRead
                     Bitmap UserMarker = Bitmap.createScaledBitmap(b, 120, 120, false);
 
                     for (int k = 0; k < address.length; k++) {
-                        if(profilePath[k]!=null) {
-                            img_url = profilePath[k];
-                            num = k;
-                            DownloadFilesTask Dtask = new DownloadFilesTask();
-                            Dtask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-                            Log.d("profilepath","있음");
-                        }
-                        else{
                             mMap.addMarker(new MarkerOptions().position(new LatLng(users[k].getX(), users[k].getY())).title(m_name[k]).icon(BitmapDescriptorFactory.fromBitmap(UserMarker)));
-                            Log.d("profilepath","없음");
-                        }
                     }
 
                     midAdr = getCurrentAddress(midP);
@@ -456,34 +425,6 @@ public class  MiddlePlaceActivity extends AppCompatActivity implements OnMapRead
             Toast.makeText(MiddlePlaceActivity.this, "로딩 완료", Toast.LENGTH_SHORT).show();
         }
 
-    }
-
-    // 프로필 url -> bitmap
-    private class DownloadFilesTask extends AsyncTask<String,Void, Bitmap> {
-        @Override
-        protected Bitmap doInBackground(String... strings) {
-            try {
-                URL url = new URL(img_url);
-                profile = BitmapFactory.decodeStream(url.openConnection().getInputStream());
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            return profile;
-        }
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-        }
-
-
-        @Override
-        protected void onPostExecute(Bitmap result) {
-            // doInBackground 에서 받아온 total 값 사용 장소
-            mMap.addMarker(new MarkerOptions().position(new LatLng(users[num].getX(), users[num].getY())).title(m_name[num]).icon(BitmapDescriptorFactory.fromBitmap(profile)));
-        }
     }
 
     // 중간 지점 찾기 시작!
@@ -999,17 +940,6 @@ public class  MiddlePlaceActivity extends AppCompatActivity implements OnMapRead
         return totalT;
     }
 
-
-    // 좌표 리스트를 다각형으로 지도에 표시하기 위해
-    private PolygonOptions makePolygon(ArrayList<LatLng> polygon_list) {
-
-        PolygonOptions opts = new PolygonOptions();
-        for (LatLng location : polygon_list) {
-            opts.add(location);
-        }
-        return opts;
-    }
-
     // Point 타입 좌표 배열을 ArrayList<LatLng> 타입으로 변환
     private ArrayList<LatLng> changeToList(Point[] polygon_point) {
 
@@ -1023,17 +953,6 @@ public class  MiddlePlaceActivity extends AppCompatActivity implements OnMapRead
         Log.d("TEST CHECK", polygonList.toString());
         //mMap.addPolygon(makePolygon(polygonList).strokeColor(Color.RED));
         return polygonList;
-    }
-
-    // 확인하려는 좌표와 도형의 좌표가 들어있는 Point타입 배열을 인자로 받아 좌표가 도형에 속하는지 확인
-    public boolean point_in_polygon(LatLng point, Point[] polygon) {
-        ArrayList<LatLng> polygonList = changeToList(polygon);
-        //LatLng point = new LatLng(point.getX(),point.getY()); // 만약 확인하려는 좌표도 Point 타입인 경우 사용
-
-        // PolyUtil 함수 사용
-        boolean inside = PolyUtil.containsLocation(point, polygonList, true);
-        Log.d("TEST CHECK", "inside check : " + inside);
-        return inside;
     }
 
     // 중간지점 근처 역 찾기
@@ -1241,5 +1160,3 @@ public class  MiddlePlaceActivity extends AppCompatActivity implements OnMapRead
         return resultText;
     }
 }
-
-
