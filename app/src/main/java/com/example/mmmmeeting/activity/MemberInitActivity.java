@@ -212,6 +212,7 @@ public class MemberInitActivity extends BasicActivity implements View.OnClickLis
             case R.id.addressSearchBtn:
                 save();
                 myStartActivity(SearchAddressActivity.class);
+                finish();
                 break;
 
             case R.id.profileImageView:

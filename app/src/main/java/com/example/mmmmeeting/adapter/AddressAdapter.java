@@ -1,5 +1,6 @@
 package com.example.mmmmeeting.adapter;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.view.LayoutInflater;
@@ -76,6 +77,7 @@ public class AddressAdapter extends BaseAdapter {
 //                intent.putExtra("post", listItem.getJibun());
 //                intent.putExtra("jibun", listItem.getPost());
                 context.startActivity(intent);
+                ((Activity)context).finish();
             }
         });
 
