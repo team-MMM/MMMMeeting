@@ -3,9 +3,11 @@
 package com.example.mmmmeeting.activity;
 
 
+import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
@@ -58,8 +60,10 @@ import com.google.firebase.firestore.QuerySnapshot;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
@@ -126,6 +130,13 @@ public class  MiddlePlaceActivity extends AppCompatActivity implements OnMapRead
     private String[] address;
     private String[] m_name;
     private String sub_name=null;
+    private String[] profilePath;
+
+    String img_url=null;
+    int num = 0;
+    HttpURLConnection conn = null;
+    BufferedInputStream bis = null;
+    Bitmap profile;
 
     private GoogleMap mMap;
 
@@ -204,6 +215,7 @@ public class  MiddlePlaceActivity extends AppCompatActivity implements OnMapRead
                         List users = (List) document.getData().get("userID");
                         String[] addr = new String[users.size()];
                         String[] name = new String[users.size()];
+                        String[] path = new String[users.size()];
                         // userID가 동일한 user 문서에서 이름, 주소 읽어오기
                         for (int m = 0; m < users.size(); m++) {
                             DocumentReference docRef = db.collection("users").document(users.get(m).toString());
@@ -215,7 +227,14 @@ public class  MiddlePlaceActivity extends AppCompatActivity implements OnMapRead
                                         DocumentSnapshot document = task.getResult();
                                         if (document.exists()) {
                                             addr[i] = document.getData().get("address").toString();
-                                            name[i++] = document.getData().get("name").toString();
+                                            name[i] = document.getData().get("name").toString();
+                                            if(document.getData().get("profilePath") != null) {
+                                                path[i] = document.getData().get("profilePath").toString();
+                                            }
+                                            else{
+                                                path[i]=null;
+                                            }
+                                            i++;
                                         } else {
                                             // 존재하지 않는 문서
                                             Log.d("Attend", "No Document");
@@ -224,6 +243,7 @@ public class  MiddlePlaceActivity extends AppCompatActivity implements OnMapRead
                                             //clustering(addr, name); // 중간지점 찾기 시작
                                             address=addr;
                                             m_name=name;
+                                            profilePath=path;
                                             BackgroundTask Btask =new BackgroundTask();
                                             Btask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
                                         }
@@ -267,13 +287,22 @@ public class  MiddlePlaceActivity extends AppCompatActivity implements OnMapRead
             runOnUiThread(new Runnable(){
                 public void run(){
 
-
-                    BitmapDrawable bitmapdraw1 = (BitmapDrawable) getResources().getDrawable(R.drawable.user);
+                    BitmapDrawable bitmapdraw1 = (BitmapDrawable) getResources().getDrawable(R.drawable.profile2);
                     Bitmap b = bitmapdraw1.getBitmap();
-                    Bitmap UserMarker = Bitmap.createScaledBitmap(b, 100, 100, false);
+                    Bitmap UserMarker = Bitmap.createScaledBitmap(b, 120, 120, false);
 
                     for (int k = 0; k < address.length; k++) {
-                        mMap.addMarker(new MarkerOptions().position(new LatLng(users[k].getX(), users[k].getY())).icon(BitmapDescriptorFactory.fromBitmap(UserMarker)));
+                        if(profilePath[k]!=null) {
+                            img_url = profilePath[k];
+                            num = k;
+                            DownloadFilesTask Dtask = new DownloadFilesTask();
+                            Dtask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+                            Log.d("profilepath","있음");
+                        }
+                        else{
+                            mMap.addMarker(new MarkerOptions().position(new LatLng(users[k].getX(), users[k].getY())).title(m_name[k]).icon(BitmapDescriptorFactory.fromBitmap(UserMarker)));
+                            Log.d("profilepath","없음");
+                        }
                     }
 
                     midAdr = getCurrentAddress(midP);
@@ -290,7 +319,7 @@ public class  MiddlePlaceActivity extends AppCompatActivity implements OnMapRead
                     markerOptions.title("중간지점");
                     markerOptions.snippet(midAdr).icon(BitmapDescriptorFactory.fromBitmap(MidMarker));
                     mMap.addMarker(markerOptions);
-                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(midP, 12));
+                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(midP, 11));
 
 
                     //LinearLayout 정의
@@ -324,7 +353,7 @@ public class  MiddlePlaceActivity extends AppCompatActivity implements OnMapRead
                     btn_params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT,RelativeLayout.TRUE);
                     //btn_params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM,RelativeLayout.TRUE);
                     btn_params.addRule(RelativeLayout.BELOW,tv_mid.getId());
-                    btn_params.setMargins(0,0,30,0);
+                    btn_params.setMargins(0,10,30,0);
                     btn_mid.setLayoutParams(btn_params);
                     btn_mid.setBackground(getDrawable(R.drawable.button_shape));
                     btn_mid.setTextColor(Color.WHITE);
@@ -429,6 +458,34 @@ public class  MiddlePlaceActivity extends AppCompatActivity implements OnMapRead
 
     }
 
+    // 프로필 url -> bitmap
+    private class DownloadFilesTask extends AsyncTask<String,Void, Bitmap> {
+        @Override
+        protected Bitmap doInBackground(String... strings) {
+            try {
+                URL url = new URL(img_url);
+                profile = BitmapFactory.decodeStream(url.openConnection().getInputStream());
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return profile;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+
+        @Override
+        protected void onPostExecute(Bitmap result) {
+            // doInBackground 에서 받아온 total 값 사용 장소
+            mMap.addMarker(new MarkerOptions().position(new LatLng(users[num].getX(), users[num].getY())).title(m_name[num]).icon(BitmapDescriptorFactory.fromBitmap(profile)));
+        }
+    }
+
     // 중간 지점 찾기 시작!
     private void clustering(String[] addr, String[] name) {
 
@@ -531,7 +588,6 @@ public class  MiddlePlaceActivity extends AppCompatActivity implements OnMapRead
 
 
             for (int i = 0; i < centers.size(); i++) {
-                //mMap.addMarker(new MarkerOptions().position(new LatLng(centers.get(i).x, centers.get(i).y)).title("centroid " + i).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
                 Log.d("Clustering", "center출력  : " + centers.get(i));
                 // 인원수에 비례하여 평균점 계산
                 latitude += centers.get(i).x * member_num.get(i);

@@ -36,7 +36,10 @@
             android:text="최소 평균 이동시간인 지점을 중간지점으로 선택했습니다."
             android:textColor="@android:color/background_dark"
             android:textSize="16dp"
-            android:layout_margin="5dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginBottom="5dp"
             android:textStyle="bold"/>
 
     </LinearLayout>
