@@ -531,7 +531,7 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
                 point=0.09f;
             }
             else if(point == -1){
-                point = 0.03f;
+                point = 0.07f;
             }
             else if(point<0){
                 point = 1/Math.abs(point);
