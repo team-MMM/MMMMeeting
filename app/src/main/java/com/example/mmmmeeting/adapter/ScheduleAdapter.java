@@ -156,6 +156,8 @@ public class ScheduleAdapter extends RecyclerView.Adapter<ScheduleAdapter.MainVi
         TextView meetingDateView = cardView.findViewById(R.id.meetingDate);
         TextView meetingPlaceView = cardView.findViewById(R.id.meetingPlace);
 
+        FrameLayout frame =cardView.findViewById(R.id.frame);
+
         ScheduleInfo postInfo = mDataset.get(position);
         String type = postInfo.getType();
         titleTextView.setText(postInfo.getTitle());
@@ -175,23 +177,13 @@ public class ScheduleAdapter extends RecyclerView.Adapter<ScheduleAdapter.MainVi
             } else {
                 meetingPlaceView.setText("모임 장소 : 미정");
             }
-        }else{
-            meetingPlaceView.setText(postInfo.getContents().get(0));
-            meetingPlaceView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 18);
-            TextView createdAtTextView = cardView.findViewById(R.id.createAtTextView);
-            createdAtTextView.setText(new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(postInfo.getCreatedAt()));
-        }
 
+            if(postInfo.getMeetingDate()!=null && postInfo.getMeetingPlace()!=null) {
+                frame.setVisibility(View.VISIBLE);
+            } else{
+                frame.setVisibility(View.INVISIBLE);
+            }
 
-        FrameLayout frame =cardView.findViewById(R.id.frame);
-        if(postInfo.getMeetingDate()!=null && postInfo.getMeetingPlace()!=null) {
-            frame.setVisibility(View.VISIBLE);
-        }
-        else{
-            frame.setVisibility(View.INVISIBLE);
-        }
-
-        if(type.equals("offline")) {
             ReadScheduleView readScheduleView = cardView.findViewById(R.id.readScheduleView);
             LinearLayout contentsLayout = cardView.findViewById(R.id.contentsLayout);
 
@@ -207,7 +199,19 @@ public class ScheduleAdapter extends RecyclerView.Adapter<ScheduleAdapter.MainVi
                     playerArrayListArrayList.add(playerArrayList);
                 }
             }
+
+        }else{
+            meetingPlaceView.setText(postInfo.getContents().get(0));
+            meetingPlaceView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 18);
+            TextView createdAtTextView = cardView.findViewById(R.id.createAtTextView);
+            createdAtTextView.setText(new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(postInfo.getCreatedAt()));
+            frame.setVisibility(View.VISIBLE);
         }
+
+
+
+
+
     }
 
     @Override
