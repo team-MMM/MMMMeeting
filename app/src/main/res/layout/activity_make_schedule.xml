@@ -13,13 +13,7 @@
         android:layout_alignParentRight="true">
 
 
-        <Button
-            android:id = "@+id/infoBtn"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:background="@drawable/ic_baseline_info_24"
-            android:backgroundTint="@color/colorPrimary"
-            android:layout_gravity="center_vertical"/>
+
 
 
     </LinearLayout>
@@ -34,16 +28,32 @@
             android:padding="10dp">
 
 
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
             <TextView
+                android:id="@+id/sctext"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:gravity="center"
+                android:layout_centerInParent="true"
                 android:text="약속 생성"
                 android:layout_margin="10sp"
                 android:textColor="#000000"
                 android:textSize="30sp"
-                android:textStyle="bold"
-                android:layout_gravity="center_horizontal"/>
+                android:textStyle="bold"/>
+
+                <Button
+                    android:id = "@+id/infoBtn"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_toRightOf="@+id/sctext"
+                    android:layout_marginLeft="15dp"
+                    android:layout_centerVertical="true"
+                    android:background="@drawable/ic_baseline_info_24"
+                    android:backgroundTint="@color/colorPrimary"/>
+
+            </RelativeLayout>
+
 
             <EditText
                 android:id="@+id/titleEditText"
