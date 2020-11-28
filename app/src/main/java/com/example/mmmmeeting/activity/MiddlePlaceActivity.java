@@ -3,9 +3,11 @@
 package com.example.mmmmeeting.activity;
 
 
+import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
@@ -58,8 +60,10 @@ import com.google.firebase.firestore.QuerySnapshot;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
@@ -84,13 +88,11 @@ import noman.googleplaces.PlacesListener;
 public class  MiddlePlaceActivity extends AppCompatActivity implements OnMapReadyCallback, PlacesListener {
 
     private ScheduleInfo scheduleInfo;
-    private String meetingname;
     private String scheduleId;
     String code;
 
     //private ArrayList<LatLng> position;
     private double[] userTime;
-    private double[] userDist;
     //##
     private LatLng midP;
 
@@ -101,9 +103,6 @@ public class  MiddlePlaceActivity extends AppCompatActivity implements OnMapRead
     private String duration;
     private double Dur;
 
-
-    //임의로 중간지점 대충 지정
-    private LatLng curPoint = new LatLng(37.56593052663891, 126.97680764976288);
 
     private String str_url;
     private String midAdr;
@@ -133,7 +132,6 @@ public class  MiddlePlaceActivity extends AppCompatActivity implements OnMapRead
 
     int i = 0;
     int j = 0;
-    Point center = new Point(0, 0);
 
     List<Marker> previous_marker = null;
     int radius = 1000;
@@ -215,7 +213,8 @@ public class  MiddlePlaceActivity extends AppCompatActivity implements OnMapRead
                                         DocumentSnapshot document = task.getResult();
                                         if (document.exists()) {
                                             addr[i] = document.getData().get("address").toString();
-                                            name[i++] = document.getData().get("name").toString();
+                                            name[i] = document.getData().get("name").toString();
+                                            i++;
                                         } else {
                                             // 존재하지 않는 문서
                                             Log.d("Attend", "No Document");
@@ -267,13 +266,12 @@ public class  MiddlePlaceActivity extends AppCompatActivity implements OnMapRead
             runOnUiThread(new Runnable(){
                 public void run(){
 
-
-                    BitmapDrawable bitmapdraw1 = (BitmapDrawable) getResources().getDrawable(R.drawable.user);
+                    BitmapDrawable bitmapdraw1 = (BitmapDrawable) getResources().getDrawable(R.drawable.profile2);
                     Bitmap b = bitmapdraw1.getBitmap();
-                    Bitmap UserMarker = Bitmap.createScaledBitmap(b, 100, 100, false);
+                    Bitmap UserMarker = Bitmap.createScaledBitmap(b, 120, 120, false);
 
                     for (int k = 0; k < address.length; k++) {
-                        mMap.addMarker(new MarkerOptions().position(new LatLng(users[k].getX(), users[k].getY())).icon(BitmapDescriptorFactory.fromBitmap(UserMarker)));
+                            mMap.addMarker(new MarkerOptions().position(new LatLng(users[k].getX(), users[k].getY())).title(m_name[k]).icon(BitmapDescriptorFactory.fromBitmap(UserMarker)));
                     }
 
                     midAdr = getCurrentAddress(midP);
@@ -290,7 +288,7 @@ public class  MiddlePlaceActivity extends AppCompatActivity implements OnMapRead
                     markerOptions.title("중간지점");
                     markerOptions.snippet(midAdr).icon(BitmapDescriptorFactory.fromBitmap(MidMarker));
                     mMap.addMarker(markerOptions);
-                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(midP, 12));
+                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(midP, 11));
 
 
                     //LinearLayout 정의
@@ -324,7 +322,7 @@ public class  MiddlePlaceActivity extends AppCompatActivity implements OnMapRead
                     btn_params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT,RelativeLayout.TRUE);
                     //btn_params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM,RelativeLayout.TRUE);
                     btn_params.addRule(RelativeLayout.BELOW,tv_mid.getId());
-                    btn_params.setMargins(0,0,30,0);
+                    btn_params.setMargins(0,10,30,0);
                     btn_mid.setLayoutParams(btn_params);
                     btn_mid.setBackground(getDrawable(R.drawable.button_shape));
                     btn_mid.setTextColor(Color.WHITE);
@@ -531,7 +529,6 @@ public class  MiddlePlaceActivity extends AppCompatActivity implements OnMapRead
 
 
             for (int i = 0; i < centers.size(); i++) {
-                //mMap.addMarker(new MarkerOptions().position(new LatLng(centers.get(i).x, centers.get(i).y)).title("centroid " + i).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
                 Log.d("Clustering", "center출력  : " + centers.get(i));
                 // 인원수에 비례하여 평균점 계산
                 latitude += centers.get(i).x * member_num.get(i);
@@ -943,17 +940,6 @@ public class  MiddlePlaceActivity extends AppCompatActivity implements OnMapRead
         return totalT;
     }
 
-
-    // 좌표 리스트를 다각형으로 지도에 표시하기 위해
-    private PolygonOptions makePolygon(ArrayList<LatLng> polygon_list) {
-
-        PolygonOptions opts = new PolygonOptions();
-        for (LatLng location : polygon_list) {
-            opts.add(location);
-        }
-        return opts;
-    }
-
     // Point 타입 좌표 배열을 ArrayList<LatLng> 타입으로 변환
     private ArrayList<LatLng> changeToList(Point[] polygon_point) {
 
@@ -967,17 +953,6 @@ public class  MiddlePlaceActivity extends AppCompatActivity implements OnMapRead
         Log.d("TEST CHECK", polygonList.toString());
         //mMap.addPolygon(makePolygon(polygonList).strokeColor(Color.RED));
         return polygonList;
-    }
-
-    // 확인하려는 좌표와 도형의 좌표가 들어있는 Point타입 배열을 인자로 받아 좌표가 도형에 속하는지 확인
-    public boolean point_in_polygon(LatLng point, Point[] polygon) {
-        ArrayList<LatLng> polygonList = changeToList(polygon);
-        //LatLng point = new LatLng(point.getX(),point.getY()); // 만약 확인하려는 좌표도 Point 타입인 경우 사용
-
-        // PolyUtil 함수 사용
-        boolean inside = PolyUtil.containsLocation(point, polygonList, true);
-        Log.d("TEST CHECK", "inside check : " + inside);
-        return inside;
     }
 
     // 중간지점 근처 역 찾기
@@ -1185,5 +1160,3 @@ public class  MiddlePlaceActivity extends AppCompatActivity implements OnMapRead
         return resultText;
     }
 }
-
-

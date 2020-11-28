@@ -1,5 +1,6 @@
 package com.example.mmmmeeting.activity;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.graphics.Color;
 import android.location.Address;
@@ -302,6 +303,7 @@ public class VoteActivity extends BasicActivity {
             place_list_view.addView(fl_place_list);
 
             favorite.setOnClickListener(new View.OnClickListener() {
+                @SuppressLint("ResourceType")
                 @Override
                 public void onClick(View v) {
                     TextView textView;
