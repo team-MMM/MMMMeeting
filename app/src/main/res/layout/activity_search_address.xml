@@ -8,9 +8,21 @@
     android:orientation="vertical"
     tools:context=".activity.SearchAddressActivity">
 
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:padding="10dp"
+        android:textSize="18dp"
+        android:text="도로명주소의 숫자까지 입력해주세요\n예) 서울시립대로 163"
+
+        />
+
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
+
+
 
         <EditText
             android:id="@+id/editAddress"

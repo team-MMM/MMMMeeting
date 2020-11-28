@@ -177,7 +177,7 @@ public class ScheduleAdapter extends RecyclerView.Adapter<ScheduleAdapter.MainVi
             }
         }else{
             meetingPlaceView.setText(postInfo.getContents().get(0));
-            meetingPlaceView.setTextSize(18);
+            meetingPlaceView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 18);
             TextView createdAtTextView = cardView.findViewById(R.id.createAtTextView);
             createdAtTextView.setText(new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(postInfo.getCreatedAt()));
         }
