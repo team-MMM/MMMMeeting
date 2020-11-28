@@ -840,10 +840,10 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
                     ratingMap.put(j, rat);
                 }else if(500 < radius && radius <= 1000){
                     // rating 점수 + 거리 점수의 가중치를 [0.1:0.3]으로 환산한 최종 점수
-                    ratingMap.put(j,(float)(0.1 * rat + 0.3 * distancePoint));
+                    ratingMap.put(j,(float)(0.1 * rat + 0.1 * distancePoint));
                 }
                 else if(1000 < radius && radius <= 2000){
-                    ratingMap.put(j,(float)(0.1 * rat + 0.1 * distancePoint));
+                    ratingMap.put(j,(float)(0.2 * rat + 0.1 * distancePoint));
                 }else{
                     ratingMap.put(j,(float)(0.3 * rat + 0.1 * distancePoint));
                 }
@@ -858,246 +858,247 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
 
             System.out.println("ratingList: "+ratingList);
 
-            // 지금은 num을 임시로 5개로 했는데, 5개 보다 검색 결과가 작으면 인덱스 에러 때문에 다시 세팅
-            if(ratingList.size() < num)
-                num = ratingList.size();
+            if(ratingList.size()==0){
+                LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                lp.gravity = Gravity.CENTER;
+                lp.setMargins(10,100,10,10);
 
-            // 상위 num개 만큼 다시 placeList에 저장
-            for (int j = 0; j < num; j++) {
-                LinearLayout.LayoutParams param = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
-                        ViewGroup.LayoutParams.WRAP_CONTENT);
+                TextView view1 = new TextView(PlaceListActivity.this);
+                view1.setText("중간지점 근처에\n현재 카테고리에 해당하는 장소가\n존재하지 않습니다.\n\n범위를 늘려보세요!");
+                view1.setTextSize(20f);
+                view1.setTextColor(Color.BLACK);
+                view1.setBackgroundColor(Color.WHITE);
+                view1.setGravity(Gravity.CENTER);
+                view1.setPadding(20,50,20,20);
+                view1.setLayoutParams(lp);
+                //부모 뷰에 추가
+                place_list_view.addView(view1);
 
-                LinearLayout.LayoutParams fl_param = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                        ViewGroup.LayoutParams.WRAP_CONTENT);
+            }else {
+                // 지금은 num을 임시로 5개로 했는데, 5개 보다 검색 결과가 작으면 인덱스 에러 때문에 다시 세팅
+                if (ratingList.size() < num)
+                    num = ratingList.size();
 
-                fl_place_list = new LinearLayout(PlaceListActivity.this);
-                fl_place_list.setOrientation(LinearLayout.VERTICAL);
-                //param.bottomMargin = 100;
-                fl_place_list.setLayoutParams(fl_param);
-                fl_place_list.setBackgroundColor(Color.WHITE);
-                fl_place_list.setPadding(20,10,0,30);
+                // 상위 num개 만큼 다시 placeList에 저장
+                for (int j = 0; j < num; j++) {
+                    LinearLayout.LayoutParams param = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
+                            ViewGroup.LayoutParams.WRAP_CONTENT);
 
+                    LinearLayout.LayoutParams fl_param = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                            ViewGroup.LayoutParams.WRAP_CONTENT);
 
-                RelativeLayout.LayoutParams rl_param = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
-                        ViewGroup.LayoutParams.WRAP_CONTENT);
-
-                RelativeLayout pl_name = new RelativeLayout(PlaceListActivity.this);
-                pl_name.setLayoutParams(rl_param);
-
-
-                String placeAddress = getCurrentAddress(placeList[ratingList.get(j)]);
-                //장소 이름, 주소 출력부분
-                TextView pInfo = new TextView(PlaceListActivity.this);
-                SpannableString s = new SpannableString(place_name[ratingList.get(j)]+"\n"+placeAddress);
-                s.setSpan(new RelativeSizeSpan(1.8f),0,place_name[ratingList.get(j)].length(),0);
-                s.setSpan(new ForegroundColorSpan(Color.BLACK),0,place_name[ratingList.get(j)].length(),0);
-                pInfo.setText(s);
-                pInfo.setLayoutParams(rl_param);
-                pl_name.addView(pInfo);
-
-                //삭제버튼
-                Button delete = new Button(PlaceListActivity.this);
-                RelativeLayout.LayoutParams btn_param2 = new RelativeLayout.LayoutParams(90, 90);
-                btn_param2.addRule(RelativeLayout.ALIGN_PARENT_RIGHT, RelativeLayout.TRUE);
-                btn_param2.setMargins(0,0,20,0);
-                delete.setLayoutParams(btn_param2);
-                delete.setPadding(0, 20, 5, 0);
-                delete.setId(2*(i + 1));
-                delete.setBackground(ContextCompat.getDrawable(PlaceListActivity.this, R.drawable.delete));
-                pl_name.addView(delete);
-
-                //추가버튼
-                Button add = new Button(PlaceListActivity.this);
-                RelativeLayout.LayoutParams btn_param = new RelativeLayout.LayoutParams(90, 90);
-                btn_param.addRule(RelativeLayout.LEFT_OF, delete.getId());
-                btn_param.setMargins(0,0,10,0);
-                add.setLayoutParams(btn_param);
-                add.setPadding(0, 20, 5, 0);
-                add.setId(2*i + 1);
-                add.setBackground(ContextCompat.getDrawable(PlaceListActivity.this, R.drawable.add_location));
-                pl_name.addView(add);
-
-                fl_place_list.addView(pl_name);
-
-                //LinearLayout 생성
-                LinearLayout ly = new LinearLayout(PlaceListActivity.this);
-                //LinearLayout.LayoutParams lyparams = param;
-                ly.setLayoutParams(param);
-                ly.setOrientation(LinearLayout.HORIZONTAL);
-
-                TextView rate_tv = new TextView(PlaceListActivity.this);
-                rate_tv.setText("별점 : "+rating[ratingList.get(j)]+" | ");
-                rate_tv.setLayoutParams(param);
-                ly.addView(rate_tv);
-
-                RatingBar rb = new RatingBar(PlaceListActivity.this,null,android.R.attr.ratingBarStyleSmall);
-                rb.setNumStars(5);
-                rb.setRating(rating[ratingList.get(j)]);
-                rb.setStepSize((float)0.1);
-                rb.setPadding(0,5,0,0);
-                rb.setLayoutParams(param);
-                ly.addView(rb);
+                    fl_place_list = new LinearLayout(PlaceListActivity.this);
+                    fl_place_list.setOrientation(LinearLayout.VERTICAL);
+                    //param.bottomMargin = 100;
+                    fl_place_list.setLayoutParams(fl_param);
+                    fl_place_list.setBackgroundColor(Color.WHITE);
+                    fl_place_list.setPadding(20, 10, 0, 30);
 
 
-                fl_place_list.addView(ly);
+                    RelativeLayout.LayoutParams rl_param = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
+                            ViewGroup.LayoutParams.WRAP_CONTENT);
 
-                place_list_view.addView(fl_place_list);
+                    RelativeLayout pl_name = new RelativeLayout(PlaceListActivity.this);
+                    pl_name.setLayoutParams(rl_param);
 
-                String finalPlaceName = place_name[ratingList.get(j)];
-                LatLng pl = placeList[ratingList.get(j)];
-                //투표추가 버튼
-                add.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        checkList(pl); // 투표리스트에 존재하는지 확인
-                        DocumentReference docRef = db.collection("vote").document(id);
 
-                        Runnable r = new Runnable() {
-                            @Override
-                            public void run() {
-                                if(state.equals("valid")) {
-                                    if(result){
-                                        result = false;
-                                        Toast.makeText(PlaceListActivity.this, "이미 추가된 장소입니다.", Toast.LENGTH_SHORT).show();
-                                    }else{
-                                        HashMap<String, Object> map = new HashMap<>();
-                                        GeoPoint location = new GeoPoint(pl.latitude, pl.longitude);
-                                        List<String> voter = new ArrayList<>();
-                                        map.put("latlng", location);
-                                        map.put("vote", 0);
-                                        map.put("name", finalPlaceName);
-                                        map.put("voter", voter);
+                    String placeAddress = getCurrentAddress(placeList[ratingList.get(j)]);
+                    //장소 이름, 주소 출력부분
+                    TextView pInfo = new TextView(PlaceListActivity.this);
+                    SpannableString s = new SpannableString(place_name[ratingList.get(j)] + "\n" + placeAddress);
+                    s.setSpan(new RelativeSizeSpan(1.8f), 0, place_name[ratingList.get(j)].length(), 0);
+                    s.setSpan(new ForegroundColorSpan(Color.BLACK), 0, place_name[ratingList.get(j)].length(), 0);
+                    pInfo.setText(s);
+                    pInfo.setLayoutParams(rl_param);
+                    pl_name.addView(pInfo);
 
-                                        if (size >= 5) { // 리스트에 5개 이상 존재할 때
-                                            Toast.makeText(PlaceListActivity.this, "더이상 투표리스트에 추가할 수 없습니다.", Toast.LENGTH_SHORT).show();
-                                        }else{
-                                            db.collection("vote").document(id).update("place", FieldValue.arrayUnion(map));
-                                            Toast.makeText(PlaceListActivity.this, "투표리스트에 추가되었습니다.", Toast.LENGTH_SHORT).show();
+                    //삭제버튼
+                    Button delete = new Button(PlaceListActivity.this);
+                    RelativeLayout.LayoutParams btn_param2 = new RelativeLayout.LayoutParams(90, 90);
+                    btn_param2.addRule(RelativeLayout.ALIGN_PARENT_RIGHT, RelativeLayout.TRUE);
+                    btn_param2.setMargins(0, 0, 20, 0);
+                    delete.setLayoutParams(btn_param2);
+                    delete.setPadding(0, 20, 5, 0);
+                    delete.setId(2 * (i + 1));
+                    delete.setBackground(ContextCompat.getDrawable(PlaceListActivity.this, R.drawable.delete));
+                    pl_name.addView(delete);
+
+                    //추가버튼
+                    Button add = new Button(PlaceListActivity.this);
+                    RelativeLayout.LayoutParams btn_param = new RelativeLayout.LayoutParams(90, 90);
+                    btn_param.addRule(RelativeLayout.LEFT_OF, delete.getId());
+                    btn_param.setMargins(0, 0, 10, 0);
+                    add.setLayoutParams(btn_param);
+                    add.setPadding(0, 20, 5, 0);
+                    add.setId(2 * i + 1);
+                    add.setBackground(ContextCompat.getDrawable(PlaceListActivity.this, R.drawable.add_location));
+                    pl_name.addView(add);
+
+                    fl_place_list.addView(pl_name);
+
+                    //LinearLayout 생성
+                    LinearLayout ly = new LinearLayout(PlaceListActivity.this);
+                    //LinearLayout.LayoutParams lyparams = param;
+                    ly.setLayoutParams(param);
+                    ly.setOrientation(LinearLayout.HORIZONTAL);
+
+                    TextView rate_tv = new TextView(PlaceListActivity.this);
+                    rate_tv.setText("별점 : " + rating[ratingList.get(j)] + " | ");
+                    rate_tv.setLayoutParams(param);
+                    ly.addView(rate_tv);
+
+                    RatingBar rb = new RatingBar(PlaceListActivity.this, null, android.R.attr.ratingBarStyleSmall);
+                    rb.setNumStars(5);
+                    rb.setRating(rating[ratingList.get(j)]);
+                    rb.setStepSize((float) 0.1);
+                    rb.setPadding(0, 5, 0, 0);
+                    rb.setLayoutParams(param);
+                    ly.addView(rb);
+
+
+                    fl_place_list.addView(ly);
+
+                    place_list_view.addView(fl_place_list);
+
+                    String finalPlaceName = place_name[ratingList.get(j)];
+                    LatLng pl = placeList[ratingList.get(j)];
+                    //투표추가 버튼
+                    add.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            checkList(pl); // 투표리스트에 존재하는지 확인
+                            DocumentReference docRef = db.collection("vote").document(id);
+
+                            Runnable r = new Runnable() {
+                                @Override
+                                public void run() {
+                                    if (state.equals("valid")) {
+                                        if (result) {
+                                            result = false;
+                                            Toast.makeText(PlaceListActivity.this, "이미 추가된 장소입니다.", Toast.LENGTH_SHORT).show();
+                                        } else {
+                                            HashMap<String, Object> map = new HashMap<>();
+                                            GeoPoint location = new GeoPoint(pl.latitude, pl.longitude);
+                                            List<String> voter = new ArrayList<>();
+                                            map.put("latlng", location);
+                                            map.put("vote", 0);
+                                            map.put("name", finalPlaceName);
+                                            map.put("voter", voter);
+
+                                            if (size >= 5) { // 리스트에 5개 이상 존재할 때
+                                                Toast.makeText(PlaceListActivity.this, "더이상 투표리스트에 추가할 수 없습니다.", Toast.LENGTH_SHORT).show();
+                                            } else {
+                                                db.collection("vote").document(id).update("place", FieldValue.arrayUnion(map));
+                                                Toast.makeText(PlaceListActivity.this, "투표리스트에 추가되었습니다.", Toast.LENGTH_SHORT).show();
+                                            }
                                         }
-                                    }
-                                }
-                                else{
-                                    Toast.makeText(PlaceListActivity.this, "이미 투표가 시작되었습니다.", Toast.LENGTH_SHORT).show();
-                                }
-
-                            }
-                        };
-
-                        delayHandler.postDelayed(r, 1000); // 1초후
-
-                        docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                            @Override
-                            public void onComplete(@NonNull com.google.android.gms.tasks.Task<DocumentSnapshot> task) {
-                                if (task.isSuccessful()) {
-                                    DocumentSnapshot document = task.getResult();
-                                    if (document.exists()) {
-                                        // 해당 문서가 존재하는 경우
-                                        List<HashMap<String,Object>> list = (List<HashMap<String, Object>>)document.get("place");
-                                        size = (int)list.size();
-                                        state = document.getData().get("state").toString(); // 투표 상태
-                                        delayHandler.sendEmptyMessage(0);
-                                        Log.d("Attend", "Find document");
                                     } else {
-                                        // 존재하지 않는 문서
-                                        Log.d("Attend", "No Document");
+                                        Toast.makeText(PlaceListActivity.this, "이미 투표가 시작되었습니다.", Toast.LENGTH_SHORT).show();
                                     }
-                                } else {
-                                    Log.d("Attend", "Task Fail : " + task.getException());
+
                                 }
-                            }
-                        });
+                            };
 
-                    }
-                });
-                //투표삭제 버튼
-                delete.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        checkList(pl); // 투표리스트에 존재하는지 확인
-                        DocumentReference docRef = db.collection("vote").document(id);
+                            delayHandler.postDelayed(r, 1000); // 1초후
 
-                        Runnable r = new Runnable() {
-                            @Override
-                            public void run() {
-                                if(state.equals("valid")) {
-                                    if (result) {
-                                        result = false;
-                                        HashMap<String, Object> map = new HashMap<>();
-                                        GeoPoint location = new GeoPoint(pl.latitude, pl.longitude);
-                                        List<String> voter = new ArrayList<>();
-                                        map.put("latlng", location);
-                                        map.put("vote", 0);
-                                        map.put("name", finalPlaceName);
-                                        map.put("voter", voter);
-
-                                        System.out.println("size : " + size);
-                                        docRef.update("place", FieldValue.arrayRemove(map));
-                                        Toast.makeText(PlaceListActivity.this, "투표리스트에서 삭제되었습니다.", Toast.LENGTH_SHORT).show();
-                                    }
-                                    else{
-                                        Toast.makeText(PlaceListActivity.this, "투표리스트에 존재하지 않습니다.", Toast.LENGTH_SHORT).show();
-                                    }
-                                }
-                                else{
-                                    Toast.makeText(PlaceListActivity.this, "이미 투표가 시작되었습니다.", Toast.LENGTH_SHORT).show();
-                                }
-                            }
-                        };
-
-                        delayHandler.postDelayed(r, 1000); // 1초후
-
-                        docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                            @Override
-                            public void onComplete(@NonNull com.google.android.gms.tasks.Task<DocumentSnapshot> task) {
-                                if (task.isSuccessful()) {
-                                    DocumentSnapshot document = task.getResult();
-                                    if (document.exists()) {
-                                        // 해당 문서가 존재하는 경우
-                                        List<HashMap<String,Object>> list = (List<HashMap<String, Object>>)document.get("place");
-                                        size = (int)list.size();
-                                        state = document.getData().get("state").toString(); // 투표 상태
-                                        delayHandler.sendEmptyMessage(0);
-                                        Log.d("Attend", "Find document");
+                            docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                @Override
+                                public void onComplete(@NonNull com.google.android.gms.tasks.Task<DocumentSnapshot> task) {
+                                    if (task.isSuccessful()) {
+                                        DocumentSnapshot document = task.getResult();
+                                        if (document.exists()) {
+                                            // 해당 문서가 존재하는 경우
+                                            List<HashMap<String, Object>> list = (List<HashMap<String, Object>>) document.get("place");
+                                            size = (int) list.size();
+                                            state = document.getData().get("state").toString(); // 투표 상태
+                                            delayHandler.sendEmptyMessage(0);
+                                            Log.d("Attend", "Find document");
+                                        } else {
+                                            // 존재하지 않는 문서
+                                            Log.d("Attend", "No Document");
+                                        }
                                     } else {
-                                        // 존재하지 않는 문서
-                                        Log.d("Attend", "No Document");
+                                        Log.d("Attend", "Task Fail : " + task.getException());
                                     }
-                                } else {
-                                    Log.d("Attend", "Task Fail : " + task.getException());
                                 }
-                            }
-                        });
-                    }
-                });
+                            });
 
-                MarkerOptions markerOptions = new MarkerOptions();
-                markerOptions.position(pl);
-                markerOptions.title(finalPlaceName);
-                markerOptions.snippet(placeAddress);
-                mMap.addMarker(markerOptions);
+                        }
+                    });
+                    //투표삭제 버튼
+                    delete.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            checkList(pl); // 투표리스트에 존재하는지 확인
+                            DocumentReference docRef = db.collection("vote").document(id);
+
+                            Runnable r = new Runnable() {
+                                @Override
+                                public void run() {
+                                    if (state.equals("valid")) {
+                                        if (result) {
+                                            result = false;
+                                            HashMap<String, Object> map = new HashMap<>();
+                                            GeoPoint location = new GeoPoint(pl.latitude, pl.longitude);
+                                            List<String> voter = new ArrayList<>();
+                                            map.put("latlng", location);
+                                            map.put("vote", 0);
+                                            map.put("name", finalPlaceName);
+                                            map.put("voter", voter);
+
+                                            System.out.println("size : " + size);
+                                            docRef.update("place", FieldValue.arrayRemove(map));
+                                            Toast.makeText(PlaceListActivity.this, "투표리스트에서 삭제되었습니다.", Toast.LENGTH_SHORT).show();
+                                        } else {
+                                            Toast.makeText(PlaceListActivity.this, "투표리스트에 존재하지 않습니다.", Toast.LENGTH_SHORT).show();
+                                        }
+                                    } else {
+                                        Toast.makeText(PlaceListActivity.this, "이미 투표가 시작되었습니다.", Toast.LENGTH_SHORT).show();
+                                    }
+                                }
+                            };
+
+                            delayHandler.postDelayed(r, 1000); // 1초후
+
+                            docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                @Override
+                                public void onComplete(@NonNull com.google.android.gms.tasks.Task<DocumentSnapshot> task) {
+                                    if (task.isSuccessful()) {
+                                        DocumentSnapshot document = task.getResult();
+                                        if (document.exists()) {
+                                            // 해당 문서가 존재하는 경우
+                                            List<HashMap<String, Object>> list = (List<HashMap<String, Object>>) document.get("place");
+                                            size = (int) list.size();
+                                            state = document.getData().get("state").toString(); // 투표 상태
+                                            delayHandler.sendEmptyMessage(0);
+                                            Log.d("Attend", "Find document");
+                                        } else {
+                                            // 존재하지 않는 문서
+                                            Log.d("Attend", "No Document");
+                                        }
+                                    } else {
+                                        Log.d("Attend", "Task Fail : " + task.getException());
+                                    }
+                                }
+                            });
+                        }
+                    });
+
+                    MarkerOptions markerOptions = new MarkerOptions();
+                    markerOptions.position(pl);
+                    markerOptions.title(finalPlaceName);
+                    markerOptions.snippet(placeAddress);
+                    mMap.addMarker(markerOptions);
 
 
-
+                }
             }
 
         } catch (JSONException e) {
             e.printStackTrace();
             System.out.println("No Result");
             //Toast.makeText(this, "현재 범위 내에 검색 결과가 없습니다.", Toast.LENGTH_SHORT).show();
-            LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-            lp.gravity = Gravity.CENTER;
-            lp.setMargins(10,100,10,10);
 
-            TextView view1 = new TextView(PlaceListActivity.this);
-            view1.setText("중간지점 근처에\n현재 카테고리에 해당하는 장소가\n존재하지 않습니다.\n\n범위를 늘려보세요!");
-            view1.setTextSize(20f);
-            view1.setTextColor(Color.BLACK);
-            view1.setBackgroundColor(Color.WHITE);
-            view1.setGravity(Gravity.CENTER);
-            view1.setPadding(20,50,20,20);
-            view1.setLayoutParams(lp);
-            //부모 뷰에 추가
-            place_list_view.addView(view1);
         }catch(NullPointerException e){
             e.printStackTrace();
         }

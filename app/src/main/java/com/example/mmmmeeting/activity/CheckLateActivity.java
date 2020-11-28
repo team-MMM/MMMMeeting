@@ -47,7 +47,6 @@ public class CheckLateActivity extends AppCompatActivity implements View.OnClick
 
     Calendar calendar;
     Calendar tempCal;
-    TextView meetingText;
     Button attendanceBtn;
     Date meetingDate;
     String place;
@@ -61,8 +60,6 @@ public class CheckLateActivity extends AppCompatActivity implements View.OnClick
                 WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         setContentView(R.layout.activity_check_late);
 
-
-        meetingText = findViewById(R.id.meetingTime);
         attendanceBtn = findViewById(R.id.checkAttendBtn);
         attendanceBtn.setOnClickListener(this);
 
@@ -91,22 +88,6 @@ public class CheckLateActivity extends AppCompatActivity implements View.OnClick
                         if(placeMap!=null){
                             place = placeMap.get("name");
                         }
-                        // 미팅 날짜를 get으로 편하게 받아오기 위해 캘린더 객체 생성
-                        if(meetingDate == null){
-                            meetingText.setText("약속 일정이 정해지지 않았습니다.");
-                            return;
-                        }
-
-                        calendar.setTime(meetingDate);
-                        hour = calendar.get(Calendar.HOUR_OF_DAY);
-                        minute = calendar.get(Calendar.MINUTE);
-                        month = calendar.get(Calendar.MONTH);
-                        day = calendar.get(Calendar.DAY_OF_MONTH);
-                        calDate = calendar.getTime();
-
-                        SimpleDateFormat sdf = new SimpleDateFormat("yyyy년 MM월 dd일 a hh : mm");
-                        meetingText.setText(sdf.format(calDate));
-
                     } else {
                         Log.d("Attend", "No Document");
                     }
@@ -139,32 +120,62 @@ public class CheckLateActivity extends AppCompatActivity implements View.OnClick
     }
 
     private void timeCheck(){
-        Date now = new Date();
-        Calendar temcal = Calendar.getInstance();
-        temcal.setTime(now);
-        // 현재 시간 받아오기
-        int nowHour = temcal.get(Calendar.HOUR_OF_DAY);
-        int nowMinute = temcal.get(Calendar.MINUTE);
-        int nowMonth = temcal.get(Calendar.MONTH);
-        int nowDay = temcal.get(Calendar.DAY_OF_MONTH);
+        // 약속 변경 후 일수도 있어서 다시 검사
+        DocumentReference docRef = db.collection("schedule").document(scID);
+        docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    if (document.exists()) {
+                        meetingDate =  document.getDate("meetingDate");
 
-        // 당일의 경우 시간 체크
-        if(nowMonth==month && nowDay == day){
-            if(nowHour >= hour + 1 && nowMinute >= minute || nowHour >= hour + 2) {
-                // flag를 없애고 bundle로 값을 전달해줌
-                Bundle bd = new Bundle();
-                bd.putString("arg", "Late");
-                sendMessage(bd);
-            }else{
-                Bundle bd = new Bundle();
-                bd.putString("arg", "TimeCheck");
-                sendMessage(bd);
+                        calendar.setTime(meetingDate);
+                        hour = calendar.get(Calendar.HOUR_OF_DAY);
+                        minute = calendar.get(Calendar.MINUTE);
+                        month = calendar.get(Calendar.MONTH);
+                        day = calendar.get(Calendar.DAY_OF_MONTH);
+                        calDate = calendar.getTime();
+
+
+                        Date now = new Date();
+                        Calendar temcal = Calendar.getInstance();
+                        temcal.setTime(now);
+                        // 현재 시간 받아오기
+                        int nowHour = temcal.get(Calendar.HOUR_OF_DAY);
+                        int nowMinute = temcal.get(Calendar.MINUTE);
+                        int nowMonth = temcal.get(Calendar.MONTH);
+                        int nowDay = temcal.get(Calendar.DAY_OF_MONTH);
+
+                        // 당일의 경우 시간 체크
+                        if(nowMonth==month && nowDay == day){
+                            if(nowHour >= hour + 1 && nowMinute >= minute || nowHour >= hour + 2) {
+                                // flag를 없애고 bundle로 값을 전달해줌
+                                Bundle bd = new Bundle();
+                                bd.putString("arg", "Late");
+                                sendMessage(bd);
+                            }else{
+                                Bundle bd = new Bundle();
+                                bd.putString("arg", "TimeCheck");
+                                sendMessage(bd);
+                            }
+                        }else{
+                            Bundle bd = new Bundle();
+                            bd.putString("arg", "Late");
+                            sendMessage(bd);
+                        }
+
+                    } else {
+                        Log.d("Attend", "No Document");
+                    }
+                } else {
+                    Log.d("Attend", "Task Fail : " + task.getException());
+                }
             }
-        }else{
-            Bundle bd = new Bundle();
-            bd.putString("arg", "Late");
-            sendMessage(bd);
-        }
+
+        });
+
+
 
 
     }
