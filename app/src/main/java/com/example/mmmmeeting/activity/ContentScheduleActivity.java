@@ -21,13 +21,16 @@ import com.example.mmmmeeting.R;
 import com.example.mmmmeeting.ScheduleDeleter;
 import com.example.mmmmeeting.view.ReadScheduleView_new;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.snackbar.Snackbar;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import androidx.annotation.NonNull;
 
@@ -44,6 +47,7 @@ public class ContentScheduleActivity extends BasicActivity implements View.OnCli
     Handler handler;
     Calendar cal;
     Calendar tempCal;
+    Date meetingDate;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -161,42 +165,65 @@ public class ContentScheduleActivity extends BasicActivity implements View.OnCli
     }
 
     private void timeCheck(){
-        Date now = new Date();
-        tempCal.setTime(now);
-        // 현재 시간 받아오기
-        int nowHour = tempCal.get(Calendar.HOUR_OF_DAY);
-        int nowMinute = tempCal.get(Calendar.MINUTE);
-        int nowMonth = tempCal.get(Calendar.MONTH);
-        int nowDay = tempCal.get(Calendar.DAY_OF_MONTH);
+        // 약속 변경 후 일수도 있어서 다시 검사
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        DocumentReference docRef = db.collection("schedule").document(scheduleInfo.getId());
+        docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    if (document.exists()) {
+                        meetingDate =  document.getDate("meetingDate");
+                        Map<String, String> placeMap = (Map<String, String>) document.getData().get("meetingPlace");
 
-        cal.setTime(scheduleInfo.getMeetingDate());
-        int month = cal.get(Calendar.MONTH);
-        int day = cal.get(Calendar.DAY_OF_MONTH);
-        hour = cal.get(Calendar.HOUR_OF_DAY);
-        minute = cal.get(Calendar.MINUTE);
+                        if(meetingDate == null || placeMap == null){
+                            Toast.makeText(getApplicationContext(),"약속 시간 또는 장소가 정해지지 않았습니다.",Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+                        cal.setTime(meetingDate);
+                        hour = cal.get(Calendar.HOUR_OF_DAY);
+                        minute = cal.get(Calendar.MINUTE);
+                        int month = cal.get(Calendar.MONTH);
+                        int day = cal.get(Calendar.DAY_OF_MONTH);
 
-        System.out.println(month+" "+day+" "+nowMonth+" "+nowDay);
-        System.out.println(hour+" "+minute+" "+nowHour+" "+nowMinute);
-        // 당일의 경우 시간 체크
-        if(nowMonth==month && nowDay == day){
-            if(nowHour > hour || (nowHour == hour && nowMinute >= minute)) {
-                // flag를 없애고 bundle로 값을 전달해줌
-                System.out.println("1");
-                Bundle bd = new Bundle();
-                bd.putString("arg", "Late");
-                sendMessage(bd);
-            }else{
-                System.out.println("2");
-                Bundle bd = new Bundle();
-                bd.putString("arg", "TimeCheck");
-                sendMessage(bd);
+
+                        Date now = new Date();
+                        Calendar temcal = Calendar.getInstance();
+                        temcal.setTime(now);
+                        // 현재 시간 받아오기
+                        int nowHour = temcal.get(Calendar.HOUR_OF_DAY);
+                        int nowMinute = temcal.get(Calendar.MINUTE);
+                        int nowMonth = temcal.get(Calendar.MONTH);
+                        int nowDay = temcal.get(Calendar.DAY_OF_MONTH);
+
+                        // 당일의 경우 시간 체크
+                        if(nowMonth==month && nowDay == day){
+                            if(nowHour >= hour + 1 && nowMinute >= minute || nowHour >= hour + 2) {
+                                // flag를 없애고 bundle로 값을 전달해줌
+                                Bundle bd = new Bundle();
+                                bd.putString("arg", "Late");
+                                sendMessage(bd);
+                            }else{
+                                Bundle bd = new Bundle();
+                                bd.putString("arg", "TimeCheck");
+                                sendMessage(bd);
+                            }
+                        }else{
+                            Bundle bd = new Bundle();
+                            bd.putString("arg", "Late");
+                            sendMessage(bd);
+                        }
+
+                    } else {
+                        Log.d("Attend", "No Document");
+                    }
+                } else {
+                    Log.d("Attend", "Task Fail : " + task.getException());
+                }
             }
-        }else{
-            System.out.println("3");
-            Bundle bd = new Bundle();
-            bd.putString("arg", "Late");
-            sendMessage(bd);
-        }
+
+        });
     }
 
     private void sendMessage(Bundle bd){
@@ -209,15 +236,11 @@ public class ContentScheduleActivity extends BasicActivity implements View.OnCli
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        switch (requestCode) {
-            case 0:
-                if (resultCode == Activity.RESULT_OK) {
-                    scheduleInfo = (ScheduleInfo)data.getSerializableExtra("scheduleInfo");
-                    System.out.println("I'mback");
-                    contentsLayout.removeAllViews();
-                    uiUpdate();
-                }
-                break;
+        if (resultCode == Activity.RESULT_OK) {
+            scheduleInfo = (ScheduleInfo)data.getSerializableExtra("scheduleInfo");
+            System.out.println("I'mback");
+            contentsLayout.removeAllViews();
+            uiUpdate();
         }
     }
 

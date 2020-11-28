@@ -231,6 +231,7 @@ import java.util.Map;
                             lateMinute = nowMinute - minute;
                         }
                         timePoint = -1.0 * (double)lateMinute * 0.2;
+                        timePoint = Double.parseDouble(String.format("%.1f",timePoint));
                         Toast.makeText(getApplicationContext(), "포인트 "+ -1 * timePoint + "점 차감!", Toast.LENGTH_SHORT).show();
                         timePointMap.put(user.getUid(),timePoint);
                         db.collection("schedule").document(scID).update("timePoint", timePointMap);
