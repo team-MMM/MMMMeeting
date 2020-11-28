@@ -184,7 +184,8 @@ public class FragHome extends Fragment {
                                             document.getData().get("meetingID").toString(),
                                             (ArrayList<String>) document.getData().get("contents"),
                                             new Date(document.getDate("createdAt").getTime()),
-                                            document.getId());
+                                            document.getId(),
+                                            document.getData().get("type").toString());
 
                                     if (document.get("meetingPlace") != null) {
                                         HashMap<String, Object> place = (HashMap<String, Object>) document.get("meetingPlace");

@@ -7,6 +7,8 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.util.Log;
+import android.util.TypedValue;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -32,16 +34,19 @@ import com.example.mmmmeeting.OnScheduleListener;
 import com.example.mmmmeeting.R;
 import com.example.mmmmeeting.ScheduleDeleter;
 import com.example.mmmmeeting.activity.CalendarActivity;
+import com.example.mmmmeeting.activity.EditScheduleActivity;
 import com.example.mmmmeeting.activity.MakeScheduleActivity;
 import com.example.mmmmeeting.activity.ContentScheduleActivity;
 import com.example.mmmmeeting.activity.NoticeActivity;
 import com.example.mmmmeeting.view.ReadScheduleView;
 import com.google.android.exoplayer2.SimpleExoPlayer;
+import com.google.api.Distribution;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
 
 public class ScheduleAdapter extends RecyclerView.Adapter<ScheduleAdapter.MainViewHolder> {
     private ArrayList<ScheduleInfo> mDataset;
@@ -84,8 +89,15 @@ public class ScheduleAdapter extends RecyclerView.Adapter<ScheduleAdapter.MainVi
         cardView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(activity, ContentScheduleActivity.class);
-                intent.putExtra("scheduleInfo", mDataset.get(mainViewHolder.getAdapterPosition()));
+                String type = mDataset.get(mainViewHolder.getAdapterPosition()).getType();
+                Intent intent;
+                if(type.equals("online")){
+                    intent = new Intent(activity, CalendarActivity.class);
+                    intent.putExtra("scheduleInfo", mDataset.get(mainViewHolder.getAdapterPosition()));
+                }else {
+                    intent = new Intent(activity, ContentScheduleActivity.class);
+                    intent.putExtra("scheduleInfo", mDataset.get(mainViewHolder.getAdapterPosition()));
+                }
                 activity.startActivity(intent);
             }
         });
@@ -144,22 +156,30 @@ public class ScheduleAdapter extends RecyclerView.Adapter<ScheduleAdapter.MainVi
         TextView meetingDateView = cardView.findViewById(R.id.meetingDate);
         TextView meetingPlaceView = cardView.findViewById(R.id.meetingPlace);
 
-
         ScheduleInfo postInfo = mDataset.get(position);
+        String type = postInfo.getType();
         titleTextView.setText(postInfo.getTitle());
 
-        if(postInfo.getMeetingDate()!=null){
-            Date meetingDate =  postInfo.getMeetingDate();
+        if (postInfo.getMeetingDate() != null) {
+            Date meetingDate = postInfo.getMeetingDate();
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy년 MM월 dd일 a hh시 mm분");
-            meetingDateView.setText("모임 날짜 : "+ sdf.format(meetingDate));
-        }else {
+            meetingDateView.setText("모임 날짜 : " + sdf.format(meetingDate));
+        } else {
             meetingDateView.setText("모임 날짜 : 미정");
         }
 
-        if(postInfo.getMeetingPlace()!=null){
-            meetingPlaceView.setText("모임 장소 : "+postInfo.getMeetingPlace());
-        }else {
-            meetingPlaceView.setText("모임 장소 : 미정");
+
+        if(type.equals("offline")) {
+            if (postInfo.getMeetingPlace() != null) {
+                meetingPlaceView.setText("모임 장소 : " + postInfo.getMeetingPlace());
+            } else {
+                meetingPlaceView.setText("모임 장소 : 미정");
+            }
+        }else{
+            meetingPlaceView.setText(postInfo.getContents().get(0));
+            meetingPlaceView.setTextSize(18);
+            TextView createdAtTextView = cardView.findViewById(R.id.createAtTextView);
+            createdAtTextView.setText(new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(postInfo.getCreatedAt()));
         }
 
 
@@ -171,20 +191,21 @@ public class ScheduleAdapter extends RecyclerView.Adapter<ScheduleAdapter.MainVi
             frame.setVisibility(View.INVISIBLE);
         }
 
+        if(type.equals("offline")) {
+            ReadScheduleView readScheduleView = cardView.findViewById(R.id.readScheduleView);
+            LinearLayout contentsLayout = cardView.findViewById(R.id.contentsLayout);
 
-        ReadScheduleView readScheduleView = cardView.findViewById(R.id.readScheduleView);
-        LinearLayout contentsLayout = cardView.findViewById(R.id.contentsLayout);
+            if (contentsLayout.getTag() == null || !contentsLayout.getTag().equals(postInfo)) {
+                contentsLayout.setTag(postInfo);
+                contentsLayout.removeAllViews();
 
-        if (contentsLayout.getTag() == null || !contentsLayout.getTag().equals(postInfo)) {
-            contentsLayout.setTag(postInfo);
-            contentsLayout.removeAllViews();
+                readScheduleView.setMoreIndex(MORE_INDEX);
+                readScheduleView.setScheduleInfo(postInfo);
 
-            readScheduleView.setMoreIndex(MORE_INDEX);
-            readScheduleView.setScheduleInfo(postInfo);
-
-            ArrayList<SimpleExoPlayer> playerArrayList = readScheduleView.getPlayerArrayList();
-            if(playerArrayList != null){
-                playerArrayListArrayList.add(playerArrayList);
+                ArrayList<SimpleExoPlayer> playerArrayList = readScheduleView.getPlayerArrayList();
+                if (playerArrayList != null) {
+                    playerArrayListArrayList.add(playerArrayList);
+                }
             }
         }
     }
@@ -201,7 +222,7 @@ public class ScheduleAdapter extends RecyclerView.Adapter<ScheduleAdapter.MainVi
             public boolean onMenuItemClick(MenuItem menuItem) {
                 switch (menuItem.getItemId()) {
                     case R.id.modify:
-                        myStartActivity(MakeScheduleActivity.class, mDataset.get(position));
+                        myStartActivity(EditScheduleActivity.class, mDataset.get(position));
                         return true;
                     case R.id.delete:
                         scheduleDeleter.storageDelete(mDataset.get(position));

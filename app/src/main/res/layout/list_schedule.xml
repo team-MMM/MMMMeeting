@@ -71,6 +71,21 @@
             android:layout_marginTop="5dp"
             android:background="#DDDDDD" />
 
+        <LinearLayout
+            android:id = "@+id/layout_list"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/meetingDate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="5sp"
+                android:text="모임날짜 : 미정"
+                android:textColor="@android:color/black"
+                android:textSize="15sp" />
+
         <TextView
             android:id="@+id/meetingPlace"
             android:layout_width="wrap_content"
@@ -80,14 +95,8 @@
             android:textColor="@android:color/black"
             android:textSize="15sp" />
 
-        <TextView
-            android:id="@+id/meetingDate"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="5sp"
-            android:text="모임날짜 : 미정"
-            android:textColor="@android:color/black"
-            android:textSize="15sp" />
+
+        </LinearLayout>
 
         <com.example.mmmmeeting.view.ReadScheduleView
             android:id="@+id/readScheduleView"

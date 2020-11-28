@@ -15,17 +15,19 @@ public class ScheduleInfo implements Serializable {
     private Date meetingDate;
     private Date createdAt;
     private String id;
+    private String type;
 
 
-    public ScheduleInfo(String title, String meetingID, ArrayList<String> contents, Date createdAt, String id){
+    public ScheduleInfo(String title, String meetingID, ArrayList<String> contents, Date createdAt, String id, String type){
         this.title = title;
         this.meetingID = meetingID;
         this.contents = contents;
         this.createdAt = createdAt;
         this.id = id;
+        this.type = type;
     }
 
-    public ScheduleInfo(String title, String meetingID, ArrayList<String> contents, ArrayList<String> lateComer, String meetingPlace, Date meetingDate, Date createdAt){
+    public ScheduleInfo(String title, String meetingID, ArrayList<String> contents, ArrayList<String> lateComer, String meetingPlace, Date meetingDate, Date createdAt, String type){
         this.title = title;
         this.meetingID = meetingID;
         this.contents = contents;
@@ -33,6 +35,7 @@ public class ScheduleInfo implements Serializable {
         this.meetingPlace = meetingPlace;
         this.meetingDate = meetingDate;
         this.createdAt = createdAt;
+        this.type = type;
     }
 
     public Map<String, Object> getScheduleInfo(){
@@ -44,6 +47,7 @@ public class ScheduleInfo implements Serializable {
         docData.put("meetingPlace",meetingPlace);
         docData.put("meetingDate",meetingDate);
         docData.put("createdAt",createdAt);
+        docData.put("type",type);
         return  docData;
     }
 
@@ -75,5 +79,8 @@ public class ScheduleInfo implements Serializable {
 
     public String getId(){ return this.id; }
     public void setId(String id){ this.id = id; }
+
+    public String getType(){ return this.type; }
+    public void setType(String type){ this.type = type; }
 
 }

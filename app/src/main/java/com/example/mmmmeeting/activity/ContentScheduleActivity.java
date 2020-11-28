@@ -257,7 +257,7 @@ public class ContentScheduleActivity extends BasicActivity implements View.OnCli
                 boardDeleter.storageDelete(scheduleInfo);
                 return true;
             case R.id.modify:
-                myStartActivity(MakeScheduleActivity.class, scheduleInfo);
+                myStartActivity(EditScheduleActivity.class, scheduleInfo);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
