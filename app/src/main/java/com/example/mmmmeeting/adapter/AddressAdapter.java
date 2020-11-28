@@ -74,9 +74,10 @@ public class AddressAdapter extends BaseAdapter {
                 // MemberInitActivity 주소 정보 전달
                 Intent intent = new Intent(context, MemberInitActivity.class);
                 intent.putExtra("road", listItem.getRoad());
+                ((Activity)context).setResult(0,intent);
 //                intent.putExtra("post", listItem.getJibun());
 //                intent.putExtra("jibun", listItem.getPost());
-                context.startActivity(intent);
+//                context.startActivity(intent);
                 ((Activity)context).finish();
             }
         });

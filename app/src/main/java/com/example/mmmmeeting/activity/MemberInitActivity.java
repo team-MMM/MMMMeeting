@@ -144,39 +144,40 @@ public class MemberInitActivity extends BasicActivity implements View.OnClickLis
 
 
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-
-        // 주소 검색 후 도로명 전달받아 텍스트뷰에 설정
-        if(getIntent().getExtras()!=null) {
-            Intent intent = getIntent();
-            addressTv.setText(intent.getExtras().getString("road"));
-
-            String name = sp.getString("name", "");
-            float restaurantBar = sp.getFloat("restaurant",0);
-            float cafeBar = sp.getFloat("cafe",0);
-            float shoppingBar = sp.getFloat("shopping",0);
-            float parkBar = sp.getFloat("park",0);
-            float actBar = sp.getFloat("act",0);
-            profilePath = sp.getString("profilePath","");
-
-            nameTv.setText(name);
-            restaurant.setRating(restaurantBar);
-            cafe.setRating(cafeBar);
-            shopping.setRating(shoppingBar);
-            park.setRating(parkBar);
-            act.setRating(actBar);
-
-            if(profilePath.equals("")){
-                profileImageVIew.setImageResource(R.drawable.profile);
-
-            }else if(profilePath!=null) {
-                Glide.with(this).load(profilePath).centerCrop().override(500).into(profileImageVIew);
-            }
-        }
-
-    }
+//    @Override
+//    protected void onResume() {
+//        super.onResume();
+//
+//        // 주소 검색 후 도로명 전달받아 텍스트뷰에 설정
+//        if(getIntent().getExtras()!=null) {
+//            Intent intent = getIntent();
+//            addressTv.setText(intent.getExtras().getString("road"));
+//
+//            String name = sp.getString("name", "");
+//            float restaurantBar = sp.getFloat("restaurant",0);
+//            float cafeBar = sp.getFloat("cafe",0);
+//            float shoppingBar = sp.getFloat("shopping",0);
+//            float parkBar = sp.getFloat("park",0);
+//            float actBar = sp.getFloat("act",0);
+//            profilePath = sp.getString("profilePath","");
+//            Log.d("info Test " , "resume value" + nameTv.getText().toString());
+//
+//            nameTv.setText(name);
+//            restaurant.setRating(restaurantBar);
+//            cafe.setRating(cafeBar);
+//            shopping.setRating(shoppingBar);
+//            park.setRating(parkBar);
+//            act.setRating(actBar);
+//
+//            if(profilePath.equals("")){
+//                profileImageVIew.setImageResource(R.drawable.profile);
+//
+//            }else if(profilePath!=null) {
+//                Glide.with(this).load(profilePath).centerCrop().override(500).into(profileImageVIew);
+//            }
+//        }
+//
+//    }
 
     private void save(){
         SharedPreferences.Editor editor = sp.edit(); // editor 사용해 저장
@@ -189,6 +190,7 @@ public class MemberInitActivity extends BasicActivity implements View.OnClickLis
         editor.putFloat("park", park.getRating());
         editor.putFloat("act", act.getRating());
         editor.putString("profilePath",profilePath);
+        Log.d("info Test " , "work value" + nameTv.getText().toString());
     }
 
     @Override
@@ -211,8 +213,11 @@ public class MemberInitActivity extends BasicActivity implements View.OnClickLis
                 // 주소 찾기
             case R.id.addressSearchBtn:
                 save();
-                myStartActivity(SearchAddressActivity.class);
-                finish();
+                Intent intent = new Intent(this, SearchAddressActivity.class);
+                startActivityForResult(intent, 0);
+
+//                myStartActivity(SearchAddressActivity.class);
+//                finish();
                 break;
 
             case R.id.profileImageView:
@@ -405,6 +410,14 @@ public class MemberInitActivity extends BasicActivity implements View.OnClickLis
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+
+        if(resultCode==0){
+            if(data!=null){
+                addressTv.setText(data.getExtras().getString("road"));
+                Log.d("Test ", data.getExtras().getString("road"));
+            }
+        }
+
         if (resultCode == RESULT_OK) {
             profilePath = data.getStringExtra(INTENT_PATH);
             System.out.println(profilePath);
