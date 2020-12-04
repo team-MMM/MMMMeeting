@@ -73,26 +73,9 @@ public class SearchPlaceActivity extends AppCompatActivity
     private String address=null;
     private LatLng arrival;
 
-    Button btn_route,btn_vote,btn_delete;
+    Button btn_vote,btn_delete;
     private View layout_search;
 
-    int category; //선택한 카테고리 넘버
-
-    // 구글 서버로 부터 받아온 데이터를 저장할 리스트
-    ArrayList<Double> lat_list;
-    ArrayList<Double> lng_list;
-    ArrayList<String> name_list;
-    ArrayList<String> vicinity_list;
-    // 지도의 표시한 마커(주변장소표시)를 관리하는 객체를 담을 리스트
-    ArrayList<Marker> markers_list;
-    // 다이얼로그를 구성하기 위한 배열
-    String[] category_name_array={
-            "모두","ATM","은행","미용실","카페","교회","주유소","식당"
-    };
-    // types 값 배열
-    String[] category_value_array={
-            "all","atm","bank","beauty_salon","cafe","church","gas_station","restaurant"
-    };
 
     private ScheduleInfo scheduleInfo;
     private String scheduleId;
@@ -117,11 +100,9 @@ public class SearchPlaceActivity extends AppCompatActivity
         previous_marker = new ArrayList<Marker>();
 
         layout_search=findViewById(R.id.layout_search);
-        btn_route = findViewById(R.id.btn_route);
         btn_vote = findViewById(R.id.btn_vote);
         btn_delete = findViewById(R.id.btn_delete);
 
-        btn_route.setOnClickListener(this);
         btn_vote.setOnClickListener(this);
         btn_delete.setOnClickListener(this);
 
@@ -176,28 +157,7 @@ public class SearchPlaceActivity extends AppCompatActivity
     public void onClick(View v) {
 
         switch (v.getId()) {
-            //경로 검색 버튼을 눌렀을 때
-            case R.id.btn_route:
-                try {
-                    if (address == null) {
-                        final Snackbar snackbar = Snackbar.make(layout_search, "목적지를 입력해주세요^^", Snackbar.LENGTH_INDEFINITE);
-                        snackbar.setAction("확인", new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                snackbar.dismiss();
-                            }
-                        });
-                        snackbar.show();
-                    } else {
-                        //DirectionActivity로 넘어간다.
-                        Intent i = new Intent(this, DirectionActivity.class);
-                        i.putExtra("address", address);
-                        startActivity(i);
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                break;
+
             //투표추가 버튼을 눌렀을 때
             case R.id.btn_vote:
                 if (address == null) {
@@ -473,41 +433,6 @@ public class SearchPlaceActivity extends AppCompatActivity
         marker.visible(false);
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(SEOUL, 8));
         mMap.clear();
-    }
-
-    public String getCurrentAddress(LatLng latlng) {
-
-        //지오코더... GPS를 주소로 변환
-        Geocoder geocoder = new Geocoder(this, Locale.getDefault());
-
-        List<Address> addresses;
-
-        try {
-
-            addresses = geocoder.getFromLocation(
-                    latlng.latitude,
-                    latlng.longitude,
-                    1);
-        } catch (IOException ioException) {
-            //네트워크 문제
-            Toast.makeText(this, "지오코더 서비스 사용불가", Toast.LENGTH_LONG).show();
-            return "지오코더 서비스 사용불가";
-        } catch (IllegalArgumentException illegalArgumentException) {
-            Toast.makeText(this, "잘못된 GPS 좌표", Toast.LENGTH_LONG).show();
-            return "잘못된 GPS 좌표";
-
-        }
-
-
-        if (addresses == null || addresses.size() == 0) {
-            Toast.makeText(this, "주소 미발견", Toast.LENGTH_LONG).show();
-            return "주소 미발견";
-
-        } else {
-            Address address = addresses.get(0);
-            return address.getAddressLine(0).toString();
-        }
-
     }
 
     class Point {

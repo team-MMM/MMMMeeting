@@ -28,16 +28,7 @@
         android:layout_weight="0.2"
         android:gravity="center_vertical|center_horizontal"
         android:orientation="horizontal">
-
-
-        <Button
-            android:id="@+id/btn_route"
-            android:layout_width="100dp"
-            android:layout_height="48dp"
-            android:layout_marginRight="30dp"
-            android:background="@drawable/back_name"
-            android:visibility="gone"
-            android:text="경로 검색" />
+        
 
         <Button
             android:id="@+id/btn_vote"
