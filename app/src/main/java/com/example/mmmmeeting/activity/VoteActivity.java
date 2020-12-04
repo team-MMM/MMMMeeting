@@ -169,7 +169,10 @@ public class VoteActivity extends BasicActivity {
 
                     Toast.makeText(VoteActivity.this, "가장 많은 투표를 받은 장소는 " + name + "입니다.", Toast.LENGTH_SHORT).show();
                     db.collection("schedule").document(scheduleId).update("meetingPlace", meetingPlace); // db에 최종장소 올리기
-                    Toast.makeText(VoteActivity.this, name + "(으)로 약속장소가 설정되었습니다.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(VoteActivity.this, name + "(으)로 약속 장소가 설정되었습니다.", Toast.LENGTH_SHORT).show();
+
+                    // db에서 투표 삭제
+                    db.collection("vote").document(id).delete();
                 } else {
                     Toast.makeText(VoteActivity.this, "가장 많은 투표를 받은 장소가 " + check + "곳입니다." + "\n" + "최종 선택이 필요합니다.", Toast.LENGTH_SHORT).show();
                     start_Btn.setVisibility(View.INVISIBLE);

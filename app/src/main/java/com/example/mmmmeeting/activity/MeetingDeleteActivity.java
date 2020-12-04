@@ -122,6 +122,7 @@ public class MeetingDeleteActivity extends AppCompatActivity {
                         scheduleDelete(code);
                         boardDelete(code);
                         chatDelete(code);
+                        voteDelete(code);
 
                         meetingdel.delete();
                     }
@@ -145,6 +146,7 @@ public class MeetingDeleteActivity extends AppCompatActivity {
                                 // 문서가 참조하는 이름이 삭제 해야하는 모임 이름과 같으면 일정 삭제
                                 if(document.getData().get("meetingID").toString().equals(code)){
                                     Log.d("일정 삭제",document.getData().get("title").toString());
+                                    voteDelete(document.getId());
                                     scheduleDel.document(document.getId()).delete();
                                     return;
                                 }
@@ -187,6 +189,31 @@ public class MeetingDeleteActivity extends AppCompatActivity {
         FirebaseDatabase firebaseDatabase= FirebaseDatabase.getInstance();
         DatabaseReference chatRef= firebaseDatabase.getReference("chat").child(code);
         chatRef.removeValue();
+    }
+
+    private void voteDelete(String code){
+        CollectionReference voteDel = db.collection("vote");
+        voteDel.get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            //모든 document 확인
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                // 문서가 참조하는 이름이 삭제 해야하는 약속 이름과 같으면 투표 삭제
+                                if(document.getData().get("scheduleID").toString().equals(code)){
+                                    voteDel.document(document.getId()).delete();
+                                    return;
+                                } else {
+                                    Log.d("Document Snapshot", "No Document");
+                                }
+                            }
+                        } else {
+                            Log.d("Document Read", "Error getting documents: ", task.getException());
+                        }
+                    }
+                });
+
     }
 
     private void startToast(String msg) {
