@@ -581,7 +581,7 @@ public class  MiddlePlaceActivity extends AppCompatActivity implements OnMapRead
 
 
             for (int i = 0; i < centers.size(); i++) {
-                mMap.addMarker(new MarkerOptions().position(new LatLng(centers.get(i).x, centers.get(i).y)).title("centroid " + i).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
+               // mMap.addMarker(new MarkerOptions().position(new LatLng(centers.get(i).x, centers.get(i).y)).title("centroid " + i).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
                 Log.d("Clustering", "center출력  : " + centers.get(i));
                 // 인원수에 비례하여 평균점 계산
                 latitude += centers.get(i).x * member_num.get(i);
@@ -696,10 +696,15 @@ public class  MiddlePlaceActivity extends AppCompatActivity implements OnMapRead
 
         }
 
-        //가중치와 단위벡터의 곱의 합을 클러스터 수로 나눈다.
-        latVector /= (avgTime * centers.size());
-        lonVector /= (avgTime * centers.size());
-
+        if(avgTime<200){
+            latVector /= (avgTime * centers.size() * 6);
+            lonVector /= (avgTime * centers.size() * 6);
+        }
+        else {
+            //가중치와 단위벡터의 곱의 합을 클러스터 수로 나눈다.
+            latVector /= (avgTime * centers.size());
+            lonVector /= (avgTime * centers.size());
+        }
         Log.d("Clustering", " 시간벡터 : " + latVector + "," + lonVector);
 
         //최적의 경로인지 확인하기 위함
