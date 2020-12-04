@@ -581,7 +581,7 @@ public class  MiddlePlaceActivity extends AppCompatActivity implements OnMapRead
 
 
             for (int i = 0; i < centers.size(); i++) {
-                mMap.addMarker(new MarkerOptions().position(new LatLng(centers.get(i).x, centers.get(i).y)).title("centroid " + i).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
+               // mMap.addMarker(new MarkerOptions().position(new LatLng(centers.get(i).x, centers.get(i).y)).title("centroid " + i).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
                 Log.d("Clustering", "center출력  : " + centers.get(i));
                 // 인원수에 비례하여 평균점 계산
                 latitude += centers.get(i).x * member_num.get(i);
