@@ -132,8 +132,7 @@ public class FragChat extends Fragment {
                         System.out.println("now: " + nmonth + " " + nday);
 
                         // 마지막 메세지보다 날짜가 지난 경우
-                        if ((year > nyear) || (month > nmonth) || (month == nmonth && day < nday)
-                        || (month == 11 && month == 0)) {
+                        if ((year < nyear) || (month < nmonth) || (month == nmonth && day < nday)) {
                             ChatItem date = new ChatItem();
                             date.setId("date");
                             date.setTime(nyear + "년 " + (nmonth + 1) + "월 " + nday + "일");
