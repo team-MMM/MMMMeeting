@@ -23,11 +23,11 @@ import androidx.appcompat.widget.PopupMenu;
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.mmmmeeting.PostDeleter;
 import com.example.mmmmeeting.activity.AlarmActivity;
 import com.example.mmmmeeting.Info.ScheduleInfo;
 import com.example.mmmmeeting.OnScheduleListener;
 import com.example.mmmmeeting.R;
+import com.example.mmmmeeting.ScheduleDeleter;
 import com.example.mmmmeeting.activity.CalendarActivity;
 import com.example.mmmmeeting.activity.EditScheduleActivity;
 import com.example.mmmmeeting.activity.ContentScheduleActivity;
@@ -43,7 +43,7 @@ import java.util.Locale;
 public class ScheduleAdapter extends RecyclerView.Adapter<ScheduleAdapter.MainViewHolder> {
     private ArrayList<ScheduleInfo> mDataset;
     private Activity activity;
-    private PostDeleter scheduleDeleter; //Firestore db에서 삭제 되도록 연동
+    private ScheduleDeleter scheduleDeleter; //Firestore db에서 삭제 되도록 연동
     private ArrayList<ArrayList<SimpleExoPlayer>> playerArrayListArrayList = new ArrayList<>();
     private final int MORE_INDEX = 2;
 
@@ -59,13 +59,13 @@ public class ScheduleAdapter extends RecyclerView.Adapter<ScheduleAdapter.MainVi
         this.mDataset = myDataset;
         this.activity = activity;
 
-        scheduleDeleter = new PostDeleter(activity);
+        scheduleDeleter = new ScheduleDeleter(activity);
     }
 
 
 
     public void setOnPostListener(OnScheduleListener onPostListener){
-        scheduleDeleter.setOnScheduleListener(onPostListener);
+        scheduleDeleter.setOnPostListener(onPostListener);
     }
 
     @Override
@@ -224,12 +224,9 @@ public class ScheduleAdapter extends RecyclerView.Adapter<ScheduleAdapter.MainVi
                 switch (menuItem.getItemId()) {
                     case R.id.modify:
                         myStartActivity(EditScheduleActivity.class, mDataset.get(position));
-
                         return true;
                     case R.id.delete:
-                        scheduleDeleter.scheduleDelete(mDataset.get(position));
-                        System.out.println("hi");
-                        //        storageDelete(mDataset.get(position));
+                        scheduleDeleter.storageDelete(mDataset.get(position));
                         return true;
                     default:
                         return false;

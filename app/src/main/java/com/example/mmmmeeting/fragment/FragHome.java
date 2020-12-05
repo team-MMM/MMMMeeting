@@ -60,7 +60,7 @@ public class FragHome extends Fragment {
                              Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.frag_home, container, false);
-        final RecyclerView recyclerView = view.findViewById(R.id.recyclerView);
+        final RecyclerView recyclerView = view.findViewById(R.id.recyclerView_sc);
         name = (TextView)view.findViewById(R.id.schedule_name);
         name.setText("약속 목록");
         text = (TextView)view.findViewById(R.id.text);
@@ -79,7 +79,7 @@ public class FragHome extends Fragment {
                         //mainBinding.swipeRefreshLo.setRefreshing(false);
                         refreshLayout.setRefreshing(false);
                     }
-                },500);
+                },800);
             }
         });
 
@@ -88,10 +88,6 @@ public class FragHome extends Fragment {
         if(bundle != null) {
             bundle = getArguments();
             meetingCode = bundle.getString("Code");
-            if(bundle.getSerializable("scheduleInfo")!=null){
-                ScheduleInfo scInfo = (ScheduleInfo) bundle.getSerializable("scheduleInfo");
-                postList.add(scInfo);
-            }
         }
 
 
@@ -176,7 +172,6 @@ public class FragHome extends Fragment {
                 // +버튼 누르면 약속 생성
                 case R.id.write_schedule:
                     myStartActivity(MakeScheduleActivity.class);
-
                     break;
             }
         }
@@ -192,8 +187,6 @@ public class FragHome extends Fragment {
 
         @Override
         public void onModify() {
-
-            scheduleAdapter.notifyDataSetChanged();
             Log.e("로그: ","수정 성공");
         }
     };

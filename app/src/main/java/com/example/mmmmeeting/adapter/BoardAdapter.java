@@ -20,12 +20,12 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
-import com.example.mmmmeeting.PostDeleter;
+import com.example.mmmmeeting.BoardDeleter;
 import com.example.mmmmeeting.Info.PostInfo;
 import com.example.mmmmeeting.R;
 import com.example.mmmmeeting.activity.ContentBoardActivity;
 import com.example.mmmmeeting.activity.MakePostActivity;
-import com.example.mmmmeeting.OnBoardListener;
+import com.example.mmmmeeting.OnPostListener;
 import com.example.mmmmeeting.view.ReadContentsView;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -38,7 +38,7 @@ import java.util.ArrayList;
 public class BoardAdapter extends RecyclerView.Adapter<BoardAdapter.MainViewHolder> {
     private ArrayList<PostInfo> mDataset;
     private Activity activity;
-    private PostDeleter boardDeleter; //Firestore db에서 삭제 되도록 연동
+    private BoardDeleter boardDeleter; //Firestore db에서 삭제 되도록 연동
     private ArrayList<ArrayList<SimpleExoPlayer>> playerArrayListArrayList = new ArrayList<>();
     private final int MORE_INDEX = 2;
     String profilePath;
@@ -56,12 +56,12 @@ public class BoardAdapter extends RecyclerView.Adapter<BoardAdapter.MainViewHold
         this.mDataset = myDataset;
         this.activity = activity;
 
-        boardDeleter = new PostDeleter(activity);
+        boardDeleter = new BoardDeleter(activity);
     }
 
 
 
-    public void setOnPostListener(OnBoardListener onPostListener){
+    public void setOnPostListener(OnPostListener onPostListener){
         boardDeleter.setOnPostListener(onPostListener);
     }
 
@@ -100,7 +100,6 @@ public class BoardAdapter extends RecyclerView.Adapter<BoardAdapter.MainViewHold
         TextView titleTextView = cardView.findViewById(R.id.titleTextView);
         ImageView profileView = cardView.findViewById(R.id.userProfile);
         TextView userName = cardView.findViewById(R.id.userName);
-        cardView.setVisibility(cardView.INVISIBLE);
 
 
         PostInfo postInfo = mDataset.get(position);
@@ -114,9 +113,10 @@ public class BoardAdapter extends RecyclerView.Adapter<BoardAdapter.MainViewHold
                     if (document.exists()) {
                         String name = document.get("name").toString();
                         userName.setText(name);
+
                         if(document.get("profilePath")!=null) {
                             profilePath = document.get("profilePath").toString();
-                            Glide.with(cardView).load(profilePath).centerCrop().override(500).into(profileView);
+                            Glide.with(profileView).load(profilePath).centerCrop().override(500).into(profileView);
                         }
                         titleTextView.setText(postInfo.getTitle());
 
@@ -135,7 +135,6 @@ public class BoardAdapter extends RecyclerView.Adapter<BoardAdapter.MainViewHold
                                 playerArrayListArrayList.add(playerArrayList);
                             }
                         }
-                        cardView.setVisibility(CardView.VISIBLE);
                     }
                 }
             }
@@ -159,7 +158,7 @@ public class BoardAdapter extends RecyclerView.Adapter<BoardAdapter.MainViewHold
                         myStartActivity(MakePostActivity.class, mDataset.get(position));
                         return true;
                     case R.id.delete:
-                        boardDeleter.boardDelete(mDataset.get(position));
+                        boardDeleter.storageDelete(mDataset.get(position));
                         return true;
                     default:
                         return false;

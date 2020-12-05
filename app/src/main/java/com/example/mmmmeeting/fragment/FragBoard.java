@@ -16,14 +16,16 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import com.bumptech.glide.Glide;
 import com.example.mmmmeeting.Info.PostInfo;
-import com.example.mmmmeeting.OnBoardListener;
+import com.example.mmmmeeting.OnPostListener;
 import com.example.mmmmeeting.R;
 import com.example.mmmmeeting.activity.MakePostActivity;
 import com.example.mmmmeeting.adapter.BoardAdapter;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -35,12 +37,12 @@ import java.util.Date;
 public class FragBoard extends Fragment {
     private static final String TAG = "HomeFragment";
     private FirebaseFirestore firebaseFirestore;
+    private SwipeRefreshLayout refreshLayout;
     private BoardAdapter boardAdapter;
     private ArrayList<PostInfo> postList;
     private boolean updating;
     private boolean topScrolled;
     private String meetingCode;
-    private SwipeRefreshLayout refreshLayout;
     int check = 0;
     TextView text;
     public FragBoard() { }
@@ -63,10 +65,14 @@ public class FragBoard extends Fragment {
         }
         Log.d("get Name Test: ", meetingCode);
 
-        refreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swipe_refresh);
+        firebaseFirestore = FirebaseFirestore.getInstance();
+        postList = new ArrayList<>();
+        boardAdapter = new BoardAdapter(getActivity(), postList);
+        boardAdapter.setOnPostListener(onPostListener);
+
         final RecyclerView recyclerView = view.findViewById(R.id.recyclerView);
 
-
+        refreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swipe_refresh);
 
         refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
@@ -75,18 +81,18 @@ public class FragBoard extends Fragment {
                 recyclerView.postDelayed(new Runnable() {
                     @Override
                     public void run() {
+                        postList = new ArrayList<>();
+                        boardAdapter = new BoardAdapter(getActivity(), postList);
+                        boardAdapter.setOnPostListener(onPostListener);
+                        recyclerView.setHasFixedSize(true);
+                        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+                        recyclerView.setAdapter(boardAdapter);
                         postsUpdate(false);
                         refreshLayout.setRefreshing(false);
                     }
-                },500);
+                },800);
             }
         });
-
-        firebaseFirestore = FirebaseFirestore.getInstance();
-        postList = new ArrayList<>();
-        boardAdapter = new BoardAdapter(getActivity(), postList);
-        boardAdapter.setOnPostListener(onPostListener);
-
 
         view.findViewById(R.id.write_post).setOnClickListener(onClickListener);
 
@@ -162,19 +168,14 @@ public class FragBoard extends Fragment {
         }
     };
 
-    OnBoardListener onPostListener = new OnBoardListener() {
+    OnPostListener onPostListener = new OnPostListener() {
         @Override
         public void onDelete(PostInfo postInfo) {
-            postList.remove(postInfo);
-            boardAdapter.notifyDataSetChanged();
-
-
             Log.e("로그: ","삭제 성공");
         }
 
         @Override
         public void onModify() {
-
             Log.e("로그: ","수정 성공");
         }
     };
@@ -196,6 +197,9 @@ public class FragBoard extends Fragment {
                                 if(document.getData().get("meetingID").toString().equals(meetingCode)) {
                                     Log.d("update Test", meetingCode);
                                     check = 1;
+
+
+
                                     postList.add(new PostInfo(
                                             document.getData().get("title").toString(),
                                             document.getData().get("description").toString(),
@@ -204,6 +208,8 @@ public class FragBoard extends Fragment {
                                             document.getData().get("publisher").toString(),
                                             new Date(document.getDate("createdAt").getTime()),
                                             document.getId()));
+
+                                    //findDB(document.getData().get("publisher").toString());
                                 }
                             }
                             if (check == 0) {
