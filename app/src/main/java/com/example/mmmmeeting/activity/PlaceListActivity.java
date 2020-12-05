@@ -91,12 +91,13 @@ import noman.googleplaces.PlacesListener;
 public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCallback{
 
     GoogleMap mMap;
-    LatLng midpoint = new LatLng(37.584114826538716, 127.05876976018965);
+    LatLng midpoint = new LatLng(37.64471, 127.05876976018965);
     LinearLayout fl_place_list,place_list_view;
 
     private String str_url = null;
     private String placeInfo;
     private int preferNum;
+    private int check = 0;
 
     private String Tag = "category Test";
     String scheduleId;
@@ -179,12 +180,14 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
             case "쇼핑몰":
                 //shopping_mall + department_store
                 Log.d(Tag, "Shopping");
+                check = 0;
                 showPlaceInformation("shopping_mall",radius);
                 showPlaceInformation("department_store",radius);
                 break;
             case "액티비티":
                 // amusement_park + aquarium +art_gallery +stadium +zoo
                 Log.d(Tag, "Activity");
+                check = 0;
                 showPlaceInformation("amusement_park",radius);
                 showPlaceInformation("aquarium",radius);
                 showPlaceInformation("art_gallery",radius);
@@ -193,14 +196,25 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
                 break;
             case "카페":
                 Log.d(Tag, "Cafe");
+                check = 0;
+                long beforeTime = System.currentTimeMillis(); //코드 실행 전에 시간 받아오기
                 showPlaceInformation("cafe",radius);
+                long afterTime = System.currentTimeMillis(); // 코드 실행 후에 시간 받아오기
+                long secDiffTime = (afterTime - beforeTime); //두 시간에 차 계산
+                System.out.println("카페 시간(ms) : "+secDiffTime);
                 break;
             case "식당":
                 Log.d(Tag, "restaurant");
+                check = 0;
+                beforeTime = System.currentTimeMillis();
                 showPlaceInformation("restaurant",radius);
+                afterTime = System.currentTimeMillis(); // 코드 실행 후에 시간 받아오기
+                secDiffTime = (afterTime - beforeTime); //두 시간에 차 계산
+                System.out.println("식당 시간(ms) : "+secDiffTime);
                 break;
             case "공원":
                 Log.d(Tag, "park");
+                check = 0;
                 showPlaceInformation("park",radius);
                 break;
         }
@@ -858,7 +872,7 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
 
             System.out.println("ratingList: "+ratingList);
 
-            if(ratingList.size()==0){
+            if(ratingList.size()==0 || ratingList == null ){
                 LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
                 lp.gravity = Gravity.CENTER;
                 lp.setMargins(10,100,10,10);
@@ -873,9 +887,15 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
                 view1.setLayoutParams(lp);
                 //부모 뷰에 추가
                 place_list_view.addView(view1);
+                System.out.println("0일때 "+ratingList);
 
             }else {
                 // 지금은 num을 임시로 5개로 했는데, 5개 보다 검색 결과가 작으면 인덱스 에러 때문에 다시 세팅
+
+                if(check == 100){
+                    place_list_view.removeAllViews();
+                }
+                System.out.println("0아닐때 "+ratingList);
                 if (ratingList.size() < num)
                     num = ratingList.size();
 
@@ -1089,6 +1109,7 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
                     markerOptions.title(finalPlaceName);
                     markerOptions.snippet(placeAddress);
                     mMap.addMarker(markerOptions);
+                    check = 1;
 
 
                 }
@@ -1098,9 +1119,45 @@ public class PlaceListActivity extends AppCompatActivity implements OnMapReadyCa
             e.printStackTrace();
             System.out.println("No Result");
             //Toast.makeText(this, "현재 범위 내에 검색 결과가 없습니다.", Toast.LENGTH_SHORT).show();
+            if(check == 0){
+                LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                lp.gravity = Gravity.CENTER;
+                lp.setMargins(10,100,10,10);
+
+                TextView view1 = new TextView(PlaceListActivity.this);
+                view1.setText("중간지점 근처에\n현재 카테고리에 해당하는 장소가\n존재하지 않습니다.\n\n범위를 늘려보세요!");
+                view1.setTextSize(20f);
+                view1.setTextColor(Color.BLACK);
+                view1.setBackgroundColor(Color.WHITE);
+                view1.setGravity(Gravity.CENTER);
+                view1.setPadding(20,50,20,20);
+                view1.setLayoutParams(lp);
+                //부모 뷰에 추가
+                place_list_view.addView(view1);
+                check = 100;
+
+            }
 
         }catch(NullPointerException e){
             e.printStackTrace();
+            if(check == 0){
+                LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                lp.gravity = Gravity.CENTER;
+                lp.setMargins(10,100,10,10);
+
+                TextView view1 = new TextView(PlaceListActivity.this);
+                view1.setText("중간지점 근처에\n현재 카테고리에 해당하는 장소가\n존재하지 않습니다.\n\n범위를 늘려보세요!");
+                view1.setTextSize(20f);
+                view1.setTextColor(Color.BLACK);
+                view1.setBackgroundColor(Color.WHITE);
+                view1.setGravity(Gravity.CENTER);
+                view1.setPadding(20,50,20,20);
+                view1.setLayoutParams(lp);
+                //부모 뷰에 추가
+                place_list_view.addView(view1);
+                check = 100;
+
+            }
         }
 
     }

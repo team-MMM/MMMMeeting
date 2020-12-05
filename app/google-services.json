@@ -15,6 +15,54 @@
       },
       "oauth_client": [
         {
+          "client_id": "341402809599-54kf2t3of569tqi4r2u46tkocasblkmn.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.mmmmeeting",
+            "certificate_hash": "6ab49e267a450ad46b9c9ff4e74619d99723aa35"
+          }
+        },
+        {
+          "client_id": "341402809599-8d2p737qjfrbdnud7q8ck4a9qhcqsmq7.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.mmmmeeting",
+            "certificate_hash": "74c7dae356f24a7f83d3c36d0284f97167fe1c07"
+          }
+        },
+        {
+          "client_id": "341402809599-asfgrtbvu6n78qbt1lcrhh4r9lnaseo7.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.mmmmeeting",
+            "certificate_hash": "4ea036dbf0259347bbd02bcfcf3b341b0cb6d858"
+          }
+        },
+        {
+          "client_id": "341402809599-br2vpb8g0pgakg3lsnlmd04k7rl9hkgm.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.mmmmeeting",
+            "certificate_hash": "debe16671c66755bd1e2ee09b2d111d09a46a9e4"
+          }
+        },
+        {
+          "client_id": "341402809599-m6qpkbpa9ieiv0mboljm80k1qt446qt6.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.mmmmeeting",
+            "certificate_hash": "607b522b4338b9351bcc0afc9301e5516caa434c"
+          }
+        },
+        {
+          "client_id": "341402809599-pa8dc46k9bamqlsmc7avmi8vrv0kcqt7.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.mmmmeeting",
+            "certificate_hash": "047f94ad4e90da84e75a8602ead146a35880b7d2"
+          }
+        },
+        {
           "client_id": "341402809599-pf04cgmhdsfrvfa32lo5kbjrm68uobqh.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
