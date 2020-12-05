@@ -696,7 +696,7 @@ public class  MiddlePlaceActivity extends AppCompatActivity implements OnMapRead
 
         }
 
-        if(avgTime<200){
+        if(avgTime<250){
             latVector /= (avgTime * centers.size() * 6);
             lonVector /= (avgTime * centers.size() * 6);
         }
