@@ -18,7 +18,7 @@ import android.widget.Toast;
 import com.example.mmmmeeting.Info.ScheduleInfo;
 import com.example.mmmmeeting.OnScheduleListener;
 import com.example.mmmmeeting.R;
-import com.example.mmmmeeting.ScheduleDeleter;
+import com.example.mmmmeeting.PostDeleter;
 import com.example.mmmmeeting.view.ReadScheduleView_new;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -36,7 +36,7 @@ import androidx.annotation.NonNull;
 
 public class ContentScheduleActivity extends BasicActivity implements View.OnClickListener {
     private ScheduleInfo scheduleInfo;
-    private ScheduleDeleter boardDeleter;
+    private PostDeleter postDeleter;
     private ReadScheduleView_new readContentsVIew;
     private LinearLayout contentsLayout;
     Button btn_calendar, btn_place, btn_attendance;
@@ -76,8 +76,8 @@ public class ContentScheduleActivity extends BasicActivity implements View.OnCli
         btn_calendar.setOnClickListener(this);
         btn_attendance.setOnClickListener(this);
 
-        boardDeleter = new ScheduleDeleter(this);
-        boardDeleter.setOnPostListener(onPostListener);
+        postDeleter = new PostDeleter(this);
+        postDeleter.setOnScheduleListener(onPostListener);
 
         cal = Calendar.getInstance();
         tempCal = Calendar.getInstance();
@@ -254,7 +254,7 @@ public class ContentScheduleActivity extends BasicActivity implements View.OnCli
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.delete:
-                boardDeleter.storageDelete(scheduleInfo);
+                postDeleter.scheduleDelete(scheduleInfo);
                 return true;
             case R.id.modify:
                 myStartActivity(EditScheduleActivity.class, scheduleInfo);
@@ -267,12 +267,16 @@ public class ContentScheduleActivity extends BasicActivity implements View.OnCli
     OnScheduleListener onPostListener = new OnScheduleListener() {
         @Override
         public void onDelete(ScheduleInfo postInfo) {
-            Log.e("로그 ","삭제 성공");
+            //postList.remove(postInfo);
+            //scheduleAdapter.notifyDataSetChanged();
+            Log.e("로그: ","삭제 성공");
         }
 
         @Override
         public void onModify() {
-            Log.e("로그 ","수정 성공");
+
+            //scheduleAdapter.notifyDataSetChanged();
+            Log.e("로그: ","수정 성공");
         }
     };
 

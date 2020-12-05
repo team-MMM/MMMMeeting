@@ -9,18 +9,17 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.LinearLayout;
 
-import com.example.mmmmeeting.BoardDeleter;
 import com.example.mmmmeeting.Info.PostInfo;
+import com.example.mmmmeeting.OnBoardListener;
+import com.example.mmmmeeting.PostDeleter;
 import com.example.mmmmeeting.R;
-import com.example.mmmmeeting.OnPostListener;
 import com.example.mmmmeeting.view.ReadContentsView;
 
 public class ContentBoardActivity extends BasicActivity {
     private PostInfo postInfo;
-    private BoardDeleter boardDeleter;
+    private PostDeleter boardDeleter;
     private ReadContentsView readContentsVIew;
     private LinearLayout contentsLayout;
-    private String meetingName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,7 +30,7 @@ public class ContentBoardActivity extends BasicActivity {
         contentsLayout = findViewById(R.id.contentsLayout);
         readContentsVIew = findViewById(R.id.readContentsView);
 
-        boardDeleter = new BoardDeleter(this);
+        boardDeleter = new PostDeleter(this);
         boardDeleter.setOnPostListener(onPostListener);
         uiUpdate();
     }
@@ -60,7 +59,7 @@ public class ContentBoardActivity extends BasicActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.delete:
-                boardDeleter.storageDelete(postInfo);
+                boardDeleter.boardDelete(postInfo);
                 return true;
             case R.id.modify:
                 // MakePost에서 다시 업로드
@@ -71,7 +70,7 @@ public class ContentBoardActivity extends BasicActivity {
         }
     }
 
-    OnPostListener onPostListener = new OnPostListener() {
+    OnBoardListener onPostListener = new OnBoardListener() {
         @Override
         public void onDelete(PostInfo postInfo) {
             Log.e("로그 ","삭제 성공");

@@ -17,6 +17,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.bumptech.glide.Glide;
 import com.example.mmmmeeting.Info.PostInfo;
+import com.example.mmmmeeting.fragment.FragHome;
 import com.example.mmmmeeting.view.ContentsItemView;
 import com.example.mmmmeeting.Info.ScheduleInfo;
 import com.example.mmmmeeting.R;
@@ -141,16 +142,6 @@ public class MakeScheduleActivity extends AppCompatActivity {
                     contentsItemView.setOnFocusChangeListener(onFocusChangeListener);
                 }
                 break;
-                /*
-            case 1:
-                if (resultCode == RESULT_OK) {
-                    String path = data.getStringExtra(INTENT_PATH);
-                    pathList.set(parent.indexOfChild((View) selectedImageVIew.getParent()) - 1, path);
-                    Glide.with(this).load(path).override(1000).into(selectedImageVIew);
-                }
-                break;
-
-                 */
         }
     }
 
@@ -171,20 +162,12 @@ public class MakeScheduleActivity extends AppCompatActivity {
 
                 case R.id.offlineBtn:
                     // 확인 버튼 누르면 Firestore에 업로드
-                    if(scheduleInfo!=null){
-                        edit();
-                    }else {
-                        storageUpload("offline");
-                    }
+                    storageUpload("offline");
                     break;
 
                 case R.id.onlineBtn:
                     // 확인 버튼 누르면 Firestore에 업로드
-                    if(scheduleInfo!=null){
-                        edit();
-                    }else {
-                        storageUpload("online");
-                    }
+                    storageUpload("online");
                     break;
             }
         }
@@ -199,47 +182,6 @@ public class MakeScheduleActivity extends AppCompatActivity {
         }
     };
 
-    private void edit(){
-
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-        final DocumentReference documentReference = db.collection("schedule").document(scheduleInfo.getId());
-
-        final String title = ((EditText) findViewById(R.id.titleEditText)).getText().toString();
-        System.out.println("I'm edit");
-        if (title.length() > 0) {
-            final ArrayList<String> contentsList = new ArrayList<>();
-
-            for (int i = 0; i < parent.getChildCount(); i++) {
-                LinearLayout linearLayout = (LinearLayout) parent.getChildAt(i);
-                for (int ii = 0; ii < linearLayout.getChildCount(); ii++) {
-                    View view = linearLayout.getChildAt(ii);
-                    if (view instanceof EditText) {
-                        String text = ((EditText) view).getText().toString();
-                        if (text.length() > 0) {
-                            // 내용 리스트에 약속 설명 추가
-                            contentsList.add(text);
-                        }
-                    }
-                }
-            }
-
-            if (successCount == 0) {
-                documentReference.update("title",title);
-                documentReference.update("contents",contentsList);
-                scheduleInfo.setTitle(title);
-                scheduleInfo.setContents(contentsList);
-                Intent resultIntent = new Intent();
-                resultIntent.putExtra("scheduleInfo", scheduleInfo);
-                resultIntent.putExtra("Code",meetingCode);
-                setResult(RESULT_OK, resultIntent);
-                finish();
-
-            }
-
-        } else {
-            showToast(MakeScheduleActivity.this, "제목을 입력해주세요.");
-        }
-    }
 
     // 글 ID 찾기, ScheduleInfo 정보 생성, 글 업로드
     private void storageUpload(String type) {

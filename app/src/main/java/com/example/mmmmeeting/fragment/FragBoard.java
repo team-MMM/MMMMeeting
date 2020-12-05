@@ -14,9 +14,10 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.example.mmmmeeting.Info.PostInfo;
-import com.example.mmmmeeting.OnPostListener;
+import com.example.mmmmeeting.OnBoardListener;
 import com.example.mmmmeeting.R;
 import com.example.mmmmeeting.activity.MakePostActivity;
 import com.example.mmmmeeting.adapter.BoardAdapter;
@@ -39,6 +40,7 @@ public class FragBoard extends Fragment {
     private boolean updating;
     private boolean topScrolled;
     private String meetingCode;
+    private SwipeRefreshLayout refreshLayout;
     int check = 0;
     TextView text;
     public FragBoard() { }
@@ -61,12 +63,31 @@ public class FragBoard extends Fragment {
         }
         Log.d("get Name Test: ", meetingCode);
 
+        refreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swipe_refresh);
+        final RecyclerView recyclerView = view.findViewById(R.id.recyclerView);
+
+
+
+        refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+
+                recyclerView.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        postsUpdate(false);
+                        refreshLayout.setRefreshing(false);
+                    }
+                },500);
+            }
+        });
+
         firebaseFirestore = FirebaseFirestore.getInstance();
         postList = new ArrayList<>();
         boardAdapter = new BoardAdapter(getActivity(), postList);
         boardAdapter.setOnPostListener(onPostListener);
 
-        final RecyclerView recyclerView = view.findViewById(R.id.recyclerView);
+
         view.findViewById(R.id.write_post).setOnClickListener(onClickListener);
 
         recyclerView.setHasFixedSize(true);
@@ -141,7 +162,7 @@ public class FragBoard extends Fragment {
         }
     };
 
-    OnPostListener onPostListener = new OnPostListener() {
+    OnBoardListener onPostListener = new OnBoardListener() {
         @Override
         public void onDelete(PostInfo postInfo) {
             postList.remove(postInfo);
@@ -153,6 +174,7 @@ public class FragBoard extends Fragment {
 
         @Override
         public void onModify() {
+
             Log.e("로그: ","수정 성공");
         }
     };

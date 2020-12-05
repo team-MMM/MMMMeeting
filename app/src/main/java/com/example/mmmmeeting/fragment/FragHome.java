@@ -8,12 +8,15 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.example.mmmmeeting.Info.ScheduleInfo;
 import com.example.mmmmeeting.OnScheduleListener;
@@ -23,6 +26,7 @@ import com.example.mmmmeeting.activity.MakeScheduleActivity;
 import com.example.mmmmeeting.adapter.ScheduleAdapter;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FieldValue;
@@ -40,6 +44,8 @@ public class FragHome extends Fragment {
     private FirebaseFirestore firebaseFirestore;
     private ScheduleAdapter scheduleAdapter;
     private ArrayList<ScheduleInfo> postList;
+    private SwipeRefreshLayout refreshLayout;
+
     private boolean updating;
     private boolean topScrolled;
     private TextView name;
@@ -54,15 +60,41 @@ public class FragHome extends Fragment {
                              Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.frag_home, container, false);
+        final RecyclerView recyclerView = view.findViewById(R.id.recyclerView);
         name = (TextView)view.findViewById(R.id.schedule_name);
         name.setText("약속 목록");
         text = (TextView)view.findViewById(R.id.text);
+        refreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swipe_refresh);
+
+
+        refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+
+                recyclerView.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        postsUpdate(false);
+                        //Snackbar.make(mainBinding.recyclerView,"Refresh Success",Snackbar.LENGTH_SHORT).show();
+                        //mainBinding.swipeRefreshLo.setRefreshing(false);
+                        refreshLayout.setRefreshing(false);
+                    }
+                },500);
+            }
+        });
+
 
         Bundle bundle = this.getArguments();
         if(bundle != null) {
             bundle = getArguments();
             meetingCode = bundle.getString("Code");
+            if(bundle.getSerializable("scheduleInfo")!=null){
+                ScheduleInfo scInfo = (ScheduleInfo) bundle.getSerializable("scheduleInfo");
+                postList.add(scInfo);
+            }
         }
+
+
         Log.d("get Name Test: ", meetingCode);
 
         firebaseFirestore = FirebaseFirestore.getInstance();
@@ -72,13 +104,14 @@ public class FragHome extends Fragment {
         scheduleAdapter.setOnPostListener(onPostListener);
 
         // 스크롤 되는 recyclerView에 실시간으로 게시글이 올라옴
-        final RecyclerView recyclerView = view.findViewById(R.id.recyclerView);
+
         view.findViewById(R.id.write_schedule).setOnClickListener(onClickListener);
 
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         recyclerView.setAdapter(scheduleAdapter);
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+
             @Override
             public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
                 super.onScrollStateChanged(recyclerView, newState);
@@ -143,6 +176,7 @@ public class FragHome extends Fragment {
                 // +버튼 누르면 약속 생성
                 case R.id.write_schedule:
                     myStartActivity(MakeScheduleActivity.class);
+
                     break;
             }
         }
@@ -153,11 +187,13 @@ public class FragHome extends Fragment {
         public void onDelete(ScheduleInfo postInfo) {
             postList.remove(postInfo);
             scheduleAdapter.notifyDataSetChanged();
-            Log.e("로그: ","삭제 성공");
+            Log.e("로그: ","삭제 성공 home");
         }
 
         @Override
         public void onModify() {
+
+            scheduleAdapter.notifyDataSetChanged();
             Log.e("로그: ","수정 성공");
         }
     };

@@ -6,9 +6,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.util.Log;
 import android.util.TypedValue;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -19,28 +17,22 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.view.View.OnLongClickListener;
-import android.content.Context;
-import android.os.Bundle;
-import androidx.appcompat.app.AppCompatActivity;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.mmmmeeting.PostDeleter;
 import com.example.mmmmeeting.activity.AlarmActivity;
 import com.example.mmmmeeting.Info.ScheduleInfo;
 import com.example.mmmmeeting.OnScheduleListener;
 import com.example.mmmmeeting.R;
-import com.example.mmmmeeting.ScheduleDeleter;
 import com.example.mmmmeeting.activity.CalendarActivity;
 import com.example.mmmmeeting.activity.EditScheduleActivity;
-import com.example.mmmmeeting.activity.MakeScheduleActivity;
 import com.example.mmmmeeting.activity.ContentScheduleActivity;
-import com.example.mmmmeeting.activity.NoticeActivity;
 import com.example.mmmmeeting.view.ReadScheduleView;
 import com.google.android.exoplayer2.SimpleExoPlayer;
-import com.google.api.Distribution;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -51,7 +43,7 @@ import java.util.Locale;
 public class ScheduleAdapter extends RecyclerView.Adapter<ScheduleAdapter.MainViewHolder> {
     private ArrayList<ScheduleInfo> mDataset;
     private Activity activity;
-    private ScheduleDeleter scheduleDeleter; //Firestore db에서 삭제 되도록 연동
+    private PostDeleter scheduleDeleter; //Firestore db에서 삭제 되도록 연동
     private ArrayList<ArrayList<SimpleExoPlayer>> playerArrayListArrayList = new ArrayList<>();
     private final int MORE_INDEX = 2;
 
@@ -67,13 +59,13 @@ public class ScheduleAdapter extends RecyclerView.Adapter<ScheduleAdapter.MainVi
         this.mDataset = myDataset;
         this.activity = activity;
 
-        scheduleDeleter = new ScheduleDeleter(activity);
+        scheduleDeleter = new PostDeleter(activity);
     }
 
 
 
     public void setOnPostListener(OnScheduleListener onPostListener){
-        scheduleDeleter.setOnPostListener(onPostListener);
+        scheduleDeleter.setOnScheduleListener(onPostListener);
     }
 
     @Override
@@ -205,7 +197,12 @@ public class ScheduleAdapter extends RecyclerView.Adapter<ScheduleAdapter.MainVi
             meetingPlaceView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 18);
             TextView createdAtTextView = cardView.findViewById(R.id.createAtTextView);
             createdAtTextView.setText(new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(postInfo.getCreatedAt()));
-            frame.setVisibility(View.VISIBLE);
+
+            if(postInfo.getMeetingDate()!=null) {
+                frame.setVisibility(View.VISIBLE);
+            } else{
+                frame.setVisibility(View.INVISIBLE);
+            }
         }
 
 
@@ -227,9 +224,12 @@ public class ScheduleAdapter extends RecyclerView.Adapter<ScheduleAdapter.MainVi
                 switch (menuItem.getItemId()) {
                     case R.id.modify:
                         myStartActivity(EditScheduleActivity.class, mDataset.get(position));
+
                         return true;
                     case R.id.delete:
-                        scheduleDeleter.storageDelete(mDataset.get(position));
+                        scheduleDeleter.scheduleDelete(mDataset.get(position));
+                        System.out.println("hi");
+                        //        storageDelete(mDataset.get(position));
                         return true;
                     default:
                         return false;

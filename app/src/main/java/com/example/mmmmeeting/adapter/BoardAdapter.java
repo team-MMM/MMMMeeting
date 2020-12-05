@@ -10,7 +10,6 @@ import androidx.cardview.widget.CardView;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.content.SharedPreferences;
 import android.view.LayoutInflater;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -21,12 +20,12 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
-import com.example.mmmmeeting.BoardDeleter;
+import com.example.mmmmeeting.PostDeleter;
 import com.example.mmmmeeting.Info.PostInfo;
 import com.example.mmmmeeting.R;
 import com.example.mmmmeeting.activity.ContentBoardActivity;
 import com.example.mmmmeeting.activity.MakePostActivity;
-import com.example.mmmmeeting.OnPostListener;
+import com.example.mmmmeeting.OnBoardListener;
 import com.example.mmmmeeting.view.ReadContentsView;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -39,7 +38,7 @@ import java.util.ArrayList;
 public class BoardAdapter extends RecyclerView.Adapter<BoardAdapter.MainViewHolder> {
     private ArrayList<PostInfo> mDataset;
     private Activity activity;
-    private BoardDeleter boardDeleter; //Firestore db에서 삭제 되도록 연동
+    private PostDeleter boardDeleter; //Firestore db에서 삭제 되도록 연동
     private ArrayList<ArrayList<SimpleExoPlayer>> playerArrayListArrayList = new ArrayList<>();
     private final int MORE_INDEX = 2;
     String profilePath;
@@ -57,12 +56,12 @@ public class BoardAdapter extends RecyclerView.Adapter<BoardAdapter.MainViewHold
         this.mDataset = myDataset;
         this.activity = activity;
 
-        boardDeleter = new BoardDeleter(activity);
+        boardDeleter = new PostDeleter(activity);
     }
 
 
 
-    public void setOnPostListener(OnPostListener onPostListener){
+    public void setOnPostListener(OnBoardListener onPostListener){
         boardDeleter.setOnPostListener(onPostListener);
     }
 
@@ -160,7 +159,7 @@ public class BoardAdapter extends RecyclerView.Adapter<BoardAdapter.MainViewHold
                         myStartActivity(MakePostActivity.class, mDataset.get(position));
                         return true;
                     case R.id.delete:
-                        boardDeleter.storageDelete(mDataset.get(position));
+                        boardDeleter.boardDelete(mDataset.get(position));
                         return true;
                     default:
                         return false;
