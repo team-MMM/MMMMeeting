@@ -53,5 +53,5 @@
 
 ## 사용 영상 :rainbow:
 
-광고영상 Youtube Link
+광고 영상 https://youtu.be/OMMlHcFzjpc
 
