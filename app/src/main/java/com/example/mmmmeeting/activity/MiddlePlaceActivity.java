@@ -715,8 +715,8 @@ public class  MiddlePlaceActivity extends AppCompatActivity implements OnMapRead
             //임의로 최적의 경로 확인
             Log.d("Clustering", i + "차이 : " + Math.abs(userTime[i] * member_num.get(i) - avgTime));
         }
-        // 현재 평균시간이 이전 평균시간보다 크면 그 전이 최적!
-        if (temp < avgTime) {
+        // 현재 평균시간이 이전 평균시간보다 크거나 같으면 그 전이 최적!
+        if (temp <= avgTime) {
             isOptimized = true;
         }
         //최적이라면 => 중간지점 출력(midPoint)
