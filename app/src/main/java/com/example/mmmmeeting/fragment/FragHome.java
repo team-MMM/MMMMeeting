@@ -23,6 +23,7 @@ import com.example.mmmmeeting.OnScheduleListener;
 import com.example.mmmmeeting.R;
 import com.example.mmmmeeting.activity.MainActivity;
 import com.example.mmmmeeting.activity.MakeScheduleActivity;
+import com.example.mmmmeeting.adapter.BoardAdapter;
 import com.example.mmmmeeting.adapter.ScheduleAdapter;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -74,9 +75,13 @@ public class FragHome extends Fragment {
                 recyclerView.postDelayed(new Runnable() {
                     @Override
                     public void run() {
+                        postList = new ArrayList<>();
+                        scheduleAdapter = new ScheduleAdapter(getActivity(), postList);
+                        scheduleAdapter.setOnPostListener(onPostListener);
+                        recyclerView.setHasFixedSize(true);
+                        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+                        recyclerView.setAdapter(scheduleAdapter);
                         postsUpdate(false);
-                        //Snackbar.make(mainBinding.recyclerView,"Refresh Success",Snackbar.LENGTH_SHORT).show();
-                        //mainBinding.swipeRefreshLo.setRefreshing(false);
                         refreshLayout.setRefreshing(false);
                     }
                 },800);
