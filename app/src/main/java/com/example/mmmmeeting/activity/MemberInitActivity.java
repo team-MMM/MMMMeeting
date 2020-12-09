@@ -243,7 +243,7 @@ public class MemberInitActivity extends BasicActivity implements View.OnClickLis
                         public void onSuccess(Void aVoid) {
                             showToast(MemberInitActivity.this,"프로필 사진을 삭제하였습니다.");
                             db.collection("users").document(user.getUid())
-                                    .update("profilePath","");
+                                    .update("profilePath",null);
                             profilePath = "";
                             System.out.println("db:"+profilePath);
                             profileImageVIew.setImageResource(R.drawable.profile);
@@ -286,7 +286,8 @@ public class MemberInitActivity extends BasicActivity implements View.OnClickLis
         if (user != null) {
             if (profilePath != null) {
                 if(profilePath.equals("") || isProfileUrl(profilePath)){
-                    memberInfo.setProfilePath(profilePath);
+                    if(!profilePath.equals(""))
+                        memberInfo.setProfilePath(profilePath);
                     storeUploader(memberInfo);
                 }else{
                     System.out.println(profilePath);

@@ -219,6 +219,8 @@ public class FragAttend extends Fragment {
                                     countAttend(attender, attendMap);
                                 }
                             }
+                            
+                            mapSort(attendMap);
 
                             new Handler().postDelayed(new Runnable() {
                                 @Override
@@ -233,6 +235,7 @@ public class FragAttend extends Fragment {
                 });
     }
 
+    // 날짜가 지났는지 확인
     private boolean checkTime(Date date) {
         int scheduleDate = 0;
         int scheduleTime = 0;
@@ -252,47 +255,7 @@ public class FragAttend extends Fragment {
         return false;
     }
 
-    private void mapSort(HashMap<String, Double> attendMap) {
-
-        Log.d(Tag, "attender map is " + attendMap.toString());
-
-        if (attendMap.isEmpty()) {
-            return;
-        }
-
-        list_entries = new ArrayList<>(attendMap.entrySet());
-        // 비교함수 Comparator를 사용하여 내림 차순으로 정렬
-        Collections.sort(list_entries, new Comparator<Map.Entry<String, Double>>() {
-            @Override
-            public int compare(Map.Entry<String, Double> obj1, Map.Entry<String, Double> obj2) {
-                // 오름 차순으로 정렬
-                return obj1.getValue().compareTo(obj2.getValue());
-            }
-        });
-
-        Log.d(Tag, "list_entries is " + list_entries.toString());
-
-        int same = 1;
-        int rank = 1;
-
-        int size = list_entries.size() < 5 ? list_entries.size() : 5;
-
-        for (int i = 0; i < size; i++) {
-            if (i != 0) {
-                if (list_entries.get(i - 1).getValue().equals(list_entries.get(i).getValue())) {
-                    same++;
-                } else {
-                    rank += same;
-                    same = 1;
-                }
-            }
-
-            setLayout(rank, list_entries.get(i).getKey());
-        }
-
-        db.collection("meetings").document(meetingCode).update("best", attendMap);
-    }
-
+    // 누가 출석 했는지 확인, 이름과 점수로 array 생성, 출석 안 한 사람은 -12점
     private void countAttend(HashMap<String, Double> attender, HashMap<String, Double> attendMap) {
         if (attender == null) {
             return;
@@ -338,9 +301,52 @@ public class FragAttend extends Fragment {
 
 
         System.out.println("attendMap:" + attendMap);
-        mapSort(attendMap);
+
 
     }
+
+    private void mapSort(HashMap<String, Double> attendMap) {
+
+        Log.d(Tag, "attender map is " + attendMap.toString());
+
+        if (attendMap.isEmpty()) {
+            return;
+        }
+
+        list_entries = new ArrayList<>(attendMap.entrySet());
+        // 비교함수 Comparator를 사용하여 내림 차순으로 정렬
+        Collections.sort(list_entries, new Comparator<Map.Entry<String, Double>>() {
+            @Override
+            public int compare(Map.Entry<String, Double> obj1, Map.Entry<String, Double> obj2) {
+                // 오름 차순으로 정렬
+                return obj1.getValue().compareTo(obj2.getValue());
+            }
+        });
+
+        Log.d(Tag, "list_entries is " + list_entries.toString());
+
+        int same = 1;
+        int rank = 1;
+
+        int size = list_entries.size() < 5 ? list_entries.size() : 5;
+
+        for (int i = 0; i < size; i++) {
+            if (i != 0) {
+                if (list_entries.get(i - 1).getValue().equals(list_entries.get(i).getValue())) {
+                    same++;
+                } else {
+                    rank += same;
+                    same = 1;
+                }
+            }
+
+            setLayout(rank, list_entries.get(i).getKey());
+        }
+
+        db.collection("meetings").document(meetingCode).update("best", attendMap);
+    }
+
+
 
     public void setLayout(int num, String user_id) {
         Log.d(Tag, "Show layout");
@@ -357,6 +363,7 @@ public class FragAttend extends Fragment {
                                 if (user_id.equals(document.getId())) {
 
                                     String user_name = document.get("name").toString();
+
 
                                     s = new SpannableString(num+"등 ("+attendMap.get(user_id).doubleValue()+"점)");
                                     s.setSpan(new RelativeSizeSpan(1.2f),0,s.length()-8,0);
